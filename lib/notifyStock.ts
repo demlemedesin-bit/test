@@ -4,7 +4,7 @@ import { siteUrl } from './siteUrl';
 /**
  * "Stok gelince haber ver": bir ürün için bekleyen (notified_at boş) kayıtlara e-posta yollar.
  * Yalnızca sunucu rotalarından çağrılır. Hiçbir koşulda fırlatmaz; sonuç { ok, sent, skipped, error? }.
- * Anahtar (Supabase servis / Resend) yoksa "atlandı" döner ve kayıtlar bekler durumda kalır.
+ * Anahtar (Supabase servis / SMTP2GO) yoksa "atlandı" döner ve kayıtlar bekler durumda kalır.
  */
 export type StockNotifyResult = { ok: boolean; sent: number; skipped: number; error?: string };
 

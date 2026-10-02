@@ -5,7 +5,7 @@ import { configFromMap } from './catalog';
 import { siteUrl } from './siteUrl';
 
 /**
- * Bildirimler: e-posta (Resend), SMS (NetGSM), giden webhook (n8n). Yalnızca sunucu rotalarından çağrılır.
+ * Bildirimler: e-posta (SMTP2GO), SMS (NetGSM), giden webhook (n8n). Yalnızca sunucu rotalarından çağrılır.
  * Anahtarlar Vercel ortam değişkenidir; tanımsızsa ilgili kanal "skipped" döner. Hiçbir fonksiyon hata fırlatmaz.
  */
 
