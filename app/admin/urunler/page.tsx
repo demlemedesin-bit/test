@@ -20,6 +20,8 @@ type Draft = {
   active: boolean;
   badge: string;
   desc: string;
+  seoTitle: string;
+  seoDesc: string;
   sizes: string;
   colors: (Color & { isNew?: boolean })[];
   thumb: string;
@@ -34,15 +36,18 @@ const SHOP_CATS: [AdminProduct['shop_cat'], string][] = [
   ['aksesuar', 'Aksesuar'],
 ];
 
+// products.data içindeki SEO alanları (AdminProduct tipinde yok)
+const seoOf = (p: AdminProduct) => (p.data ?? {}) as { seo_title?: string; seo_desc?: string };
+
 const blank = (sort: number): Draft => ({
   isNew: true, slug: '', slugTouched: false, name: '', category: 'Ev & Sofra', shop_cat: 'sofra', price: '', stock: '', soon: false, active: true,
-  badge: '', desc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '',
+  badge: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '',
   details: [{ t: 'Malzeme', v: '' }, { t: 'Kargo & iade', v: 'Siparişin 2–4 iş gününde kargoda. 14 gün içinde koşulsuz iade.' }], data: {}, sort,
 });
 
 const toDraft = (p: AdminProduct): Draft => ({
   isNew: false, slug: p.slug, slugTouched: true, name: p.name, category: p.category, shop_cat: p.shop_cat, price: String(p.price), stock: p.stock == null ? '' : String(p.stock),
-  soon: p.soon, active: p.active, badge: p.data?.badge ?? '', desc: p.data?.desc ?? '', sizes: (p.sizes ?? []).join(', '),
+  soon: p.soon, active: p.active, badge: p.data?.badge ?? '', desc: p.data?.desc ?? '', seoTitle: seoOf(p).seo_title ?? '', seoDesc: seoOf(p).seo_desc ?? '', sizes: (p.sizes ?? []).join(', '),
   colors: (p.colors ?? []).map((c) => ({ ...c, hex: c.hex || '#EDE6D6', img: c.img || '' })), thumb: p.thumb ?? '',
   details: (p.data?.details ?? []).map(([t, v]) => ({ t, v })), data: p.data ?? {}, sort: p.sort,
 });
@@ -105,6 +110,8 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       ...d.data,
       desc: d.desc.trim(),
       badge: d.badge.trim() || undefined,
+      seo_title: d.seoTitle.trim() || undefined,
+      seo_desc: d.seoDesc.trim() || undefined,
       details: d.details.filter((x) => x.t.trim() && x.v.trim()).map((x) => [x.t.trim(), x.v.trim()]),
       ...(sizes.length ? { size_label: d.data.size_label || 'Beden' } : {}),
     };
@@ -205,6 +212,16 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <p className="sec-t">Açıklama</p>
         <Field label="Kısa açıklama"><textarea className="inp" value={d.desc} onChange={(e) => set('desc', e.target.value)} /></Field>
         <Field label="Rozet (isteğe bağlı)" hint="Örn. “Atölyede üretilir”"><input className="inp" value={d.badge} onChange={(e) => set('badge', e.target.value)} /></Field>
+      </div>
+
+      <div className="sec">
+        <p className="sec-t">SEO</p>
+        <Field label="Arama sonucu başlığı" hint={`${d.seoTitle.length}/60 · Boşsa “${d.name.trim() || 'Ürün adı'} · Demleme Mağaza” kullanılır`}>
+          <input className="inp" value={d.seoTitle} maxLength={120} onChange={(e) => set('seoTitle', e.target.value)} />
+        </Field>
+        <Field label="Arama sonucu açıklaması" hint={`${d.seoDesc.length}/160 · Boşsa kısa açıklama kullanılır`}>
+          <textarea className="inp" value={d.seoDesc} maxLength={300} onChange={(e) => set('seoDesc', e.target.value)} />
+        </Field>
       </div>
 
       <div className="sec">

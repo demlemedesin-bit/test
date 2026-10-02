@@ -28,6 +28,8 @@ export type SiteProduct = {
   chart?: unknown;
   details: string[][];
   sort: number;
+  seoTitle?: string;
+  seoDesc?: string;
 };
 
 type Row = {
@@ -39,7 +41,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string };
+  data?: { seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -88,6 +90,8 @@ function fromRow(r: Row): SiteProduct {
     chart: d.chart,
     details: d.details ?? [],
     sort: r.sort ?? 0,
+    seoTitle: d.seo_title?.trim() || undefined,
+    seoDesc: d.seo_desc?.trim() || undefined,
   };
 }
 

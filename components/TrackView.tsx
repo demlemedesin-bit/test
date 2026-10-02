@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase';
 import { Alert, Field, emailOk } from './ui';
 import { OrderBody, StatusBadge, StatusSteps, dateTr, type OrderRow } from './OrderParts';
 
-export function TrackView() {
-  const [no, setNo] = useState('');
-  const [email, setEmail] = useState('');
+export function TrackView({ initialNo = '', initialEmail = '' }: { initialNo?: string; initialEmail?: string }) {
+  const [no, setNo] = useState(initialNo);
+  const [email, setEmail] = useState(initialEmail);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [order, setOrder] = useState<OrderRow | null>(null);

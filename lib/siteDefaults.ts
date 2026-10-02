@@ -348,6 +348,34 @@ export const FIELDS: Field[] = [
   "def": "Demleme izlerken çektiğin fotoğrafı bizimle paylaş, sen de ayın demleyenleri arasında yerini al."
  },
  {
+  "id": "konuk_table",
+  "group": "Ana sayfa · Konuklar",
+  "label": "Konuklar masası görseli",
+  "kind": "image",
+  "def": "/demleme/04-konuklar/table/table-2000.webp"
+ },
+ {
+  "id": "logo_main",
+  "group": "Ana sayfa · Genel",
+  "label": "Logo (üst menü)",
+  "kind": "image",
+  "def": "/demleme/01-brand/logo/logo-still.png"
+ },
+ {
+  "id": "logo_footer",
+  "group": "Ana sayfa · Genel",
+  "label": "Logo (alt bilgi)",
+  "kind": "image",
+  "def": "/demleme/01-brand/logo/logo-still-footer.png"
+ },
+ {
+  "id": "shop_note",
+  "group": "Ana sayfa · Mağaza",
+  "label": "Not: iyi sohbet her yerde (görsel)",
+  "kind": "image",
+  "def": "/demleme/03-shop/svg/note-iyi-sohbet-her-yerde.svg"
+ },
+ {
   "id": "dm_sehpa",
   "group": "Ana sayfa · Ayın demleyenleri",
   "label": "Sehpa görseli",

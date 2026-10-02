@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getConfig, getProducts, type SiteProduct } from './catalog';
+import { getFooterPages } from './cms';
 import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite } from './site';
 import { DRAWINGS } from './siteDefaults';
 
@@ -17,7 +18,9 @@ const isUrl = (c: string) => /^(https?:)?\/\//.test(c) || c.startsWith('/');
 
 /** Ana sayfa gövdesi: handoff HTML'i + panelden gelen metin/görsel/SSS/konuk/footer verisi. */
 export async function homeHtml(): Promise<string> {
-  const [site, cfg, list] = await Promise.all([getSite(), getConfig(), getProducts()]);
+  const [site, cfg, list, footerPages] = await Promise.all([getSite(), getConfig(), getProducts(), getFooterPages()]);
+  // “Footer'da göster” denen sayfalar alt şerit bağlantılarına eklenir
+  const legal = [...site.footer.legal, ...footerPages.filter((p) => !site.footer.legal.some((l) => l.href === p.href))];
   const aspect = json<Record<string, number>>('meta/guest-aspect.json');
   const steam = json<Record<string, unknown>>('meta/steam-spots.json');
   const tea = json<{ teas: { steam: number[][] } }>('konuklar.json').teas.steam;
@@ -41,7 +44,7 @@ export async function homeHtml(): Promise<string> {
   const html = fill(read('home.html'), site)
     .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
     .replace('{{FOOTER_COLS}}', () => footerCols(site.footer))
-    .replace('{{FOOTER_LEGAL}}', () => footerLegal(site.footer))
+    .replace('{{FOOTER_LEGAL}}', () => footerLegal({ ...site.footer, legal }))
     .replace('{{DM_MONTH}}', () => esc(site.dm.month))
     .replace('{{DM_DATA}}', () => safe(dm))
     .replace('{{ANIM}}', () => safe(animCfg(site)))
