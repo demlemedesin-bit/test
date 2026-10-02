@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowDown, ArrowUp, ImagePlus, Package, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Clock, ImagePlus, Package, Pencil, Plus, Power, Save, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { refreshSite, slugify, tl, uploadImage, type AdminProduct, type Color } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
@@ -59,6 +59,7 @@ const toDraft = (p: AdminProduct): Draft => ({
 function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () => void; onSaved: () => void; toast: (t: string, e?: boolean) => void }) {
   const [d, setD] = useState<Draft>(init);
   const [busy, setBusy] = useState(false);
+  const menu = useMenu();
   const [up, setUp] = useState<string | null>(null);
   const [errs, setErrs] = useState<string[]>([]);
   const [ask, setAsk] = useState(false);
@@ -153,32 +154,24 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
   }
 
   return (
-    <Panel
-      wide
-      onClose={onClose}
-      title={d.isNew ? 'Yeni ürün' : d.name || 'Ürünü düzenle'}
-      footer={
-        <>
-          {!d.isNew && (
-            <button className="btn danger" style={{ marginRight: 'auto' }} onClick={() => setAsk(true)} disabled={busy}>
-              <Trash2 size={15} /> Sil
-            </button>
-          )}
-          <button className="btn ghost" onClick={onClose}>Vazgeç</button>
-          <button className="btn" onClick={save} disabled={busy || up !== null}>
-            {busy ? 'Kaydediliyor…' : 'Kaydet'}
-          </button>
-        </>
-      }
-    >
+    <>
+      <TopBar title={d.isNew ? 'Yeni ürün' : d.name || 'Ürünü düzenle'} sub={d.isNew ? 'Ürün bilgilerini doldur, görselleri sürükleyip bırak' : 'Değişiklikler kaydedince sitede yayınlanır'} onMenu={menu}>
+        <button className="btn ghost" onClick={onClose}><ArrowLeft size={15} /> Ürünlere dön</button>
+        {!d.isNew && <button className="btn danger" onClick={() => setAsk(true)} disabled={busy}><Trash2 size={15} /> Sil</button>}
+        <button className="btn" onClick={save} disabled={busy || up !== null}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
+      </TopBar>
+      <div className="adm-scroll"><div className="adm-inner pe" style={{ maxWidth: 1180 }}>
+      <div className="pu-grid">
+      <div className="pu-form">
       {errs.length > 0 && (
         <div className="alert err">
           {errs.map((x) => (<div key={x}>{x}</div>))}
         </div>
       )}
 
-      <div className="sec">
-        <p className="sec-t">Temel bilgiler</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Temel bilgiler</h2></div>
+        <div className="card-b">
         <Field label="Ürün adı">
           <input
             className="inp"
@@ -207,38 +200,42 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
             <input className="inp" value={d.category} onChange={(e) => set('category', e.target.value)} />
           </Field>
         </div>
-        <div className="row2">
-          <label className="chk"><input type="checkbox" checked={d.active} onChange={(e) => set('active', e.target.checked)} /> Sitede yayında</label>
-          <label className="chk"><input type="checkbox" checked={d.soon} onChange={(e) => set('soon', e.target.checked)} /> “Yakında” (satışa kapalı)</label>
         </div>
-      </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Açıklama</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Açıklama</h2></div>
+        <div className="card-b">
         <Field label="Kısa açıklama"><textarea className="inp" value={d.desc} onChange={(e) => set('desc', e.target.value)} /></Field>
         <Field label="Rozet (isteğe bağlı)" hint="Örn. “Atölyede üretilir”"><input className="inp" value={d.badge} onChange={(e) => set('badge', e.target.value)} /></Field>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Katalog bilgisi</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Katalog bilgisi</h2></div>
+        <div className="card-b">
         {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu (YouTube/MP4 bağlantısı)']] as const).map(([k, l]) => (
           <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
         ))}
         <Field label="Kritik stok seviyesi" hint="Stok bu sayıya inince panelde uyarı çıkar (varsayılan 5)"><input className="inp" type="number" min={0} value={String((d.data as Record<string, unknown>).crit ?? '')} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, crit: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) } }))} /></Field>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">SEO</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">SEO</h2></div>
+        <div className="card-b">
         <Field label="Arama sonucu başlığı" hint={`${d.seoTitle.length}/60 · Boşsa “${d.name.trim() || 'Ürün adı'} · Demleme Mağaza” kullanılır`}>
           <input className="inp" value={d.seoTitle} maxLength={120} onChange={(e) => set('seoTitle', e.target.value)} />
         </Field>
         <Field label="Arama sonucu açıklaması" hint={`${d.seoDesc.length}/160 · Boşsa kısa açıklama kullanılır`}>
           <textarea className="inp" value={d.seoDesc} maxLength={300} onChange={(e) => set('seoDesc', e.target.value)} />
         </Field>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Renkler / seçenekler ve görseller</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Renkler / seçenekler ve görseller</h2></div>
+        <div className="card-b">
         <div className="colors">
           {d.colors.map((c, i) => (
             <div className="color-row" key={i}>
@@ -255,31 +252,39 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
           <Plus size={14} /> Renk ekle
         </button>
         <p className="hint" style={{ marginTop: 8 }}>Tek seçenekli ürünlerde tek satır bırak. Görseller otomatik küçültülüp WebP’ye çevrilir.</p>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Ürün galerisi (ek görseller)</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Ürün galerisi (ek görseller)</h2></div>
+        <div className="card-b">
         <GalleryInput value={d.gallery} onChange={(v) => set('gallery', v)} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} max={10} />
         <p className="hint" style={{ marginTop: 8 }}>Renk görsellerine ek olarak ürün sayfasında küçük resim olarak görünür. Sürükleyerek sırala.</p>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Bedenler</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Bedenler</h2></div>
+        <div className="card-b">
         <Field label="Beden listesi (virgülle)" hint="Örn. S, M, L, XL. Doluysa müşteri beden seçmeden sepete ekleyemez. Beden yoksa boş bırak.">
           <input className="inp" value={d.sizes} onChange={(e) => set('sizes', e.target.value)} placeholder="S, M, L, XL" />
         </Field>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Ana sayfa kart görseli</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Ana sayfa kart görseli</h2></div>
+        <div className="card-b">
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
           <ImageSlot value={d.thumb} onChange={(v) => set('thumb', v)} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={96} />
           <p className="hint" style={{ margin: 0 }}>Boş bırakırsan ilk rengin görseli kullanılır.</p>
         </div>
-      </div>
+        </div>
+      </section>
 
-      <div className="sec">
-        <p className="sec-t">Detaylar (ürün sayfasındaki açılır başlıklar)</p>
+      <section className="card pe-sec">
+        <div className="card-h"><h2 className="card-t">Detaylar (ürün sayfasındaki açılır başlıklar)</h2></div>
+        <div className="card-b">
         {d.details.map((x, i) => (
           <div className="pair" key={i}>
             <input className="inp" placeholder="Başlık" value={x.t} onChange={(e) => set('details', d.details.map((y, j) => (j === i ? { ...y, t: e.target.value } : y)))} />
@@ -288,12 +293,52 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
           </div>
         ))}
         <button type="button" className="btn ghost sm" onClick={() => set('details', [...d.details, { t: '', v: '' }])}><Plus size={14} /> Satır ekle</button>
-      </div>
+        </div>
+      </section>
 
+      </div>
+      <aside className="pu-prev">
+        <section className="card">
+          <div className="card-h"><h2 className="card-t">Yayın</h2></div>
+          <div className="card-b">
+            <button type="button" className={`pu-power${d.active ? ' on' : ''}`} aria-pressed={d.active} onClick={() => set('active', !d.active)}><Power size={16} /> {d.active ? 'Sitede yayında' : 'Gizli, yayına almak için dokun'}</button>
+            <button type="button" className={`pu-power${d.soon ? ' on warn' : ''}`} aria-pressed={d.soon} onClick={() => set('soon', !d.soon)} style={{ marginBottom: 0 }}><Clock size={16} /> {d.soon ? '“Yakında” modunda (satışa kapalı)' : 'Satışa açık'}</button>
+          </div>
+        </section>
+        <section className="card">
+          <div className="card-h"><h2 className="card-t">Mağaza kartı önizleme</h2></div>
+          <div className="card-b">
+            <div className="pe-card">
+              <div className="pe-card-i">{(d.thumb || d.colors[0]?.img) ? <img src={d.thumb || d.colors[0].img} alt="" /> : <ImagePlus size={28} />}</div>
+              <b>{d.name || 'Ürün adı'}</b>
+              <small>{d.category}</small>
+              <span>{d.price ? '₺' + Number(d.price.replace(',', '.')).toLocaleString('tr-TR') : '₺0'}</span>
+              <div className="pe-sw">{d.colors.map((c, i) => <i key={i} style={{ background: c.hex }} title={c.name} />)}</div>
+            </div>
+          </div>
+        </section>
+        <section className="card">
+          <div className="card-h"><h2 className="card-t">Hazırlık kontrolü</h2></div>
+          <div className="card-b">
+            <ul className="pe-chk">
+              {[
+                ['Ürün adı ve adres', d.name.trim().length > 1 && !!d.slug],
+                ['Fiyat', d.price.trim() !== '' && !isNaN(Number(d.price.replace(',', '.')))],
+                ['Her renk için görsel', d.colors.length > 0 && d.colors.every((c) => c.name.trim() && c.img)],
+                ['Açıklama', d.desc.trim().length > 10],
+                ['Galeri (ek görsel)', d.gallery.length > 0],
+                ['Arama başlığı ve açıklaması', !!d.seoTitle.trim() && !!d.seoDesc.trim()],
+              ].map(([l, ok]) => <li key={l as string} className={ok ? 'ok' : ''}><i>{ok ? '✓' : ''}</i>{l as string}</li>)}
+            </ul>
+          </div>
+        </section>
+      </aside>
+      </div>
+      </div></div>
       {ask && (
         <Confirm title="Ürün silinsin mi?" text="Ürün siteden kalkar. Geçmiş siparişler etkilenmez. Geçici olarak gizlemek için “Sitede yayında” kutusunu kapatman yeterli." confirmText="Evet, sil" busy={busy} onCancel={() => setAsk(false)} onConfirm={remove} />
       )}
-    </Panel>
+    </>
   );
 }
 
@@ -348,6 +393,8 @@ export default function Products() {
 
   const nextSort = (list?.reduce((m, p) => Math.max(m, p.sort), 0) ?? 0) + 10;
 
+  if (edit) return (<><Editor key={edit.slug || 'yeni'} init={edit} toast={show} onClose={() => setEdit(null)} onSaved={load} />{node}</>);
+
   return (
     <>
       <TopBar title="Ürünler" sub={list ? `${list.length} ürün` : ''} onMenu={menu}>
@@ -396,7 +443,6 @@ export default function Products() {
           <p className="cell-muted" style={{ marginTop: 14 }}>Kaydettiğin her değişiklik siteye anında yansır. Sıra, ana sayfadaki mağaza şeridinin sırasıdır.</p>
         </div>
       </div>
-      {edit && <Editor key={edit.slug || 'yeni'} init={edit} toast={show} onClose={() => setEdit(null)} onSaved={load} />}
       {node}
     </>
   );
