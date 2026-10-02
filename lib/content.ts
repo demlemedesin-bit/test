@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getProducts, type SiteProduct } from './catalog';
+import { getConfig, getProducts, type SiteProduct } from './catalog';
+import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite } from './site';
+import { DRAWINGS } from './siteDefaults';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -11,20 +13,18 @@ const safe = (v: unknown) => JSON.stringify(v).replace(/</g, '\\u003c');
 
 const KONUK = '/demleme/04-konuklar/';
 
-type Reel = { cover: string; url: string; progress: number };
-type KonukFile = {
-  teas: { steam: number[][] };
-  guests: { name: string; url: string; drawing: string; reels: Reel[] }[];
-};
+const isUrl = (c: string) => /^(https?:)?\/\//.test(c) || c.startsWith('/');
 
-/** Ana sayfa gövdesi. Konuk verisi content/konuklar.json'dan gelir (düzenlenecek yer orası). */
+/** Ana sayfa gövdesi: handoff HTML'i + panelden gelen metin/görsel/SSS/konuk/footer verisi. */
 export async function homeHtml(): Promise<string> {
-  const c = json<KonukFile>('konuklar.json');
+  const [site, cfg, list] = await Promise.all([getSite(), getConfig(), getProducts()]);
   const aspect = json<Record<string, number>>('meta/guest-aspect.json');
   const steam = json<Record<string, unknown>>('meta/steam-spots.json');
-  const covers = [...new Set(c.guests.flatMap((g) => g.reels.map((r) => r.cover)))].sort();
+  const tea = json<{ teas: { steam: number[][] } }>('konuklar.json').teas.steam;
+  const guests = site.guests.filter((g) => g && g.name && DRAWINGS.includes(g.drawing));
+  const covers = [...new Set(guests.flatMap((g) => (g.reels ?? []).map((r) => r.cover).filter(Boolean)))].sort();
   const data = {
-    guests: c.guests.map((g) => ({
+    guests: guests.map((g) => ({
       name: g.name,
       url: g.url,
       img: `${KONUK}guests/${g.drawing}-720.webp`,
@@ -32,13 +32,21 @@ export async function homeHtml(): Promise<string> {
       steam: steam[g.drawing] ?? null,
       stand: `${KONUK}stand-sit/${g.drawing}-stand.mp4`,
       sit: `${KONUK}stand-sit/${g.drawing}-sit.mp4`,
-      reels: g.reels.map((r) => ({ c: covers.indexOf(r.cover), url: r.url, p: r.progress })),
+      reels: (g.reels ?? []).filter((r) => r.cover).map((r) => ({ c: covers.indexOf(r.cover), url: r.url, p: Number(r.progress) || 0 })),
     })),
-    covers: covers.map((f) => `${KONUK}reel-covers/${f}`),
-    teas: c.teas.steam,
+    covers: covers.map((f) => (isUrl(f) ? f : `${KONUK}reel-covers/${f}`)),
+    teas: tea,
   };
-  const list = await getProducts();
-  return read('home.html').replace('{{KR_DATA}}', safe(data)).replace('{{SHOP_CARDS}}', shopCards(list));
+  const dm = { month: site.dm.month, photos: site.dm.photos };
+  const html = fill(read('home.html'), site)
+    .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
+    .replace('{{FOOTER_COLS}}', () => footerCols(site.footer))
+    .replace('{{FOOTER_LEGAL}}', () => footerLegal(site.footer))
+    .replace('{{DM_MONTH}}', () => esc(site.dm.month))
+    .replace('{{DM_DATA}}', () => safe(dm))
+    .replace('{{ANIM}}', () => safe(animCfg(site)))
+    .replaceAll('{{contactEmail}}', esc(cfg.contactEmail));
+  return html.replace('{{KR_DATA}}', () => safe(data)).replace('{{SHOP_CARDS}}', () => shopCards(list));
 }
 
 export type Product = SiteProduct;

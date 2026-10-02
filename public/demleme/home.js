@@ -1,4 +1,8 @@
 (function(){
+  // Panelden gelen animasyon ayarları (#animCfg); yoksa tasarımdaki varsayılanlar
+  var AN={}; try{ AN=JSON.parse(document.getElementById('animCfg').textContent)||{}; }catch(e){}
+  var an=function(k,d){ var v=AN[k]; return (typeof v==='number' && isFinite(v) && v>=0) ? v : d; };
+  if(AN.off){ var mm=window.matchMedia.bind(window); window.matchMedia=function(q){ var o=mm(q); return /prefers-reduced-motion/.test(q) ? {matches:true,media:q,addEventListener:function(){},removeEventListener:function(){},addListener:function(){},removeListener:function(){}} : o; }; }
   // Mobile nav
   var nav = document.getElementById('nav');
   var toggle = document.getElementById('navToggle');
@@ -39,7 +43,7 @@
     var TIPS=(meta.getAttribute('data-tips')||'').split(',').map(Number); if(TIPS.length!==N) TIPS=null;
     art.style.setProperty('--sx', meta.getAttribute('data-spout-x')||.5);
     var DROP=Math.round(N*0.35); if(TIPS){ for(var q=0;q<N;q++){ if(TIPS[q]>0){ DROP=q; break; } } }   // first frame with tea leaving the spout
-    var START0=0, PIN=Math.max(120, Math.round(DROP*3)), POUR=520, last=-1, curF=START0, done=false, want=START0;   // the wrist moves from the first scroll pixel (≈3px per frame at 24 fps) and the pot fills as it pours; the page releases when the tea leaves the spout
+    var START0=0, PIN=Math.max(120, Math.round(DROP*an('pourPin',3))), POUR=an('pourPx',520), last=-1, curF=START0, done=false, want=START0;   // the wrist moves from the first scroll pixel (≈3px per frame at 24 fps) and the pot fills as it pours; the page releases when the tea leaves the spout
     var imgs=SRCS.map(function(src){ var im=new Image(); im.src=src; return im; });
     var mobile=function(){ return matchMedia('(max-width: 768px)').matches; };
     var about=document.querySelector('.hero-about'), landing=document.getElementById('landing'), stats=document.getElementById('stats');
@@ -118,7 +122,7 @@
     var FR=["/demleme/01-brand/logo/animation-frames/frame-00.png", "/demleme/01-brand/logo/animation-frames/frame-01.png", "/demleme/01-brand/logo/animation-frames/frame-02.png", "/demleme/01-brand/logo/animation-frames/frame-03.png", "/demleme/01-brand/logo/animation-frames/frame-04.png", "/demleme/01-brand/logo/animation-frames/frame-05.png", "/demleme/01-brand/logo/animation-frames/frame-06.png", "/demleme/01-brand/logo/animation-frames/frame-07.png", "/demleme/01-brand/logo/animation-frames/frame-08.png", "/demleme/01-brand/logo/animation-frames/frame-09.png", "/demleme/01-brand/logo/animation-frames/frame-10.png", "/demleme/01-brand/logo/animation-frames/frame-11.png", "/demleme/01-brand/logo/animation-frames/frame-12.png", "/demleme/01-brand/logo/animation-frames/frame-13.png", "/demleme/01-brand/logo/animation-frames/frame-14.png", "/demleme/01-brand/logo/animation-frames/frame-15.png", "/demleme/01-brand/logo/animation-frames/frame-16.png", "/demleme/01-brand/logo/animation-frames/frame-17.png", "/demleme/01-brand/logo/animation-frames/frame-18.png", "/demleme/01-brand/logo/animation-frames/frame-19.png", "/demleme/01-brand/logo/animation-frames/frame-20.png", "/demleme/01-brand/logo/animation-frames/frame-21.png", "/demleme/01-brand/logo/animation-frames/frame-22.png", "/demleme/01-brand/logo/animation-frames/frame-23.png", "/demleme/01-brand/logo/animation-frames/frame-24.png", "/demleme/01-brand/logo/animation-frames/frame-25.png", "/demleme/01-brand/logo/animation-frames/frame-26.png", "/demleme/01-brand/logo/animation-frames/frame-27.png", "/demleme/01-brand/logo/animation-frames/frame-28.png", "/demleme/01-brand/logo/animation-frames/frame-29.png", "/demleme/01-brand/logo/animation-frames/frame-30.png"], fr=nav.querySelector('.fr'), st=nav.querySelector('.st'); if(!fr || !st || !FR.length) return;
     var imgs=FR.map(function(src){ var im=new Image(); im.src=src; return im; });
     nav.classList.add('intro'); fr.style.opacity=1; st.style.opacity=0; var i=0;
-    setTimeout(function(){ var t=setInterval(function(){ i++; if(i<FR.length){ fr.src=FR[i]; } else { clearInterval(t); fr.style.transition='opacity 350ms'; st.style.transition='opacity 350ms'; fr.style.opacity=0; st.style.opacity=1; } }, 90); }, 1300);
+    setTimeout(function(){ var t=setInterval(function(){ i++; if(i<FR.length){ fr.src=FR[i]; } else { clearInterval(t); fr.style.transition='opacity 350ms'; st.style.transition='opacity 350ms'; fr.style.opacity=0; st.style.opacity=1; } }, 90); }, an('logoDelay',1300));
   })();
 
   // Konuklar (video): the table is one looping video made of clips joined with short crossfades; in each clip a guest
@@ -243,7 +247,7 @@
       a.innerHTML=h; host.appendChild(a);
       var c=document.createElement('a'); c.className='kc'; c.href=g.url; c.textContent=g.name; host.appendChild(c); var v=document.createElement('video'); v.className='kr-v'; v.muted=true; v.playsInline=true; v.preload='auto'; v.setAttribute('aria-hidden','true'); host.appendChild(v);
       return {g:a, c:c, v:v, i:i, vid:false, ar:+g.ar||1.1}; });
-    var rot=0, from=0, target=0, t0=0, DUR=1000, raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
+    var rot=0, from=0, target=0, t0=0, DUR=an('tableMs',1000), raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
     var layout=function(){ var m=mob(); VIS=m?1:2; A=m?.69:.486;
       var calc=function(W){ var th=W/TAR, need=0; for(var k=-VIS;k<=VIS;k++){ var x=.5-A*Math.sin(k*STEP), e=edge(x), sc=.9+(e-edge(.5))/(edge(0)-edge(.5))*.22, gw=W*(m?.27:.165)*sc;
           need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.2); if(Math.abs(k)===VIS) need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.3*1.343*.86); }   // room for a guest standing up at the edge seats
@@ -380,14 +384,14 @@
   var stats = document.getElementById('stats');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var fmt = function(n, d){ return d ? n.toFixed(d).replace('.', ',') : Math.round(n).toLocaleString('tr-TR'); };   // 3,3M with the Turkish decimal comma
-  var counters = [].slice.call(stats.querySelectorAll('[data-count]'));
+  var counters = stats ? [].slice.call(stats.querySelectorAll('[data-count]')) : [];
   var runStats = function(){
     stats.classList.add('is-in');
     counters.forEach(function(el, i){
       var target = parseFloat(el.getAttribute('data-count'));
       var suffix = el.getAttribute('data-suffix') || '', dec = +el.getAttribute('data-decimals') || 0;
       if(reduce){ el.textContent = fmt(target, dec) + suffix; return; }
-      var delay = i * 110, dur = 1400, start = null;
+      var delay = i * an('countStagger',110), dur = an('countMs',1400), start = null;
       var ease = function(t){ return 1 - Math.pow(1 - t, 3); };
       var step = function(ts){
         if(start === null) start = ts;
@@ -403,8 +407,8 @@
     var io = new IntersectionObserver(function(entries){
       if(entries[0].isIntersecting){ io.disconnect(); runStats(); }
     }, { threshold:.4 });
-    io.observe(stats);
-  } else { runStats(); }
+    if(stats) io.observe(stats);
+  } else if(stats){ runStats(); }
 
   // Steeping. The page goes white → cream-light on a real steeping curve (tau 40s),
   // with a small gain on every dip (3.5s, the same rhythm as the bag in the mark).
@@ -510,6 +514,7 @@
         if(hit){ hit.qty=Math.min(MAXQ, hit.qty+1); }
         else { items.push({slug:slug, color:color, size:'', name:name, price:pr, qty:1, img:b.getAttribute('data-img')||''}); }
         save(); render(); open(true);
+        if(window.dmTrack) dmTrack('add_to_cart');
       });
     });
     render();
@@ -519,7 +524,7 @@
   // Newsletter (no backend yet)
   var form = document.getElementById('newsletterForm');
   var note = document.getElementById('newsletterNote');
-  form.addEventListener('submit', function(e){
+  if(form) form.addEventListener('submit', function(e){
     e.preventDefault();
     note.textContent = 'Teşekkürler, sofradasın.';
     form.reset();
