@@ -58,7 +58,7 @@
     var nm=cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+')', sz=size>=0 ? cur.sizes.items[size][0] : '', cl=cur.colors[col].key,
         hit=items.filter(function(x){ return x.slug===cur.slug && x.color===cl && (x.size||'')===sz; })[0];
     if(hit){ hit.qty=Math.min(9, hit.qty+q); } else { items.push({slug:cur.slug, color:cl, size:sz, name:nm, price:cur.price, qty:q, img:cur.colors[col].img}); }
-    saveCart(); countCart(); m.classList.remove('warn');
+    saveCart(); countCart(); m.classList.remove('warn'); if(window.dmTrack) dmTrack('add_to_cart');
     m.textContent=q+' × '+cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+') sepete eklendi.'; });
   render(); countCart();
 })();

@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, LogOut, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
@@ -17,6 +17,13 @@ const NAV = [
       { href: '/admin/siparisler', label: 'Siparişler', Icon: ShoppingBag, badge: true },
       { href: '/admin/urunler', label: 'Ürünler', Icon: Package },
       { href: '/admin/musteriler', label: 'Müşteriler', Icon: Users },
+    ],
+  },
+  {
+    g: 'İçerik ve pazarlama',
+    items: [
+      { href: '/admin/icerik', label: 'İçerik', Icon: FileText },
+      { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone },
     ],
   },
   { g: 'Sistem', items: [{ href: '/admin/ayarlar', label: 'Ayarlar', Icon: Settings }] },
