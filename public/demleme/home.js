@@ -316,6 +316,29 @@
 
   // Ayın demleyenleri: the 5 photos of the month, either hanging on a washing line (#dmLine: drawn to the page width,
   // sags in the middle; hover = a breeze moves the polaroid on its peg and, less, its neighbours) or lying on the
+  // Sehpa renkleri: fareyi sehpanın üzerinde gezdirince renkler döner; alttaki noktalar (telefonda dokunma) rengi seçer. Panel: İçerik → Ayın demleyenleri → Sehpa renkleri.
+  (function(){
+    var dataEl=document.getElementById('demleyenData'), box=document.getElementById('dmSehpa'); if(!dataEl || !box) return;
+    var D; try{ D=JSON.parse(dataEl.textContent); }catch(e){ return; }
+    var cols=(D.sehpa_colors||[]).filter(function(c){ return c && c.img; }); if(!cols.length) return;
+    var base=box.querySelector('.dm-sehpa-img'); if(!base) return;
+    var b=D.sehpa_base||{}, all=[{name:b.name||'', hex:b.hex||'#8B1D1D', img:base.getAttribute('src')}].concat(cols);
+    var alt=document.createElement('img'); alt.className='dm-sehpa-alt'; alt.alt=''; alt.setAttribute('aria-hidden','true'); base.insertAdjacentElement('afterend', alt);
+    var dots=document.createElement('div'); dots.className='dm-sw'; dots.setAttribute('role','group'); dots.setAttribute('aria-label','Sehpa rengi');
+    dots.innerHTML=all.map(function(c,i){ return '<button type="button" data-i="'+i+'" aria-label="'+(c.name||('Renk '+(i+1)))+'" title="'+(c.name||'')+'" style="--c:'+c.hex+'"></button>'; }).join('')+'<span class="dm-sw-n"></span>';
+    box.appendChild(dots);
+    var cur=0, loaded=false, nm=dots.querySelector('.dm-sw-n');
+    var preload=function(){ if(loaded) return; loaded=true; cols.forEach(function(c){ var im=new Image(); im.src=c.img; }); };
+    var show=function(i){ if(i===cur) return; cur=i; var c=all[i];
+      if(i===0){ alt.classList.remove('on'); } else { alt.src=c.img; alt.classList.add('on'); }
+      [].forEach.call(dots.querySelectorAll('button'), function(x,k){ x.classList.toggle('on', k===i); }); nm.textContent=c.name||''; };
+    dots.querySelector('button').classList.add('on'); nm.textContent=all[0].name||'';
+    dots.addEventListener('click', function(e){ var x=e.target.closest('button'); if(x){ preload(); show(+x.getAttribute('data-i')); } });
+    box.addEventListener('pointerenter', preload);
+    box.addEventListener('pointermove', function(e){ if(e.pointerType!=='mouse') return; var r=base.getBoundingClientRect(); if(e.clientY<r.top || e.clientY>r.bottom+40) return;
+      var f=Math.min(.999, Math.max(0, (e.clientX-r.left)/r.width)); show(Math.floor(f*all.length)); });
+  })();
+
   // tray of the Demleme sehpa (#dmTray: a flat plane squashed to the tray's perspective).
   // Click / Enter on a polaroid: the page blurs behind a glass layer and the polaroid flies up big (FLIP from its place);
   // ‹ › / ← → switch photos, Esc, × or a click outside closes.

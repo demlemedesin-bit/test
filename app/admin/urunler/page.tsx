@@ -107,7 +107,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         while (used.has(key)) key = `${base}-${n++}`;
         used.add(key);
       }
-      return { key, name: c.name.trim(), hex: c.hex, img: c.img };
+      return { key, name: c.name.trim(), hex: c.hex, img: c.img, ...(c.imgs && c.imgs.length ? { imgs: c.imgs.slice(0, 8) } : {}) };
     });
     const sizes = d.sizes.split(',').map((s) => s.trim()).filter(Boolean);
     if (new Set(sizes).size !== sizes.length) return setErrs(['Beden listesinde aynı değer iki kez yazılmış.']);
@@ -244,13 +244,19 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <div className="card-b">
         <div className="colors">
           {d.colors.map((c, i) => (
-            <div className="color-row" key={i}>
+            <div key={i} className="color-blk">
+            <div className="color-row">
               <ImageSlot value={c.img} onChange={(v) => setColor(i, { img: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={84} />
               <input className="inp" placeholder="Renk adı (örn. Krem)" value={c.name} onChange={(e) => setColor(i, { name: e.target.value })} />
               <input className="hex" type="color" value={c.hex} onChange={(e) => setColor(i, { hex: e.target.value })} aria-label="Renk" />
               <button type="button" className="icon-btn" onClick={() => set('colors', d.colors.filter((_, j) => j !== i))} disabled={d.colors.length === 1} aria-label="Kaldır">
                 <X size={16} />
               </button>
+            </div>
+            <details className="color-xtra" open={!!(c.imgs && c.imgs.length)}>
+              <summary>Bu renge özel ek görseller {c.imgs && c.imgs.length ? <b className="chip-n">+{c.imgs.length}</b> : <span className="muted">(isteğe bağlı)</span>}</summary>
+              <GalleryInput value={c.imgs ?? []} onChange={(v) => setColor(i, { imgs: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} max={8} />
+            </details>
             </div>
           ))}
         </div>
@@ -262,10 +268,10 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       </section>
 
       <section className="card pe-sec">
-        <div className="card-h"><h2 className="card-t">Ürün galerisi (ek görseller)</h2></div>
+        <div className="card-h"><h2 className="card-t">Tüm renklerde görünen ek görseller</h2></div>
         <div className="card-b">
         <GalleryInput value={d.gallery} onChange={(v) => set('gallery', v)} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} max={10} />
-        <p className="hint" style={{ marginTop: 8 }}>Renk görsellerine ek olarak ürün sayfasında küçük resim olarak görünür. Sürükleyerek sırala.</p>
+        <p className="hint" style={{ marginTop: 8 }}>Hangi renk seçili olursa olsun görünür (ör. ambalaj, ölçü tablosu). Sadece bir renge ait fotoğraflar için yukarıda o rengin altındaki “Bu renge özel ek görseller” alanını kullan. Sürükleyerek sırala.</p>
         </div>
       </section>
 

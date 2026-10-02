@@ -292,3 +292,21 @@ select.inp { appearance: auto; }
   .panel { width: 100%; box-shadow: none; height: auto; animation: none; }
   .adm-wrap { height: auto; overflow: visible; }
 }
+
+/* Ürün rengi: renge özel ek görseller */
+.color-blk { margin-bottom: 12px; }
+.color-xtra { margin: 8px 0 0 0; padding: 8px 12px; border: 1px dashed var(--bdr2); border-radius: 10px; }
+.color-xtra > summary { cursor: pointer; font-size: 12.5px; color: var(--tx2); display: flex; align-items: center; gap: 8px; list-style: none; }
+.color-xtra > summary::-webkit-details-marker { display: none; }
+.color-xtra[open] > summary { margin-bottom: 10px; }
+.color-xtra .chip-n { background: var(--ac); color: #fff; border-radius: 99px; padding: 1px 8px; font-size: 11px; }
+.color-xtra .muted { color: var(--tx3); }
+
+/* Ürün rengi: renge özel ek görseller */
+.color-blk { margin-bottom: 12px; }
+.color-xtra { margin: 8px 0 0 0; padding: 8px 12px; border: 1px dashed var(--bdr2); border-radius: 10px; }
+.color-xtra > summary { cursor: pointer; font-size: 12.5px; color: var(--tx2); display: flex; align-items: center; gap: 8px; list-style: none; }
+.color-xtra > summary::-webkit-details-marker { display: none; }
+.color-xtra[open] > summary { margin-bottom: 10px; }
+.color-xtra .chip-n { background: var(--ac); color: #fff; border-radius: 99px; padding: 1px 8px; font-size: 11px; }
+.color-xtra .muted { color: var(--tx3); }

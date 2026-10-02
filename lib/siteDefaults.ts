@@ -6,7 +6,8 @@ export type FooterLink = { label: string; href: string };
 export type FooterCol = { title: string; links: FooterLink[] };
 export type Reel = { cover: string; url: string; progress: number };
 export type Guest = { name: string; url: string; drawing: string; reels: Reel[] };
-export type Demleyen = { month: string; photos: { name: string; city: string; img: string; icon: 'heart' | 'mug'; tilt: number }[] };
+export type SehpaColor = { name: string; hex: string; img: string };
+export type Demleyen = { month: string; photos: { name: string; city: string; img: string; icon: 'heart' | 'mug'; tilt: number }[]; sehpa_base?: { name: string; hex: string }; sehpa_colors?: SehpaColor[] };
 export type FooterData = { cols: FooterCol[]; legal: FooterLink[] };
 
 export const FIELDS: Field[] = [

@@ -36,7 +36,7 @@ export async function getSite(): Promise<Site> {
     // SSS ve konuklar: kayıt varsa (boş liste dahil) o geçerli
     faq: Array.isArray(m.faq) ? (m.faq as Faq[]) : DEFAULT_FAQ,
     footer: { cols: arr(f?.cols, DEFAULT_FOOTER.cols), legal: Array.isArray(f?.legal) ? f.legal : DEFAULT_FOOTER.legal },
-    dm: { month: dm?.month || DEFAULT_DM.month, photos: Array.isArray(dm?.photos) ? dm.photos : DEFAULT_DM.photos },
+    dm: { month: dm?.month || DEFAULT_DM.month, photos: Array.isArray(dm?.photos) ? dm.photos : DEFAULT_DM.photos, sehpa_base: dm?.sehpa_base, sehpa_colors: Array.isArray(dm?.sehpa_colors) ? dm.sehpa_colors.filter((c) => c && c.img) : [] },
     guests: Array.isArray(m.guests) && m.guests.length ? (m.guests as Guest[]) : DEFAULT_GUESTS,
     announce: _toAnnounce(m.announce),
   };
