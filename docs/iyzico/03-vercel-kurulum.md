@@ -18,6 +18,7 @@ Değişkenleri girdikten sonra **yeniden deploy** et. `/odeme` sayfasında "Kred
 ## 2. iyzico panelinde
 
 - Webhook adresi: `https://alanadin.com/api/odeme/iyzico/webhook`
+- **Webhook imzası:** iyzico'nun `X-IYZ-SIGNATURE-V3` başlığını göndermesi için `entegrasyon@iyzico.com` adresine yazıp özelliği açtırman gerekir. Kapalıyken webhook imzasız gelir ve reddedilir; ödeme yine de müşteri dönüşündeki (`/sonuc`) teyitle işlenir.
 - Sandbox test kartları: iyzico dokümanındaki test kart listesi (SMS şifresi `123456`).
 
 ## 3. Akış (özet)
@@ -34,3 +35,7 @@ Değişkenleri girdikten sonra **yeniden deploy** et. `/odeme` sayfasında "Kred
 - Canlıya geçmeden sandbox'ta tam bir ödeme + iade dene.
 - `identityNumber` için yer tutucu gönderiliyor; iş yeri onayında iyzico'nun kabul ettiğini doğrula (`01-basvuru-kontrol-listesi.md`).
 - Webhook imza biçimi (V3) sandbox'ta teyit edilmeli.
+
+## 5. Doğrulama
+
+İstek biçimi, `IYZWSv2` imzası, webhook imza dizgisi ve iptal/iade uç noktaları iyzico'nun güncel dokümanıyla karşılaştırıldı; sahte iyzico sunucusuyla başarı, inceleme (fraud=0), red, tutar uyuşmazlığı, tekrar çağrı ve iade senaryoları test edildi. Gerçek sandbox denemesi anahtarlar girilince yapılmalı.
