@@ -70,8 +70,8 @@ export function shopCards(list: SiteProduct[]): string {
         ? ' <span class="sh-tag">Yakında</span>'
         : p.out
           ? ' <span class="sh-tag">Tükendi</span>'
-          : (p.was ? ` <span class="sh-tag sh-sale">%${p.salePct ?? ''} indirim</span>` : '') + (p.left ? ` <span class="sh-tag sh-low">Son ${p.left} adet</span>` : '');
-      const priceHtml = p.was && !p.out && !p.soon ? `<s>${esc(p.was)}</s> ${esc(p.price)}` : esc(p.price);
+          : (p.was ? ` <span class="sh-sale">-%${p.salePct ?? ''}</span>` : '') + (p.left ? ` <span class="sh-low">Son ${p.left} adet</span>` : '');
+      const priceHtml = p.was && !p.out && !p.soon ? `<s>${esc(p.was)}</s> <b class="sh-now">${esc(p.price)}</b>` : esc(p.price);
       return `            <article class="sh-card" data-cat="${esc(p.shopCat)}">
               <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
               <p class="sh-name">${esc(p.name)}${tag}</p></a><p class="sh-price">${priceHtml}</p>
