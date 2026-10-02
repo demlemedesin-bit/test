@@ -229,7 +229,7 @@ function Messages({ toast }: { toast: Toast }) {
   return (
     <div className="int-stack">
       <section className="card">
-        <div className="card-h"><h2 className="card-t">Sağlayıcı durumu</h2><span className="card-m">E-posta: Resend · SMS: NetGSM</span></div>
+        <div className="card-h"><h2 className="card-t">Sağlayıcı durumu</h2><span className="card-m">E-posta: SMTP2GO · SMS: NetGSM</span></div>
         <Status checks={checks} err={err} names={['SMTP2GO_API_KEY', 'MAIL_FROM', 'NETGSM_USERCODE', 'NETGSM_PASSWORD', 'NETGSM_HEADER']} />
       </section>
 
