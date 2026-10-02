@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase';
 import { authMessage, useAuth } from '@/lib/auth';
 import { Alert, Field, phoneOk } from './ui';
 import { Favorites } from './Favorites';
+import { LoyaltyTab } from './Loyalty';
 import { OrderBody, StatusBadge, dateTr, type OrderRow } from './OrderParts';
 
-type Tab = 'orders' | 'favorites' | 'profile' | 'addresses';
+type Tab = 'orders' | 'favorites' | 'points' | 'profile' | 'addresses';
 type Addr = { id: string; title: string; full_name: string; phone: string; city: string; district: string; address: string; zip: string | null };
 
 export function AccountView() {
@@ -62,6 +63,7 @@ export function AccountView() {
           [
             ['orders', 'Siparişlerim'],
             ['favorites', 'Favorilerim'],
+            ['points', 'Puanlarım'],
             ['profile', 'Bilgilerim'],
             ['addresses', 'Adreslerim'],
           ] as [Tab, string][]
@@ -74,6 +76,7 @@ export function AccountView() {
 
       {tab === 'orders' && <Orders />}
       {tab === 'favorites' && <Favorites />}
+      {tab === 'points' && <LoyaltyTab />}
       {tab === 'profile' && (profile ? <Profile userId={user.id} profile={profile} onSaved={setProfile} /> : <p className="loading">Yükleniyor…</p>)}
       {tab === 'addresses' && <Addresses userId={user.id} />}
     </>

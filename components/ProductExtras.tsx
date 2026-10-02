@@ -1,5 +1,6 @@
 'use client';
 
+import { LoyaltyHint } from './Loyalty';
 import { useEffect, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '@/lib/supabase';
@@ -238,6 +239,7 @@ function ReviewForm({ slug, name: productName }: { slug: string; name: string })
 
   return (
     <form className="px px-form" onSubmit={submit} noValidate>
+      <LoyaltyHint kind="review" />
       <h3 className="px-form-t">{productName} için yorum yaz</h3>
       <div className="px-field">
         <span className="px-lbl" id="pxRateLbl">
