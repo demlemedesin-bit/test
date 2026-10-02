@@ -1,12 +1,15 @@
 import { getProducts, rest, type Color } from './catalog';
 import { siteUrl } from './siteUrl';
+import { saleOf } from './sale';
 
 /** Ürün beslemeleri (Google Merchant, Meta Catalog, pazaryeri) için ortak ürün listesi: aktif ve "yakında" olmayan ürünler. */
 export type FeedProduct = {
   slug: string;
   name: string;
   desc: string;
-  price: number;
+  price: number; // normal fiyat
+  salePrice?: number; // geçerli süreli kampanya fiyatı
+  saleEnds?: string;
   stock: number | null;
   inStock: boolean;
   colors: Color[];
@@ -18,7 +21,7 @@ export type FeedProduct = {
 
 type Row = {
   slug: string; name: string; category: string; price: number | string; colors: Color[] | null; sizes: string[] | null;
-  soon: boolean; thumb: string | null; stock: number | null; data?: { desc?: string };
+  soon: boolean; thumb: string | null; stock: number | null; data?: { desc?: string; sale?: unknown };
 };
 
 export const abs = (u?: string | null): string => {
@@ -38,8 +41,9 @@ export async function feedProducts(): Promise<FeedProduct[]> {
         const colors = r.colors ?? [];
         const stock = r.stock ?? null;
         const images = [r.thumb, ...colors.map((c) => c.img)].map(abs).filter((v, i, a) => v && a.indexOf(v) === i);
+        const sl = saleOf(Number(r.price), r.data);
         return {
-          slug: r.slug, name: r.name, desc: (r.data?.desc ?? '').trim(), price: Number(r.price), stock, inStock: stock === null || stock > 0,
+          slug: r.slug, name: r.name, desc: (r.data?.desc ?? '').trim(), price: Number(r.price), ...(sl.on ? { salePrice: sl.price, saleEnds: sl.ends } : {}), stock, inStock: stock === null || stock > 0,
           colors, sizes: r.sizes ?? [], category: r.category, images, link: `${base}/urun/${r.slug}`,
         };
       });

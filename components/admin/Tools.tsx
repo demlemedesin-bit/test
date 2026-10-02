@@ -67,7 +67,7 @@ function Bell_() {
 
 export function AdminTools() {
   const [t, setT] = useState<'dark' | 'light'>('dark');
-  useEffect(() => { const el = document.querySelector('.adm'); setT(el?.getAttribute('data-theme') === 'light' ? 'light' : 'dark'); }, []);
+  useEffect(() => { const id = setTimeout(() => { const el = document.querySelector('.adm'); setT(el?.getAttribute('data-theme') === 'light' ? 'light' : 'dark'); }, 0); return () => clearTimeout(id); }, []);
   return (
     <>
       <button type="button" className="tb-search" onClick={() => window.dispatchEvent(new Event('adm-palette'))} aria-label="Ara"><Search size={15} /><span>Ara…</span><kbd>Ctrl K</kbd></button>

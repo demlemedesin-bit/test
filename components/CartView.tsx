@@ -48,7 +48,7 @@ export function CartView() {
                 <p className="line-name">
                   <a href={`/urun/${l.item.slug}`}>{l.item.name}</a>
                 </p>
-                <p className="line-meta">{l.problem ? '' : `Birim fiyat ${tl(l.unit)}`}</p>
+                <p className="line-meta">{l.problem ? '' : l.was ? <>Birim fiyat <s style={{ opacity: 0.5 }}>{tl(l.was)}</s> {tl(l.unit)} <b style={{ color: '#DD262C', fontWeight: 600 }}>kampanya</b></> : `Birim fiyat ${tl(l.unit)}`}</p>
                 {l.problem && <p className="line-warn">{l.problem}</p>}
               </div>
               <div className="line-end">

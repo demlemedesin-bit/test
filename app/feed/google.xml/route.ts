@@ -24,6 +24,8 @@ export async function GET() {
         ...p.images.slice(1, 11).map((u) => `<g:additional_image_link>${x(u)}</g:additional_image_link>`),
         `<g:availability>${p.inStock ? 'in_stock' : 'out_of_stock'}</g:availability>`,
         `<g:price>${priceTry(p.price)}</g:price>`,
+        p.salePrice !== undefined && `<g:sale_price>${priceTry(p.salePrice)}</g:sale_price>`,
+        p.salePrice !== undefined && p.saleEnds && `<g:sale_price_effective_date>${new Date().toISOString().slice(0, 19)}Z/${new Date(p.saleEnds).toISOString().slice(0, 19)}Z</g:sale_price_effective_date>`,
         '<g:brand>Demleme</g:brand>',
         '<g:condition>new</g:condition>',
         color && `<g:color>${x(color)}</g:color>`,
