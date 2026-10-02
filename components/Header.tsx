@@ -5,11 +5,14 @@ import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { D } from './Display';
 
-export function Header({ active }: { active?: 'sepet' | 'hesap' }) {
+export type NavLabels = { shop: string; guests: string; about: string; contact: string; account: string; login: string };
+const DEFAULT_LABELS: NavLabels = { shop: 'Mağaza', guests: 'Konuklar', about: 'Hakkında', contact: 'İletişim', account: 'Hesabım', login: 'Giriş yap' };
+
+export function Header({ active, labels = DEFAULT_LABELS }: { active?: 'sepet' | 'hesap'; labels?: NavLabels }) {
   const { items } = useCart();
   const { user, loading } = useAuth();
   const count = items.reduce((n, i) => n + i.qty, 0);
-  const acct = loading ? 'Hesabım' : user ? 'Hesabım' : 'Giriş yap';
+  const acct = loading || user ? labels.account : labels.login;
 
   return (
     <header className="pn">
@@ -20,10 +23,10 @@ export function Header({ active }: { active?: 'sepet' | 'hesap' }) {
         <img src="/demleme/01-brand/logo/logo-still.png" alt="" />
       </a>
       <nav className="pn-links" aria-label="Ana menü">
-        <a href="/#magaza">Mağaza</a>
-        <a href="/#konuklar">Konuklar</a>
-        <a href="/#hakkinda">Hakkında</a>
-        <a href="/#iletisim">İletişim</a>
+        <a href="/#magaza">{labels.shop}</a>
+        <a href="/#konuklar">{labels.guests}</a>
+        <a href="/#hakkinda">{labels.about}</a>
+        <a href="/#iletisim">{labels.contact}</a>
       </nav>
       <div className="pn-right">
         <Link className={`pn-acct${active === 'hesap' ? ' on' : ''}`} href={user ? '/hesabim' : '/giris'}>

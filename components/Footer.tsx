@@ -1,17 +1,28 @@
-import Link from 'next/link';
+import type { FooterLink } from '@/lib/siteDefaults';
 
-export function Footer() {
+const DEFAULT_LINKS: FooterLink[] = [
+  { label: 'Sipariş takibi', href: '/siparis-takip' },
+  { label: 'Kargo ve iade', href: '/kargo-ve-iade' },
+  { label: 'Mesafeli satış sözleşmesi', href: '/mesafeli-satis-sozlesmesi' },
+  { label: 'KVKK', href: '/kvkk' },
+  { label: 'Gizlilik politikası', href: '/gizlilik-politikasi' },
+  { label: 'Kullanım şartları', href: '/kullanim-sartlari' },
+];
+
+const safe = (u: string) => (/^(\/|#|https?:\/\/|mailto:|tel:)/i.test(u.trim()) ? u.trim() : '#');
+
+/** Alt bilgi. Metin ve bağlantılar yönetim panelinden (İçerik → Menü ve footer) gelir; verilmezse varsayılanlar. */
+export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', links = DEFAULT_LINKS }: { copy?: string; links?: FooterLink[] }) {
   return (
     <footer className="pf">
-      <span>© 2026 Demleme. Tüm hakları saklıdır.</span>
+      <span>{copy}</span>
       <span className="pf-links">
         <a href="/">Ana sayfa</a>
-        <Link href="/siparis-takip">Sipariş takibi</Link>
-        <Link href="/kargo-ve-iade">Kargo &amp; iade</Link>
-        <Link href="/mesafeli-satis-sozlesmesi">Mesafeli satış sözleşmesi</Link>
-        <Link href="/kvkk">KVKK</Link>
-        <Link href="/gizlilik-politikasi">Gizlilik</Link>
-        <Link href="/kullanim-sartlari">Kullanım şartları</Link>
+        {links.map((l, i) => (
+          <a key={i} href={safe(l.href)}>
+            {l.label}
+          </a>
+        ))}
       </span>
     </footer>
   );

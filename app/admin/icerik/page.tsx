@@ -270,7 +270,7 @@ export default function Content() {
               ))}
               <div style={{ marginBottom: 18 }}><AddBtn onClick={() => setFooter((f) => ({ ...f, cols: [...f.cols, { title: 'Yeni sütun', links: [] }] }))}>Sütun ekle</AddBtn></div>
               <section className="card">
-                <div className="card-h"><h2 className="card-t">Alt şerit bağlantıları</h2></div>
+                <div className="card-h"><h2 className="card-t">Alt şerit bağlantıları</h2><span className="card-m">Ana sayfa ve tüm mağaza sayfalarında görünür</span></div>
                 <div className="card-b"><LinkList links={footer.legal} onChange={(legal) => setFooter((f) => ({ ...f, legal }))} /></div>
               </section>
               <p className="hint" style={{ marginTop: 12 }}>Footer slogan ve telif satırı “Metin ve görseller → Footer” altındadır. Bağlantı: “/sayfa”, “#bolum” ya da “https://…”.</p>
