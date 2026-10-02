@@ -26,12 +26,13 @@ export function Loading({ text = 'Yükleniyor…' }: { text?: string }) {
   );
 }
 
-export function Empty({ title, text, icon }: { title: string; text?: string; icon?: ReactNode }) {
+export function Empty({ title, text, icon, action }: { title: string; text?: string; icon?: ReactNode; action?: ReactNode }) {
   return (
     <div className="empty">
-      {icon ?? <Inbox size={30} strokeWidth={1.5} />}
+      <div className="empty-ic"><i /><span>{icon ?? <Inbox size={28} strokeWidth={1.6} />}</span></div>
       <b>{title}</b>
-      {text && <span>{text}</span>}
+      {text && <span className="empty-t">{text}</span>}
+      {action && <div className="empty-a">{action}</div>}
     </div>
   );
 }
