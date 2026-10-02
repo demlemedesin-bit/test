@@ -1,14 +1,23 @@
 'use client';
 
-import { useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import config from '@/content/shop-config.json';
+import { fetchSettings } from '@/lib/shop';
 import { LAST_ORDER_KEY } from './CheckoutView';
 import { OrderBody, type OrderRow } from './OrderParts';
 
 type Placed = OrderRow & { email: string };
 
 export function OrderDone() {
+  const [cfg, setCfg] = useState<Record<string, string>>({});
+  useEffect(() => {
+    fetchSettings()
+      .then((s) => setCfg(s.map))
+      .catch(() => {});
+  }, []);
+  const config = { contactEmail: cfg.contact_email || 'merhaba@demleme.com' };
+  const bank = { holder: cfg.bank_holder || '', bankName: cfg.bank_name || '', iban: cfg.bank_iban || '' };
+
   // Sunucuda undefined (yükleniyor), tarayıcıda kayıtlı sipariş ya da null
   const raw = useSyncExternalStore(
     () => () => {},
@@ -42,7 +51,6 @@ export function OrderDone() {
       </div>
     );
 
-  const bank = config.bank;
   const hasIban = !!bank.iban;
 
   return (

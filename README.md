@@ -47,3 +47,11 @@ npm run build
 - Ortam değişkenleri: `.env.example` (yalnızca anon anahtar; `service_role` asla koda/repoya girmez).
 - Satıcı/banka bilgileri: `content/shop-config.json` (boşsa yasal metinlerde ve havale ekranında yer tutucu gösterilir).
 - Ödeme: havale/EFT ve kapıda ödeme aktif; kart ödemesi için sanal pos (iyzico/PayTR) bilgileri gerekir.
+
+## Yönetim paneli (`/admin`)
+
+- Beyaz temalı panel: genel bakış, siparişler (durum, kargo takibi, iptal, CSV, yazdır), ürünler (fiyat, stok, görsel yükleme, renk/beden, sıra, yayın durumu), müşteriler, ayarlar (kargo, havale/IBAN, satıcı bilgileri, yöneticiler).
+- Yetki: `profiles.role = 'admin'`. `shop_settings.admin_emails` içindeki e-posta ile kayıt olan kullanıcı otomatik yönetici olur; sonrası panelden eklenir. Rol, tarayıcıdan değiştirilemez (sütun yetkisi + RLS).
+- Site ↔ veritabanı: ürünler ve ayarlar Supabase'ten okunur (`lib/catalog.ts`, 60 sn önbellek). Panelde kaydedince `/api/revalidate` (yalnızca yönetici jetonuyla) siteyi anında yeniler. Veritabanına ulaşılamazsa `content/` altındaki dosyalar devreye girer.
+- Stok: `products.stock` boşsa sınırsız; sipariş stoktan düşer, iptalde geri eklenir.
+- Şema: `supabase/migrations/0002_yonetim.sql` (0001'den sonra uygulanır).

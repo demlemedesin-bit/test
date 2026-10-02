@@ -14,9 +14,10 @@ export type DbProduct = {
   sizes: string[];
   soon: boolean;
   active: boolean;
+  stock?: number | null;
 };
 
-export type Settings = { freeFrom: number; fee: number };
+export type Settings = { freeFrom: number; fee: number; map: Record<string, string> };
 
 export const tl = (n: number) =>
   '₺' + n.toLocaleString('tr-TR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
@@ -24,8 +25,9 @@ export const tl = (n: number) =>
 export async function fetchSettings(): Promise<Settings> {
   const { data, error } = await supabase().from('shop_settings').select('key, value');
   if (error) throw error;
-  const m = Object.fromEntries((data ?? []).map((r) => [r.key as string, Number(r.value)]));
-  return { freeFrom: m.free_shipping_threshold ?? 750, fee: m.shipping_fee ?? 0 };
+  const map = Object.fromEntries((data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
+  const num = (k: string, d: number) => (map[k] !== undefined && map[k] !== '' && !isNaN(Number(map[k])) ? Number(map[k]) : d);
+  return { freeFrom: num('free_shipping_threshold', 750), fee: num('shipping_fee', 0), map };
 }
 
 export async function fetchProducts(slugs: string[]): Promise<DbProduct[]> {
@@ -62,6 +64,7 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     else if (p.soon) problem = 'Bu ürün henüz satışta değil.';
     else if (item.color && !p.colors.some((c) => c.key === item.color)) problem = 'Bu renk artık mevcut değil.';
     else if (p.sizes.length && !p.sizes.includes(item.size)) problem = 'Beden seçilmesi gerekiyor.';
+    else if (p.stock != null && p.stock < item.qty) problem = p.stock <= 0 ? 'Bu ürün tükendi.' : `Stokta yalnızca ${p.stock} adet var.`;
     const unit = p ? p.price : 0;
     return { item, key: lineKey(item), unit, total: problem ? 0 : unit * item.qty, problem };
   });
