@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getProducts, type SiteProduct } from './catalog';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -17,7 +18,7 @@ type KonukFile = {
 };
 
 /** Ana sayfa gövdesi. Konuk verisi content/konuklar.json'dan gelir (düzenlenecek yer orası). */
-export function homeHtml(): string {
+export async function homeHtml(): Promise<string> {
   const c = json<KonukFile>('konuklar.json');
   const aspect = json<Record<string, number>>('meta/guest-aspect.json');
   const steam = json<Record<string, unknown>>('meta/steam-spots.json');
@@ -36,26 +37,38 @@ export function homeHtml(): string {
     covers: covers.map((f) => `${KONUK}reel-covers/${f}`),
     teas: c.teas.steam,
   };
-  return read('home.html').replace('{{KR_DATA}}', safe(data));
+  const list = await getProducts();
+  return read('home.html').replace('{{KR_DATA}}', safe(data)).replace('{{SHOP_CARDS}}', shopCards(list));
 }
 
-export type Product = {
-  slug: string;
-  name: string;
-  cat: string;
-  price: string;
-  desc: string;
-  badge?: string;
-  soon?: boolean;
-};
+export type Product = SiteProduct;
 
-export function products(): Product[] {
-  return json<Product[]>('products.json');
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/** Ana sayfadaki mağaza şeridi kartları (ürünler veritabanından). */
+export function shopCards(list: SiteProduct[]): string {
+  return list
+    .map((p) => {
+      const c0 = p.colors[0];
+      const choose = p.colors.length > 1 || p.sizes?.pick || p.soon || p.out;
+      const tag = p.soon ? ' <span class="sh-tag">Yakında</span>' : p.out ? ' <span class="sh-tag">Tükendi</span>' : '';
+      return `            <article class="sh-card" data-cat="${esc(p.shopCat)}">
+              <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
+              <p class="sh-name">${esc(p.name)}${tag}</p></a><p class="sh-price">${esc(p.price)}</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="${esc(p.name)}" data-price="${esc(p.price)}" data-slug="${esc(p.slug)}" data-color="${esc(c0?.key ?? '')}" data-img="${esc(c0?.img ?? p.thumb)}"${choose ? ' data-choose="1"' : ''}>Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>`;
+    })
+    .join('\n');
 }
 
-export function productHtml(): string {
+export async function products(): Promise<SiteProduct[]> {
+  return getProducts();
+}
+
+export async function productHtml(list?: SiteProduct[]): Promise<string> {
+  const all = list ?? (await getProducts());
   return read('product.html').replace(
     '{{PRODUCT_DATA}}',
-    `<script type="application/json" id="productData">${safe(json('products.json'))}</script>`,
+    `<script type="application/json" id="productData">${safe(all)}</script>`,
   );
 }
