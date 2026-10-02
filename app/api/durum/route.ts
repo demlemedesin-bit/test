@@ -42,7 +42,7 @@ export async function GET(req: Request) {
     simple('IYZICO_API_KEY', 'kart ödemesi kapalı'),
     simple('IYZICO_SECRET_KEY', 'kart ödemesi kapalı'),
     iyz,
-    simple('RESEND_API_KEY', 'e-posta gönderilmez'),
+    simple('SMTP2GO_API_KEY', 'e-posta gönderilmez'),
     simple('MAIL_FROM', 'e-posta gönderilmez'),
     simple('NETGSM_USERCODE', 'SMS gönderilmez'),
     simple('NETGSM_PASSWORD', 'SMS gönderilmez'),

@@ -36,19 +36,20 @@ export function renderTemplate(str: string, vars: Record<string, string>): strin
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e)).slice(0, 300);
 
 export async function sendEmail(p: { to: string; subject: string; text: string }): Promise<SendResult> {
-  const key = process.env.RESEND_API_KEY;
+  // SMTP2GO HTTP API: SMTP2GO_API_KEY + MAIL_FROM (SMTP2GO'da doğrulanmış gönderen, ör. "Demleme <garen@demlemedesin.com>")
+  const key = process.env.SMTP2GO_API_KEY;
   const from = process.env.MAIL_FROM;
-  if (!key || !from) return { status: 'skipped', error: !key ? 'RESEND_API_KEY tanımsız' : 'MAIL_FROM tanımsız' };
+  if (!key || !from) return { status: 'skipped', error: !key ? 'SMTP2GO_API_KEY tanımsız' : 'MAIL_FROM tanımsız' };
   try {
-    const r = await fetch('https://api.resend.com/emails', {
+    const r = await fetch('https://api.smtp2go.com/v3/email/send', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [p.to], subject: p.subject, text: p.text }),
+      headers: { 'X-Smtp2go-Api-Key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text }),
       signal: AbortSignal.timeout(10000),
     });
-    if (!r.ok) {
-      const t = await r.text().catch(() => '');
-      return { status: 'failed', error: `Resend ${r.status} ${t}`.slice(0, 300) };
+    const j = (await r.json().catch(() => ({}))) as { data?: { succeeded?: number; error?: string; error_code?: string } };
+    if (!r.ok || (j.data && j.data.succeeded === 0)) {
+      return { status: 'failed', error: `SMTP2GO ${r.status} ${j.data?.error_code ?? ''} ${j.data?.error ?? ''}`.trim().slice(0, 300) };
     }
     return { status: 'sent' };
   } catch (e) {
