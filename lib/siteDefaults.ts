@@ -353,7 +353,7 @@ export const FIELDS: Field[] = [
   "group": "Ana sayfa · Konuklar",
   "label": "Konuklar masası görseli",
   "kind": "image",
-  "def": "/demleme/04-konuklar/table/table-2000-v2.webp"
+  "def": "/demleme/04-konuklar/table/table-2000.webp"
  },
  {
   "id": "logo_main",
