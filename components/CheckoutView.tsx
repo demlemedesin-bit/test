@@ -24,7 +24,7 @@ export function CheckoutView() {
 
   const [v, setV] = useState({ email: '', full_name: '', phone: '', city: '', district: '', address: '', zip: '', title: 'Teslimat adresi' });
   const [note, setNote] = useState('');
-  const [payment, setPayment] = useState<'havale' | 'kapida' | 'kart'>('havale');
+  const [payment, setPayment] = useState<'havale' | 'kart'>('havale');
   const [agree, setAgree] = useState(false);
   const [saveAddr, setSaveAddr] = useState(false);
   const [saved, setSaved] = useState<Addr[]>([]);
@@ -244,13 +244,6 @@ export function CheckoutView() {
               <div>
                 <b>Havale / EFT</b>
                 <span>Siparişi verdikten sonra ödeme bilgilerini göreceksin. Ödemen onaylanınca siparişin hazırlanır.</span>
-              </div>
-            </label>
-            <label className="pay-opt">
-              <input type="radio" name="pay" checked={payment === 'kapida'} onChange={() => setPayment('kapida')} />
-              <div>
-                <b>Kapıda ödeme</b>
-                <span>Ürünler sana ulaştığında kurye ya da kargo görevlisine ödersin.</span>
               </div>
             </label>
             <label className={`pay-opt${cardOn ? '' : ' is-off'}`} aria-disabled={cardOn ? undefined : 'true'}>
