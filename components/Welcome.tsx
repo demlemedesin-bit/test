@@ -9,6 +9,7 @@ import './Popups.css';
 import './Welcome.css';
 
 const KEY = 'demleme-welcome';
+const DELAY_MS = 5000;
 // Yalnızca ilk karşılama sayfaları; alışveriş, ödeme, hesap ve panel akışlarına karışmaz.
 const SKIP = ['/admin', '/odeme', '/sepet', '/hesabim', '/giris', '/kayit', '/siparis', '/sifre', '/sifremi', '/t/', '/api', '/kvkk', '/gizlilik', '/cerez', '/kullanim', '/mesafeli', '/kargo', '/acik-riza'];
 
@@ -34,12 +35,21 @@ export function Welcome() {
   const [out, setOut] = useState(false);
   const [done, setDone] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const checked = useRef(false);
 
   useEffect(() => {
-    if (checked.current) return;
-    checked.current = true;
-    if (shouldShow(path)) setOpen(true);
+    if (!shouldShow(path)) return;
+    // 5 sn sonra aç; kullanıcı o sırada forma yazıyorsa yazmayı bırakana kadar bekle
+    let t = 0;
+    const tryOpen = () => {
+      const a = document.activeElement;
+      if (a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement) {
+        t = window.setTimeout(tryOpen, 2000);
+        return;
+      }
+      if (shouldShow(window.location.pathname)) setOpen(true);
+    };
+    t = window.setTimeout(tryOpen, DELAY_MS);
+    return () => window.clearTimeout(t);
   }, [path]);
 
   const close = useCallback(() => {
