@@ -10,6 +10,7 @@ import { ImageInput } from '@/components/admin/Editors';
 import { PopupCard } from '@/components/Popups';
 import { toIso, toLocalInput } from '@/lib/design';
 import { BGS, DEVICES, FREQS, KINDS, PAGES, POPUP_TEMPLATES, TRIGGERS, emptyPopup, parsePopupsLoose, type Popup } from '@/lib/popups';
+import { PageHero } from '@/components/admin/PageHero';
 
 export default function PopupAdmin() {
   const menu = useMenu();
@@ -43,7 +44,7 @@ export default function PopupAdmin() {
       <TopBar title="Popuplar" sub="Bülten, duyuru, çıkış niyeti ve geri sayım" onMenu={menu}>
         <button className="btn" onClick={save} disabled={busy}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 1100 }}>
+      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 1100 }}><PageHero />
         <div style={{ display: 'grid', gridTemplateColumns: '240px minmax(0,1fr)', gap: 18, alignItems: 'start' }}>
           <aside className="card"><div className="card-b" style={{ padding: 10 }}>
             {list.map((x, i) => (

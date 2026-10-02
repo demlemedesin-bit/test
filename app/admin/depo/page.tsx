@@ -8,6 +8,7 @@ import { RET_STATUS, type Ret } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Loading, TopBar, useToast } from '@/components/admin/ui';
 import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 type O = AdminOrder & { packed_at?: string | null };
 const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['topla', 'Ürün toplama'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
@@ -70,7 +71,7 @@ export default function Depo() {
   return (
     <>
       <TopBar title="Depo" sub="Hazırlama, paketleme, kargo ve iade teslim" onMenu={menu} />
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="kpis">
           {[['Hazırlanacak', prep.length], ['Paketlenen', packed.length], ['Ödeme bekleyen', (os ?? []).filter((o) => o.status === 'odeme_bekleniyor').length], ['Gelen iade', rs.length]].map(([l, v]) => <div className="kpi" key={String(l)}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}
         </div>

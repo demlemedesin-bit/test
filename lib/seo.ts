@@ -23,6 +23,7 @@ export type Seo = {
   default_title: string;
   default_desc: string;
   og_image: string;
+  favicon: string;
   twitter: string;
   locale: string;
   noindex_site: boolean;
@@ -103,6 +104,7 @@ export const DEFAULT_SEO: Seo = {
   default_title: '',
   default_desc: '',
   og_image: '',
+  favicon: '',
   twitter: '',
   locale: 'tr_TR',
   noindex_site: false,
@@ -142,6 +144,7 @@ export function parseSeo(raw: unknown): Seo {
     default_title: str(r.default_title, 200),
     default_desc: str(r.default_desc, 400),
     og_image: safePathOrUrl(r.og_image),
+    favicon: safePathOrUrl(r.favicon),
     twitter: /^[A-Za-z0-9_]{1,15}$/.test(tw) ? tw : '',
     locale: /^[a-z]{2}_[A-Z]{2}$/.test(str(r.locale, 10)) ? str(r.locale, 10) : d.locale,
     noindex_site: bool(r.noindex_site, false),

@@ -8,6 +8,7 @@ import { downloadCsv, downloadJson } from '@/lib/csv';
 import { useMenu } from '@/components/admin/Shell';
 import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 import './sistem.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Tab = 'ekip' | 'kayit' | 'yedek' | 'durum';
 const TABS: [Tab, string][] = [
@@ -400,7 +401,7 @@ export default function System() {
     <>
       <TopBar title="Kullanıcılar ve kayıtlar" sub="Ekip, işlem geçmişi, yedek ve sistem durumu" onMenu={menu} />
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           <div className="tabs" style={{ marginBottom: 16 }}>
             {TABS.map(([k, l]) => <button key={k} type="button" className={`tab${tab === k ? ' on' : ''}`} onClick={() => setTab(k)}>{l}</button>)}
           </div>

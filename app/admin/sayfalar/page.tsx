@@ -11,6 +11,7 @@ import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/compo
 import { ImageInput } from '@/components/admin/Editors';
 import { AnnounceBar, type AnnounceData } from '@/components/AnnounceBar';
 import './sayfalar.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS = ['Sayfalar', 'Blog', 'Yönlendirmeler', 'Duyuru çubuğu'] as const;
 type Toast = (t: string, e?: boolean) => void;
@@ -29,7 +30,7 @@ export default function Pages() {
         <a className="btn ghost" href="/blog" target="_blank" rel="noopener">Blogu aç</a>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner" style={{ maxWidth: 980 }}>
+        <div className="adm-inner" style={{ maxWidth: 980 }}><PageHero />
           <div className="tabs" style={{ marginBottom: 18 }}>
             {TABS.map((x) => (
               <button key={x} type="button" className={`tab${tab === x ? ' on' : ''}`} onClick={() => setTab(x)}>{x}</button>

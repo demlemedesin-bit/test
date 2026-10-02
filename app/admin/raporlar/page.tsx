@@ -10,6 +10,7 @@ import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
 import { Empty, Kpi, Loading, TopBar } from '@/components/admin/ui';
 import './raporlar.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Summary = { orders: number; revenue: number; discount: number; shipping: number; customers: number; aov: number };
 type Sales = {
@@ -219,7 +220,7 @@ export default function Reports() {
     <>
       <TopBar title="Raporlar" sub={label} onMenu={menu} />
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           <div className="rp-bar">
             <div className="tabs">

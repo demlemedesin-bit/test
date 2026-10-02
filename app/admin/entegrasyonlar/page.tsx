@@ -8,6 +8,7 @@ import { CARRIERS } from '@/lib/carriers';
 import { useMenu } from '@/components/admin/Shell';
 import { Empty, Field, Loading, TopBar, useToast } from '@/components/admin/ui';
 import './entegrasyonlar.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Tab = 'odeme' | 'mesaj' | 'webhook' | 'besleme' | 'kargo' | 'dogrulama' | 'gunluk';
 const TABS: [Tab, string][] = [
@@ -537,7 +538,7 @@ export default function Integrations() {
     <>
       <TopBar title="Entegrasyonlar" onMenu={menu} />
       <div className="adm-scroll">
-        <div className="adm-inner" style={{ maxWidth: 940 }}>
+        <div className="adm-inner" style={{ maxWidth: 940 }}><PageHero />
           <div className="tabs int-tabs">
             {TABS.map(([k, l]) => (
               <button key={k} className={`tab${tab === k ? ' on' : ''}`} onClick={() => setTab(k)}>{l}</button>

@@ -7,6 +7,7 @@ import { slugify, tl } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { AreaChart, Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type TLink = { id: string; code: string; name: string; dest: string; utm_source: string; utm_medium: string; utm_campaign: string; utm_term: string; utm_content: string; active: boolean; created_at: string };
 type Row = { source: string; medium: string; campaign: string; clicks: number; views: number; visitors: number; carts: number; orders: number; revenue: number };
@@ -112,7 +113,7 @@ export default function Tracking() {
         <button className="btn" onClick={() => setEdit({ ...EMPTY })}><Plus size={15} /> Yeni takip linki</button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           <div className="tabs" style={{ marginBottom: 16 }}>
             {RANGES.map(([n, l]) => <button key={n} type="button" className={`tab${days === n ? ' on' : ''}`} onClick={() => setDays(n)}>{l}</button>)}

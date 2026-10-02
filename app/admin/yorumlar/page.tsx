@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { dt, refreshSite } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Review = {
   id: string;
@@ -122,7 +123,7 @@ export default function Reviews() {
     <>
       <TopBar title="Ürün yorumları" sub="Onayla, yanıtla, yayından kaldır" onMenu={menu} />
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {!rows ? (
             !err && <Loading />

@@ -7,6 +7,8 @@ import { refreshSite, slugify, tl, uploadImage, type AdminProduct, type Color } 
 import { useMenu } from '@/components/admin/Shell';
 import { ProductsInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
+import { GalleryInput, ImageSlot } from '@/components/admin/DropZone';
 
 type Draft = {
   isNew: boolean;
@@ -26,6 +28,7 @@ type Draft = {
   sizes: string;
   colors: (Color & { isNew?: boolean })[];
   thumb: string;
+  gallery: string[];
   details: { t: string; v: string }[];
   data: AdminProduct['data'];
   sort: number;
@@ -42,14 +45,14 @@ const seoOf = (p: AdminProduct) => (p.data ?? {}) as { seo_title?: string; seo_d
 
 const blank = (sort: number): Draft => ({
   isNew: true, slug: '', slugTouched: false, name: '', category: 'Ev & Sofra', shop_cat: 'sofra', price: '', stock: '', soon: false, active: true,
-  badge: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '',
+  badge: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '', gallery: [],
   details: [{ t: 'Malzeme', v: '' }, { t: 'Kargo & iade', v: 'Siparişin 2–4 iş gününde kargoda. 14 gün içinde koşulsuz iade.' }], data: {}, sort,
 });
 
 const toDraft = (p: AdminProduct): Draft => ({
   isNew: false, slug: p.slug, slugTouched: true, name: p.name, category: p.category, shop_cat: p.shop_cat, price: String(p.price), stock: p.stock == null ? '' : String(p.stock),
   soon: p.soon, active: p.active, badge: p.data?.badge ?? '', desc: p.data?.desc ?? '', seoTitle: seoOf(p).seo_title ?? '', seoDesc: seoOf(p).seo_desc ?? '', sizes: (p.sizes ?? []).join(', '),
-  colors: (p.colors ?? []).map((c) => ({ ...c, hex: c.hex || '#EDE6D6', img: c.img || '' })), thumb: p.thumb ?? '',
+  colors: (p.colors ?? []).map((c) => ({ ...c, hex: c.hex || '#EDE6D6', img: c.img || '' })), thumb: p.thumb ?? '', gallery: Array.isArray((p.data as { gallery?: unknown })?.gallery) ? ((p.data as { gallery: unknown[] }).gallery.filter((x) => typeof x === 'string') as string[]) : [],
   details: (p.data?.details ?? []).map(([t, v]) => ({ t, v })), data: p.data ?? {}, sort: p.sort,
 });
 
@@ -113,6 +116,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       badge: d.badge.trim() || undefined,
       seo_title: d.seoTitle.trim() || undefined,
       seo_desc: d.seoDesc.trim() || undefined,
+      gallery: d.gallery.length ? d.gallery : undefined,
       details: d.details.filter((x) => x.t.trim() && x.v.trim()).map((x) => [x.t.trim(), x.v.trim()]),
       ...(sizes.length ? { size_label: d.data.size_label || 'Beden' } : {}),
     };
@@ -238,10 +242,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <div className="colors">
           {d.colors.map((c, i) => (
             <div className="color-row" key={i}>
-              <label className="up" title="Görsel yükle">
-                {c.img ? <img src={c.img} alt="" /> : up === String(i) ? <span className="spin" /> : <ImagePlus size={20} />}
-                <input type="file" accept="image/*" onChange={(e) => { pick(e.target.files?.[0], i); e.target.value = ''; }} />
-              </label>
+              <ImageSlot value={c.img} onChange={(v) => setColor(i, { img: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={84} />
               <input className="inp" placeholder="Renk adı (örn. Krem)" value={c.name} onChange={(e) => setColor(i, { name: e.target.value })} />
               <input className="hex" type="color" value={c.hex} onChange={(e) => setColor(i, { hex: e.target.value })} aria-label="Renk" />
               <button type="button" className="icon-btn" onClick={() => set('colors', d.colors.filter((_, j) => j !== i))} disabled={d.colors.length === 1} aria-label="Kaldır">
@@ -257,6 +258,12 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       </div>
 
       <div className="sec">
+        <p className="sec-t">Ürün galerisi (ek görseller)</p>
+        <GalleryInput value={d.gallery} onChange={(v) => set('gallery', v)} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} max={10} />
+        <p className="hint" style={{ marginTop: 8 }}>Renk görsellerine ek olarak ürün sayfasında küçük resim olarak görünür. Sürükleyerek sırala.</p>
+      </div>
+
+      <div className="sec">
         <p className="sec-t">Bedenler</p>
         <Field label="Beden listesi (virgülle)" hint="Örn. S, M, L, XL. Doluysa müşteri beden seçmeden sepete ekleyemez. Beden yoksa boş bırak.">
           <input className="inp" value={d.sizes} onChange={(e) => set('sizes', e.target.value)} placeholder="S, M, L, XL" />
@@ -266,12 +273,8 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       <div className="sec">
         <p className="sec-t">Ana sayfa kart görseli</p>
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          <label className="up" style={{ width: 84, height: 84 }}>
-            {d.thumb || d.colors[0]?.img ? <img src={d.thumb || d.colors[0].img} alt="" /> : up === 'thumb' ? <span className="spin" /> : <ImagePlus size={22} />}
-            <input type="file" accept="image/*" onChange={(e) => { pick(e.target.files?.[0], 'thumb'); e.target.value = ''; }} />
-          </label>
+          <ImageSlot value={d.thumb} onChange={(v) => set('thumb', v)} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={96} />
           <p className="hint" style={{ margin: 0 }}>Boş bırakırsan ilk rengin görseli kullanılır.</p>
-          {d.thumb && <button className="link-btn" onClick={() => set('thumb', '')}>Sıfırla</button>}
         </div>
       </div>
 
@@ -351,7 +354,7 @@ export default function Products() {
         <button className="btn" onClick={() => setEdit(blank(nextSort))}><Plus size={15} /> Yeni ürün</button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {list && list.length > 0 && <ProductsInsight list={list} />}
           <div className="card">

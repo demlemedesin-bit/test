@@ -207,7 +207,7 @@ a:active .dbtn, button:not([disabled]):active .dbtn{ transform:translateY(1px); 
   --tea:         #8E2A21;   /* the tea in the drawings */
 
   /* type */
-  --font-display: 'strenuous', 'Strenuous', 'Fraunces', Georgia, serif;
+  --font-display: 'strenuous', 'Strenuous', 'Kodchasan', Georgia, serif;
   --font-body:    'Kodchasan', 'Karla', system-ui, sans-serif;
   --t-10: 10pt;          /* marquee */
   --t-12: 12px;          /* labels, captions */
