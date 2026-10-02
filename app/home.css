@@ -653,6 +653,8 @@ em{ font-style:normal; font-weight:400; }
   .shop-grid{ grid-template-columns:repeat(2, 1fr); gap:var(--s-32) var(--s-16); }
   .newsletter-form{ flex-direction:column; }
   .newsletter-form .btn{ border-left:0; border-top:1px solid var(--ink); justify-content:center; }
+  .newsletter-form input{ flex:none; height:52px; width:100%; }
+  .newsletter-form .btn{ min-height:52px; }
 }
 
 .sh-price s{ opacity:.5; margin-right:4px; font-weight:400; }
