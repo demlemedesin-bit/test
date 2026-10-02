@@ -118,3 +118,35 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .at-bar{ position:absolute; left:0; bottom:0; height:4px; width:100%; background:#DD262C; transform-origin:left; animation:atBar 6.5s linear forwards; } @keyframes atBar{ to{ transform:scaleX(0) } }
 @media(max-width:600px){ .add-toast{ right:16px; left:16px; top:auto; bottom:16px; width:auto; transform:translateY(24px) scale(.96); } }
 @media(prefers-reduced-motion:reduce){ .add-toast,.at-ok,.pn-cart.bump,.pp-add.done,.at-bar{ animation:none !important; transition:opacity 150ms !important; } }
+
+/* Süreli indirim kartı */
+.sale-card{ position:relative; margin:14px 0 10px; padding:14px 16px 14px; border-radius:16px; color:#fff; overflow:hidden; background:linear-gradient(135deg,#DD262C 0%,#B01A20 55%,#7A1015 100%); box-shadow:0 14px 30px -14px rgba(221,38,44,.6); animation:scIn .7s cubic-bezier(.2,.8,.2,1) both; }
+.sale-card::before{ content:""; position:absolute; inset:0; background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%); transform:translateX(-120%); animation:scShine 4.5s ease-in-out 1s infinite; pointer-events:none; }
+.sale-card::after{ content:""; position:absolute; right:-30px; top:-30px; width:110px; height:110px; border-radius:50%; background:rgba(255,255,255,.08); pointer-events:none; }
+.sc-top{ position:relative; display:flex; align-items:center; gap:10px; }
+.sc-fire{ font-size:24px; line-height:1; animation:scFire 1.6s ease-in-out infinite; transform-origin:50% 90%; }
+.sc-t{ display:flex; flex-direction:column; flex:1; min-width:0; line-height:1.2; }
+.sc-t b{ font-size:15px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+.sc-t small{ font-size:12px; opacity:.8; }
+.sc-save{ display:flex; flex-direction:column; align-items:center; padding:6px 10px; border-radius:12px; background:#fff; color:#B01A20; font-weight:700; font-size:16px; line-height:1.05; transform:rotate(3deg); }
+.sc-save small{ font-size:9.5px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; }
+.sc-cd{ position:relative; display:flex; align-items:center; justify-content:center; gap:6px; margin:12px 0 10px; }
+.sc-cd div{ display:flex; flex-direction:column; align-items:center; min-width:58px; padding:8px 4px 6px; border-radius:12px; background:rgba(0,0,0,.24); backdrop-filter:blur(2px); }
+.sc-cd b{ font-size:28px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
+.sc-cd b.tick{ animation:scTick .45s ease-out; }
+.sc-cd small{ margin-top:4px; font-size:10px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+.sc-cd i{ font-style:normal; font-size:22px; opacity:.55; margin-bottom:12px; animation:scBlink 1s steps(2) infinite; }
+.sc-bar{ position:relative; height:5px; border-radius:5px; background:rgba(255,255,255,.25); overflow:hidden; }
+.sc-bar span{ display:block; height:100%; border-radius:5px; background:#fff; transition:width 1s linear; }
+.sale-card.urgent .sc-bar span{ background:#FFD84D; animation:scPulse 1s ease-in-out infinite; }
+.sale-card.urgent .sc-cd b{ color:#FFE27A; }
+.sale-card.ended{ background:#8a8478; box-shadow:none; }
+.sale-card.ended::before{ display:none; }
+@keyframes scIn{ from{ opacity:0; transform:translateY(14px) scale(.97); } to{ opacity:1; transform:none; } }
+@keyframes scShine{ 0%,60%{ transform:translateX(-120%); } 100%{ transform:translateX(120%); } }
+@keyframes scFire{ 0%,100%{ transform:scale(1) rotate(-4deg); } 50%{ transform:scale(1.18) rotate(5deg); } }
+@keyframes scTick{ 0%{ transform:translateY(-6px); opacity:.4; } 100%{ transform:none; opacity:1; } }
+@keyframes scBlink{ 50%{ opacity:.15; } }
+@keyframes scPulse{ 50%{ opacity:.55; } }
+@media (max-width:480px){ .sc-cd div{ min-width:0; flex:1; } .sc-cd b{ font-size:24px; } .sale-card{ padding:12px; } }
+@media (prefers-reduced-motion:reduce){ .sale-card, .sale-card::before, .sc-fire, .sc-cd b.tick, .sc-cd i, .sale-card.urgent .sc-bar span{ animation:none; } }
