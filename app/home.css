@@ -656,5 +656,6 @@ em{ font-style:normal; font-weight:400; }
 }
 
 .sh-price s{ opacity:.5; margin-right:4px; font-weight:400; }
-.sh-sale{ background:#DD262C; color:#fff; padding:1px 6px; border-radius:99px; font-size:10px; letter-spacing:.04em; margin-left:6px; }
-.sh-low{ color:#9a2f24; }
+.sh-price .sh-now{ color:#DD262C; font-weight:600; }
+.sh-sale{ display:inline-block; white-space:nowrap; background:#DD262C; color:#fff; padding:1px 7px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:0; line-height:1.5; margin-left:6px; vertical-align:middle; text-transform:none; }
+.sh-low{ display:block; white-space:nowrap; color:#9a2f24; font-size:11px; letter-spacing:0; margin-top:2px; text-transform:none; }

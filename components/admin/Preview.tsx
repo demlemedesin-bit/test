@@ -97,15 +97,17 @@ export function SalePreview({ name, base, price, pct, ends, left, state }: { nam
         <div style={{ fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: '#8a7e70', marginBottom: 10 }}>Ana sayfa · mağaza kartı</div>
         <div style={{ width: 170, background: '#fff', borderRadius: 12, padding: 12, boxShadow: '0 2px 12px rgba(0,0,0,.08)' }}>
           <div style={{ height: 96, background: '#efe6d8', borderRadius: 8, marginBottom: 10 }} />
-          <div style={{ fontSize: 14 }}>{name}{live && <span style={{ background: '#DD262C', color: '#fff', padding: '1px 6px', borderRadius: 99, fontSize: 10, marginLeft: 6 }}>%{pct} indirim</span>}{live && left ? <span style={{ color: '#9a2f24', fontSize: 10, marginLeft: 6 }}>Son {left} adet</span> : null}</div>
-          <div style={{ fontSize: 14, color: '#5c5348' }}>{live && <s style={{ opacity: 0.5, marginRight: 4 }}>{f(base)}</s>}{f(live ? price : base)}</div>
+          <div style={{ fontSize: 14 }}>{name}{live && <span style={{ background: '#DD262C', color: '#fff', padding: '1px 7px', borderRadius: 99, fontSize: 11, fontWeight: 600, marginLeft: 6, whiteSpace: 'nowrap' }}>-%{pct}</span>}</div>
+          {live && left ? <div style={{ color: '#9a2f24', fontSize: 11 }}>Son {left} adet</div> : null}
+          <div style={{ fontSize: 14, color: '#5c5348' }}>{live && <s style={{ opacity: 0.5, marginRight: 4 }}>{f(base)}</s>}<span style={live ? { color: '#DD262C', fontWeight: 600 } : undefined}>{f(live ? price : base)}</span></div>
         </div>
         {!live && <p style={{ fontSize: 12, color: '#8a7e70', marginTop: 10 }}>Kampanya şu an aktif değil; kartta normal fiyat görünür.</p>}
       </div>
       <div style={{ background: '#f7f1e8', color: '#1d1a16', borderRadius: 14, padding: 18 }}>
         <div style={{ fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: '#8a7e70', marginBottom: 10 }}>Ürün sayfası</div>
+        <div style={{ position: 'relative', height: 90, background: '#efe6d8', borderRadius: 10, marginBottom: 12 }}>{live && <span style={{ position: 'absolute', top: 8, right: 8, width: 56, height: 56, borderRadius: '50%', background: '#DD262C', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', lineHeight: 1.05, transform: 'rotate(8deg)', boxShadow: '0 6px 18px rgba(221,38,44,.35)' }}><b style={{ fontSize: 15 }}>-%{pct}</b><small style={{ fontSize: 9 }}>indirim</small></span>}</div>
         <div style={{ fontSize: 22, fontFamily: 'Georgia, serif' }}>{name}</div>
-        <div style={{ fontSize: 18, margin: '6px 0' }}>{live && <s style={{ opacity: 0.5, marginRight: 8, fontWeight: 400 }}>{f(base)}</s>}{f(live ? price : base)}</div>
+        <div style={{ fontSize: 18, margin: '6px 0' }}>{live && <s style={{ opacity: 0.5, marginRight: 8, fontWeight: 400 }}>{f(base)}</s>}<span style={live ? { color: '#DD262C', fontWeight: 600 } : undefined}>{f(live ? price : base)}</span></div>
         {live && <div style={{ fontSize: 13, color: '#9a2f24' }}>{cd}</div>}
         {live && left ? <div style={{ fontSize: 13, color: '#9a2f24' }}>Son {left} adet kaldı</div> : null}
         <div style={{ marginTop: 12, display: 'inline-block', background: '#14161b', color: '#fff', padding: '8px 18px', borderRadius: 99, fontSize: 14 }}>Sepete ekle</div>
