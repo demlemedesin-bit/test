@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
@@ -253,6 +253,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
           )}
         </div>
       </MenuCtx.Provider>
+      <nav className="bnav" aria-label="Hızlı gezinme">
+        {[['/admin', 'Genel', LayoutDashboard], ['/admin/siparisler', 'Sipariş', ShoppingBag], ['/admin/urunler', 'Ürün', Package], ['/admin/musteriler', 'Müşteri', Users]].filter(([h]) => perms.length || h === '/admin').map(([h, l, I]) => {
+          const Ic = I as typeof Users;
+          return (
+            <Link key={h as string} href={h as string} className={`bi${active(h as string) ? ' on' : ''}`}>
+              <Ic size={19} strokeWidth={1.9} />
+              <span>{l as string}</span>
+            </Link>
+          );
+        })}
+        <button type="button" className="bi" onClick={() => setOpen(true)}>
+          <Menu size={19} strokeWidth={1.9} />
+          <span>Menü</span>
+        </button>
+      </nav>
     </div>
   );
 }

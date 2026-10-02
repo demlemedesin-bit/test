@@ -67,7 +67,7 @@ export default function Analiz() {
             <div style={{ padding: '14px 16px 6px' }}><AreaChart data={daily} fmt={tl} /></div>
           </Card>
           <div className="grid2 even">
-            <Card title="Yeni / tekrar müşteri"><div style={{ padding: 18 }}><Donut size={130} center={{ big: String(k.newCust + k.repeatCust), small: 'müşteri' }} segs={[{ label: 'Yeni', value: k.newCust, color: '#f0674f' }, { label: 'Tekrar', value: k.repeatCust, color: '#25d6a0' }]} /></div></Card>
+            <Card title="Yeni / tekrar müşteri"><div style={{ padding: 18 }}><Donut size={130} center={{ big: String(k.newCust + k.repeatCust), small: 'müşteri' }} segs={[{ label: 'Yeni', value: k.newCust, color: '#7c6af7' }, { label: 'Tekrar', value: k.repeatCust, color: '#25d6a0' }]} /></div></Card>
             <Card title="Dönem özeti"><div style={{ padding: 18, display: 'grid', gap: 8, fontSize: 13.5 }}>
               <div>Satılan adet: <b>{k.unitsSold}</b></div><div>İade tutarı: <b>{tl(k.retAmt)}</b></div><div>Ziyaretçi (oturum): <b>{k.visitors}</b></div><div>Sepete ekleyen: <b>{k.carts}</b> · Checkout: <b>{k.checkout}</b></div>
             </div></Card>

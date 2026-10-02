@@ -74,7 +74,7 @@ function FullDashboard() {
       );
     const since30 = orders ? now.getTime() - 30 * 86400000 : 0;
     const last30 = (orders ?? []).filter((o) => new Date(o.created_at).getTime() >= since30);
-    const stLabel: Record<string, [string, string]> = { odeme_bekleniyor: ['Ödeme bekliyor', '#f3ad4a'], hazirlaniyor: ['Hazırlanıyor', '#5aaefc'], kargoda: ['Kargoda', '#f0674f'], teslim_edildi: ['Teslim edildi', '#25d6a0'], iptal: ['İptal', '#6c6c85'] };
+    const stLabel: Record<string, [string, string]> = { odeme_bekleniyor: ['Ödeme bekliyor', '#f3ad4a'], hazirlaniyor: ['Hazırlanıyor', '#5aaefc'], kargoda: ['Kargoda', '#7c6af7'], teslim_edildi: ['Teslim edildi', '#25d6a0'], iptal: ['İptal', '#6c6c85'] };
     const statusSegs = Object.entries(stLabel).map(([k, [label, color]]) => ({ label, color, value: last30.filter((o) => o.status === k).length }));
     const payMap = new Map<string, number>();
     last30.filter((o) => o.status !== 'iptal').forEach((o) => payMap.set(o.payment_method, (payMap.get(o.payment_method) ?? 0) + Number(o.total)));

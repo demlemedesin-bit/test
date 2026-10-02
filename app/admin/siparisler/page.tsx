@@ -8,6 +8,7 @@ import { dt, tl, type AdminOrder } from '@/lib/admin';
 import { PAY, STATUS } from '@/components/OrderParts';
 import { CARRIER_NAMES } from '@/lib/carriers';
 import { useMenu } from '@/components/admin/Shell';
+import { OrdersInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
 
 const TABS: [string, string][] = [
@@ -318,6 +319,8 @@ function Orders() {
   const [tab, setTab] = useState(sp.get('durum') || 'hepsi');
   const [q, setQ] = useState(sp.get('q') || '');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [nowTs, setNowTs] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setNowTs(Date.now()), 0); return () => clearTimeout(t); }, []);
   const { show, node } = useToast();
 
   const load = useCallback(async () => {
@@ -372,6 +375,7 @@ function Orders() {
       <div className="adm-scroll">
         <div className="adm-inner">
           {err && <div className="alert err">{err}</div>}
+          {orders && orders.length > 0 && <OrdersInsight orders={orders} now={nowTs} />}
           <div className="toolbar">
             <div className="search">
               <Search size={15} />
