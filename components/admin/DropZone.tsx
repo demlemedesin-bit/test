@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { ArrowLeft, ArrowRight, ImagePlus, Link2, UploadCloud, X } from 'lucide-react';
 import { uploadImageDetailed } from '@/lib/admin';
 import { checkImageFile, fmtBytes, getMediaSettings } from '@/lib/media';
@@ -74,7 +74,7 @@ export function GalleryInput({ value, onChange, folder, onError, max = 10 }: { v
   const [over, setOver] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   const cur = useRef(value);
-  cur.current = value;
+  useEffect(() => { cur.current = value; });
   async function many(list: FileList | File[]) {
     const fs = Array.from(list).filter(isImg);
     if (!fs.length) return onError?.('Yalnızca görsel dosyası yükleyebilirsin.');
