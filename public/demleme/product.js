@@ -43,9 +43,9 @@
     // colours: swatches + one thumbnail per colour (the photo swaps)
     var c=p.colors;
     $('ppColors').innerHTML='<div class="pp-opt-h"><b>Renk</b><span id="colName"></span></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+'"></button>'; }).join('')+'</div>' : '');
-    $('ppThumbs').innerHTML=c.length>1 ? c.map(function(x,i){ return '<button type="button" data-i="'+i+'" aria-label="'+esc(x.name)+'"><img src="'+x.img+'" alt=""></button>'; }).join('') : '';
-    if(p.gallery&&p.gallery.length){ $('ppThumbs').innerHTML+=p.gallery.map(function(g,k){ return '<button type="button" data-g="'+k+'" aria-label="Görsel '+(k+1)+'"><img src="'+esc(g)+'" alt="" loading="lazy"></button>'; }).join(''); }
-    [].forEach.call(document.querySelectorAll('#ppThumbs button[data-g]'), function(b){ b.addEventListener('click', function(){ var im=$('ppImg'); [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button'), function(x){ x.classList.remove('on'); }); b.classList.add('on'); im.classList.add('fade'); setTimeout(function(){ im.src=cur.gallery[+b.getAttribute('data-g')]; im.classList.remove('fade'); },180); }); });
+    $('ppThumbs').innerHTML=c.length>1 ? c.map(function(x,i){ return '<button type="button" data-i="'+i+'" aria-label="'+esc(x.name)+'"><img src="'+x.img+'" alt="">'+(x.imgs&&x.imgs.length ? '<em class="th-n" title="Bu renkte '+x.imgs.length+' ek görsel var">+'+x.imgs.length+'</em>' : '')+'</button>'; }).join('') : '';
+    $('ppThumbs').innerHTML+='<span id="ppXtra" class="th-x"></span>';
+    xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.addEventListener('click', function(){ setCol(+b.getAttribute('data-i')); }); });
     // sizes: either real sizes to pick (t-shirt) or links to the sibling product (jar / tray sizes) or a single fixed size
     var s=p.sizes, h='';
@@ -62,7 +62,10 @@
     if($('more')){ var start=P.indexOf(p), pick=[]; for(var k=1;k<=4;k++) pick.push(P[(start+k)%P.length]);
       $('more').innerHTML=pick.map(function(x){ return '<a href="/urun/'+x.slug+'"><div class="th"><img src="'+x.colors[0].img+'" alt="" loading="lazy"></div><p>'+esc(x.name)+'</p><span>'+x.price+'</span></a>'; }).join(''); }
     setCol(0, true); glyph(); scrollTo(0,0); };
-  var setCol=function(i, now){ col=i; var x=cur.colors[i], im=$('ppImg'); $('colName').textContent=x.name;
+  var xtra=function(){ var box=$('ppXtra'); if(!box) return; var x=(cur.colors[col]||{}), list=[]; (x.imgs||[]).forEach(function(u){ list.push(['c',u]); }); (cur.gallery||[]).forEach(function(u){ list.push(['g',u]); });
+    box.innerHTML=list.map(function(it,k){ return '<button type="button" data-x="'+k+'" class="'+(it[0]==='c' ? 'th-c' : 'th-g')+'" aria-label="Görsel '+(k+1)+'"><img src="'+esc(it[1])+'" alt="" loading="lazy"></button>'; }).join('');
+    [].forEach.call(box.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ var im=$('ppImg'), u=list[+b.getAttribute('data-x')][1]; [].forEach.call(document.querySelectorAll('#ppThumbs button'), function(y){ y.classList.remove('on'); }); b.classList.add('on'); im.classList.add('fade'); setTimeout(function(){ im.src=u; im.classList.remove('fade'); },180); }); }); };
+  var setCol=function(i, now){ col=i; var x=cur.colors[i], im=$('ppImg'); $('colName').textContent=x.name; xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.classList.toggle('on', +b.getAttribute('data-i')===i); });
     if(now){ im.src=x.img; im.alt=cur.name+', '+x.name; return; }
     im.classList.add('fade'); setTimeout(function(){ im.src=x.img; im.alt=cur.name+', '+x.name; im.classList.remove('fade'); }, 180); };

@@ -32,7 +32,7 @@ export type AdminOrder = OrderRow & {
   items: (OrderRow['items'][number] & { slug?: string })[];
 };
 
-export type Color = { key: string; name: string; hex: string; img: string };
+export type Color = { key: string; name: string; hex: string; img: string; imgs?: string[] };
 export type AdminProduct = {
   slug: string;
   name: string;
