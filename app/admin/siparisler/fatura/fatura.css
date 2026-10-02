@@ -29,3 +29,14 @@
   .fatura-page { max-width: none; }
   .fatura-page .sheet { border: none; box-shadow: none; padding: 0; border-radius: 0; }
 }
+
+/* Kargo etiketi 10x15 cm */
+.lbl { page: label; width: 100mm; min-height: 150mm; margin: 0 auto; background: #fff; color: #111; border: 1.5px solid #111; padding: 5mm; display: grid; gap: 4mm; align-content: start; font-size: 12px; }
+.lbl small { display: block; font-size: 9px; letter-spacing: 0.08em; color: #555; font-weight: 700; margin-bottom: 1mm; }
+.lbl b { display: block; font-size: 14px; } .lbl span { display: block; }
+.lbl-to { border: 2px solid #111; padding: 3mm; font-size: 14px; } .lbl-to b { font-size: 18px; margin-bottom: 1mm; }
+.lbl-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; border-top: 1px solid #111; border-bottom: 1px solid #111; padding: 3mm 0; }
+.lbl-bc { text-align: center; border: 1px dashed #111; padding: 3mm; } .lbl-bc b { font-size: 20px; letter-spacing: 0.1em; }
+.lbl-items span { margin-top: 1mm; }
+@page label { size: 100mm 150mm; margin: 0; }
+@media print { .lbl { border: none; margin: 0; width: 100mm; min-height: 150mm; } }

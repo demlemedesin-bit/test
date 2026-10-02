@@ -52,6 +52,7 @@ export async function homeHtml(): Promise<string> {
     .replace('{{DM_MONTH}}', () => esc(site.dm.month))
     .replace('{{DM_DATA}}', () => safe(dm))
     .replace('{{ANIM}}', () => safe(animCfg(site)))
+    .replaceAll('{{FREE_FROM}}', String(Number(cfg.freeFrom) || 0))
     .replaceAll('{{contactEmail}}', esc(cfg.contactEmail));
   return html.replace('{{KR_DATA}}', () => safe(data)).replace('{{SHOP_CARDS}}', () => shopCards(list));
 }

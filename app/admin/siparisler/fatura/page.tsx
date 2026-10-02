@@ -10,7 +10,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { Empty, Loading, TopBar } from '@/components/admin/ui';
 import './fatura.css';
 
-type Mode = 'fatura' | 'irsaliye';
+type Mode = 'fatura' | 'irsaliye' | 'etiket';
 type Seller = { name: string; address: string; taxOffice: string; taxNo: string; mersis: string; phone: string; email: string };
 
 function Doc() {
@@ -66,6 +66,7 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
         <div className="tabs">
           <button className={`tab${mode === 'fatura' ? ' on' : ''}`} onClick={() => setMode('fatura')}>Fatura bilgi formu</button>
           <button className={`tab${mode === 'irsaliye' ? ' on' : ''}`} onClick={() => setMode('irsaliye')}>Sevk irsaliyesi</button>
+          <button className={`tab${mode === 'etiket' ? ' on' : ''}`} onClick={() => setMode('etiket')}>Kargo etiketi (10×15)</button>
         </div>
         <span className="grow" />
         <button className="btn" onClick={() => window.print()}>
@@ -73,7 +74,16 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
         </button>
       </div>
 
-      <article className="sheet">
+      {mode === 'etiket' && (
+        <article className="lbl">
+          <div className="lbl-from"><small>GÖNDERİCİ</small><b>{s.name || 'Demleme'}</b><span>{[s.address, s.phone].filter(Boolean).join(' · ')}</span></div>
+          <div className="lbl-to"><small>ALICI</small><b>{o.full_name}</b><span style={{ whiteSpace: 'pre-line' }}>{addr}</span><span>Tel: {o.phone}</span></div>
+          <div className="lbl-row"><div><small>SİPARİŞ</small><b className="mono">{o.order_no}</b></div><div><small>KARGO</small><b>{o.tracking_carrier || '—'}</b></div><div><small>ÖDEME</small><b>{o.payment_method === 'havale' || o.payment_method === 'kapida' ? PAY[o.payment_method] ?? o.payment_method : 'Ödendi'}</b></div></div>
+          {o.tracking_no && <div className="lbl-bc"><small>TAKİP NO</small><b className="mono">{o.tracking_no}</b></div>}
+          <div className="lbl-items"><small>İÇERİK</small>{o.items.map((i, k) => <span key={k}>{i.qty} × {i.name}{[i.color_name, i.size].filter(Boolean).length ? ` (${[i.color_name, i.size].filter(Boolean).join(' · ')})` : ''}</span>)}</div>
+        </article>
+      )}
+      {mode !== 'etiket' && <article className="sheet">
         <div className="sh-head">
           <div>
             <h2>{mode === 'fatura' ? 'Fatura bilgi formu' : 'Sevk irsaliyesi'}</h2>
@@ -170,7 +180,7 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
             ? 'Bu form resmî e-fatura / e-arşiv fatura yerine geçmez; yalnızca sipariş bilgilerini içeren bilgi çıktısıdır.'
             : 'Bu belge resmî e-irsaliye değildir; paketle birlikte gönderilen bilgi / sevk çıktısıdır.'}
         </p>
-      </article>
+      </article>}
     </>
   );
 }
