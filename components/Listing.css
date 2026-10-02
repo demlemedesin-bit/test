@@ -1,0 +1,24 @@
+.ls-bar{ display:flex; flex-wrap:wrap; gap:16px 24px; align-items:center; justify-content:space-between; margin:var(--s-32, 32px) 0 var(--s-24, 24px); padding-bottom:16px; border-bottom:1px solid var(--line); }
+.ls-cats, .ls-sort{ display:flex; flex-wrap:wrap; gap:8px; }
+.ls-chip{ display:inline-flex; gap:6px; align-items:center; padding:8px 16px; border:1px solid var(--line); border-radius:99px; font-size:14px; transition:border-color .15s, background .15s; }
+.ls-chip small{ opacity:.55; font-size:12px; }
+.ls-chip:hover{ border-color:var(--ink); }
+.ls-chip.on{ background:var(--ink); color:var(--bg, #F8F4EA); border-color:var(--ink); }
+.ls-s{ font-size:13px; color:var(--ink-2); padding:6px 4px; border-bottom:1px solid transparent; }
+.ls-s:hover{ color:var(--ink); }
+.ls-s.on{ color:var(--ink); border-bottom-color:var(--ink); }
+.ls-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:32px 20px; }
+.ls-card{ display:grid; gap:6px; text-align:center; }
+.ls-img{ position:relative; display:block; aspect-ratio:1; border-radius:14px; overflow:hidden; background:#EFE7D8; }
+.ls-img img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+.ls-card:hover .ls-img img{ transform:scale(1.04); }
+.ls-pct{ position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:99px; background:#DD262C; color:#fff; font-size:12px; font-weight:600; }
+.ls-tag{ position:absolute; left:10px; top:10px; padding:4px 10px; border-radius:99px; background:rgba(255,255,255,.9); font-size:12px; }
+.ls-name{ font-size:16px; margin-top:8px; }
+.ls-cat{ font-size:12px; color:var(--ink-2); }
+.ls-price s{ opacity:.5; margin-right:8px; font-size:14px; }
+.ls-price b{ font-weight:500; }
+.ls-price b.sale{ color:#DD262C; }
+.ls-low{ font-size:12px; color:#9a2f24; }
+@media (max-width:980px){ .ls-grid{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+@media (max-width:640px){ .ls-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:24px 12px; } .ls-bar{ gap:12px; } .ls-chip{ padding:7px 12px; } }

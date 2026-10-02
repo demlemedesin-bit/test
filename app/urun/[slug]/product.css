@@ -53,8 +53,8 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .tg-brv::after{ content:""; position:absolute; left:50%; top:-.19em; width:.42em; height:.15em; margin-left:-.21em; border:.09em solid currentColor; border-top:0; border-radius:0 0 .22em .22em / 0 0 .15em .15em; }
 
 .pn{ position:sticky; top:0; z-index:10; height:var(--nav-h); display:flex; align-items:center; justify-content:space-between; padding:0 var(--pad); background:var(--cream-light); border-bottom:1px solid var(--line); }
-.pn-logo{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:26px; } .pn-logo img{ height:44px; width:auto; }
-.pn-links{ display:flex; gap:32px; font-size:15px; color:var(--ink-2); } .pn-links a:hover{ color:var(--ink); } .pn-links a.on{ color:var(--ink); }
+.pn-logo{ display:inline-flex; align-items:center; gap:10px; flex:none; font-family:var(--font-display); font-size:26px; } .pn-logo img{ height:44px; width:auto; }
+.pn-links{ display:flex; gap:32px; margin-left:clamp(36px, 4.5vw, 72px); font-size:15px; color:var(--ink-2); } .pn-links a:hover{ color:var(--ink); } .pn-links a.on{ color:var(--ink); }
 .pn-cart{ position:relative; } .pn-cart img{ height:34px; width:auto; } .pn-count{ position:absolute; right:-6px; top:-4px; min-width:18px; height:18px; padding:0 4px; background:var(--ink); color:var(--cream-light); font-size:11px; line-height:18px; text-align:center; opacity:0; transition:opacity 200ms; } .pn-count.on{ opacity:1; }
 .crumb{ margin:var(--s-24) var(--pad) 0; font-size:var(--t-14); color:var(--ink-2); } .crumb a:hover{ color:var(--ink); } .crumb span{ margin:0 8px; }
 .pp{ display:grid; grid-template-columns:minmax(0, 1.08fr) minmax(0, .92fr); gap:clamp(32px, 5vw, 88px); margin:var(--s-24) var(--pad) 0; align-items:start; }
