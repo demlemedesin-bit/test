@@ -11,7 +11,7 @@ export type Storefront = {
   related_on: boolean;
   related_title: string;
   related_count: number;
-  related_mode: 'auto' | 'manual';
+  related_mode: 'auto' | 'manual' | 'together';
   upsell_cart_on: boolean;
   upsell_title: string;
   upsell_count: number;
@@ -57,7 +57,7 @@ export function toStorefront(v: unknown): Storefront {
     related_on: bool(o.related_on, d.related_on),
     related_title: str(o.related_title, d.related_title),
     related_count: int(o.related_count, d.related_count, 1, 8),
-    related_mode: o.related_mode === 'manual' ? 'manual' : 'auto',
+    related_mode: o.related_mode === 'manual' ? 'manual' : o.related_mode === 'together' ? 'together' : 'auto',
     upsell_cart_on: bool(o.upsell_cart_on, d.upsell_cart_on),
     upsell_title: str(o.upsell_title, d.upsell_title),
     upsell_count: int(o.upsell_count, d.upsell_count, 1, 6),

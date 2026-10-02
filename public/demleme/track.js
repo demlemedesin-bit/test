@@ -50,7 +50,7 @@
         var m={view_item:'ViewContent', add_to_cart:'AddToCart', begin_checkout:'InitiateCheckout', purchase:'Purchase'}[name];
         if(m){ var fp={currency:cur, value:value, content_type:'product', content_ids:items.map(function(i){ return i.item_id; }).filter(Boolean)};
           if(items[0] && items[0].item_name) fp.content_name=items[0].item_name; if(name==='purchase' && d.transaction_id) fp.order_id=d.transaction_id;
-          fbq('track',m,fp); }
+          if(name==='purchase' && d.transaction_id) fbq('track',m,fp,{eventID:String(d.transaction_id)}); else fbq('track',m,fp); }
       }
     }catch(e){}
     try{
@@ -78,8 +78,21 @@
   var viewed=false;
   var viewItem=function(d){ if(viewed) return; viewed=true; window.dmEvent('view_item', d||pageItem()||{}); };
 
+  // Öneri kaynağı: [data-rec] kartına tıklanınca saklanır; ürün sayfasında rec_click, sepete eklemede rec etiketi gider
+  var rec=null; try{ rec=JSON.parse(sessionStorage.getItem('dm-rec')||'null'); if(rec && Date.now()-rec.ts>30*6e4) rec=null; }catch(e){ rec=null; }
+  document.addEventListener('click', function(e){ var c=e.target && e.target.closest && e.target.closest('[data-rec]'); if(!c) return;
+    var m=(c.getAttribute('href')||'').match(/\/urun\/([^/?#]+)/); if(!m) return;
+    try{ sessionStorage.setItem('dm-rec', JSON.stringify({slug:decodeURIComponent(m[1]), rec:c.getAttribute('data-rec'), ts:Date.now()})); }catch(x){} }, true);
   window.dmTrack=function(type, extra){
-    send(type, extra);
+    var d0=extra||{}, prod=d0.product||d0.item_id||'';
+    if(!prod && type==='add_to_cart'){ var i0=pageItem()||last; prod=(i0&&i0.item_id)||''; }
+    if(!prod && pm) prod=decodeURIComponent(pm[1]);
+    var ex={}; for(var kk in d0) ex[kk]=d0[kk];
+    if(type==='order'){ ex.url=location.href; }
+    if(prod && type!=='order') ex.product=prod;
+    if(type==='order' && rec) ex.rec=rec.rec;
+    if(rec && prod && rec.slug===prod && (type==='add_to_cart'||type==='view')) ex.rec=rec.rec;
+    send(type, ex);
     try{
       var d=extra||{};
       if(type==='view'){ viewItem(d.item_id ? d : null); }
@@ -94,5 +107,7 @@
     var cart=[]; try{ cart=JSON.parse(ls('demleme-cart')||'[]'); }catch(e){ cart=[]; }
     if(cart && cart.length) window.dmEvent('begin_checkout', {items:cart.map(function(x){ return {item_id:x.slug||'', item_name:x.name||'', price:price(x.price), quantity:+x.qty||1}; })});
   }
+  if(/^\/odeme\/?$/.test(location.pathname)) send('begin_checkout');
   send('view');
+  if(pm && rec && rec.slug===decodeURIComponent(pm[1])) send('rec_click',{product:rec.slug, rec:rec.rec});
 })();

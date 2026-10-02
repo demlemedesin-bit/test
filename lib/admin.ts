@@ -70,17 +70,22 @@ export const PERMS = [
   { key: 'reports', label: 'Raporlar' },
   { key: 'tracking', label: 'Takip (UTM)' },
   { key: 'integrations', label: 'Entegrasyonlar' },
+  { key: 'warehouse', label: 'Depo (hazırlama, paketleme, iade teslim)' },
+  { key: 'accounting', label: 'Muhasebe (ödeme, iade, fatura)' },
+  { key: 'support', label: 'Müşteri hizmetleri (talepler, Customer 360)' },
   { key: 'system', label: 'Sistem ve kullanıcılar' },
 ] as const;
 export type Perm = (typeof PERMS)[number]['key'];
 
 /** Hazır rol şablonları (Sistem sayfasında seçilir). */
 export const ROLE_TEMPLATES: { key: string; label: string; perms: Perm[] }[] = [
-  { key: 'depo', label: 'Depo', perms: ['orders', 'products'] },
-  { key: 'muhasebe', label: 'Muhasebe', perms: ['orders', 'reports', 'customers'] },
+  { key: 'eticaret', label: 'E-ticaret', perms: ['products', 'orders', 'campaigns', 'content', 'reports'] },
+  { key: 'pazarlama', label: 'Pazarlama', perms: ['campaigns', 'tracking', 'reports', 'content', 'integrations', 'customers'] },
+  { key: 'depo', label: 'Depo', perms: ['warehouse', 'orders', 'products'] },
+  { key: 'muhasebe', label: 'Muhasebe', perms: ['accounting', 'orders', 'reports'] },
+  { key: 'musteri', label: 'Müşteri hizmetleri', perms: ['support', 'orders', 'customers'] },
   { key: 'icerik', label: 'İçerik editörü', perms: ['content'] },
-  { key: 'pazarlama', label: 'Pazarlama', perms: ['campaigns', 'tracking', 'reports', 'content'] },
-  { key: 'musteri', label: 'Müşteri hizmetleri', perms: ['orders', 'customers'] },
+  { key: 'yonetici', label: 'Yönetici (tüm paneller)', perms: ['orders', 'products', 'customers', 'campaigns', 'content', 'reports', 'tracking', 'integrations', 'warehouse', 'accounting', 'support'] },
 ];
 
 /** Oturum + panel yetkileri. perms boşsa panele giremez. */

@@ -5,6 +5,7 @@ import { getFooterPages } from './cms';
 import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite } from './site';
 import { DRAWINGS } from './siteDefaults';
 import type { Storefront } from './storefront';
+import { bannersHtml, parseBanners } from './design';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -42,7 +43,9 @@ export async function homeHtml(): Promise<string> {
     teas: tea,
   };
   const dm = { month: site.dm.month, photos: site.dm.photos };
+  const banners = parseBanners(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.banners')) ?? [])[0]?.value);
   const html = fill(read('home.html'), site)
+    .replace('{{BANNERS}}', () => bannersHtml(banners))
     .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
     .replace('{{FOOTER_COLS}}', () => footerCols(site.footer))
     .replace('{{FOOTER_LEGAL}}', () => footerLegal({ ...site.footer, legal }))
@@ -105,9 +108,10 @@ async function productMeta(): Promise<Map<string, Meta>> {
   );
 }
 
-function pickRelated(list: SiteProduct[], cur: SiteProduct, meta: Map<string, Meta>, sf: Storefront): SiteProduct[] {
+function pickRelated(list: SiteProduct[], cur: SiteProduct, meta: Map<string, Meta>, sf: Storefront, together: string[] = []): SiteProduct[] {
   const by = new Map(list.map((p) => [p.slug, p]));
   const manual: SiteProduct[] = [];
+  if (sf.related_mode === 'together') for (const s of together) { const p = by.get(s); if (p && p.slug !== cur.slug && !p.soon && !manual.includes(p)) manual.push(p); }
   for (const s of meta.get(cur.slug)?.related ?? []) {
     const p = by.get(s);
     if (p && p.slug !== cur.slug && !manual.includes(p)) manual.push(p);
@@ -128,7 +132,7 @@ function relatedHtml(items: SiteProduct[], title: string): string {
   const cards = items
     .map((x) => {
       const img = x.colors[0]?.img || x.thumb;
-      return `<a href="/urun/${esc(x.slug)}"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
+      return `<a href="/urun/${esc(x.slug)}" data-rec="related"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
     })
     .join('');
   return `<section class="more px-related"><div class="more-h"><h2>${esc(title)}</h2><a href="/#magaza">Tüm ürünler →</a></div><div class="more-row">${cards}</div></section>`;
@@ -202,7 +206,8 @@ export async function productHtml(list: SiteProduct[] | undefined, slug: string,
   const since = sf.badges.new_days > 0 ? Date.now() - sf.badges.new_days * 864e5 : Infinity;
   const all = base.map((p) => ((meta.get(p.slug)?.created ?? NaN) >= since && !p.badge ? { ...p, badge: 'Yeni' } : p));
   const cur = all.find((p) => p.slug === slug);
-  const related = sf.related_on && cur ? relatedHtml(pickRelated(all, cur, meta, sf), sf.related_title) : '';
+  const together = sf.related_on && cur && sf.related_mode === 'together' ? ((await rest<string[]>(`rpc/co_purchased?p_slug=${encodeURIComponent(slug)}&p_limit=8`)) ?? []) : [];
+  const related = sf.related_on && cur ? relatedHtml(pickRelated(all, cur, meta, sf, together), sf.related_title) : '';
   return fill(read('product.html'), site)
     .replace('{{REVIEWS}}', () => (sf.reviews_on ? reviewsHtml(reviews) : ''))
     .replace('{{RELATED}}', () => related)
