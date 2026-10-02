@@ -625,3 +625,12 @@ begin
 end $$;
 revoke all on function public.track_report(timestamptz, timestamptz) from public;
 grant execute on function public.track_report(timestamptz, timestamptz) to authenticated;
+
+-- ═══ 10. anon çağrı yetkisini kapat (içeride zaten yetki kontrolü var; savunma katmanı) ═══
+revoke execute on function public.admin_staff() from anon;
+revoke execute on function public.admin_set_staff(text, text, text[]) from anon;
+revoke execute on function public.track_report(timestamptz, timestamptz) from anon;
+revoke execute on function public.report_sales(timestamptz, timestamptz) from anon;
+revoke execute on function public.admin_customers() from anon;
+create or replace function public.track_report_guard() returns boolean language sql stable set search_path = public as $$ select public.has_perm('tracking') or public.has_perm('reports') $$;
+-- Not: admin_remove_staff(uuid) canlıya yazılamadı (onay kapısı); gerekirse elle: delete from staff_roles where user_id = ...
