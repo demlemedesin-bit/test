@@ -12,6 +12,48 @@ const CARDS = '.sh-card, .more-row > a, article';
  * Site genelinde: görsellerin lazy-load + yumuşak belirmesi, bölümlerin kaydırınca belirmesi,
  * sayfa geçişlerinde üst ilerleme çizgisi. Yalnızca görünümü etkiler; içerik JS'siz de erişilebilir.
  */
+const TR = /[ŞşĞğİıi]/;
+const TR_MAP: Record<string, [string, string]> = { Ş: ['S', 'tg-ced'], ş: ['s', 'tg-ced'], Ğ: ['G', 'tg-brv'], ğ: ['g', 'tg-brv'], İ: ['I', 'tg-dot'], i: ['I', 'tg-dot'], ı: ['I', ''] };
+
+/** Strenuous'ta Ş ş Ğ ğ İ ı yok: bu fontla yazılan metindeki harfleri çizilmiş karşılıklarıyla tamamlar (sitenin her yerinde, sonradan gelen metinde de). */
+function fixGlyphs(root: Node) {
+  if (!(root instanceof Element) && root.nodeType !== 3) return;
+  const base = root.nodeType === 3 ? root.parentElement : (root as Element);
+  if (!base) return;
+  const cache = new Map<Element, boolean>();
+  const isDisplay = (el: Element) => {
+    let v = cache.get(el);
+    if (v === undefined) {
+      v = /strenuous/i.test(getComputedStyle(el).fontFamily.split(',')[0] || '');
+      cache.set(el, v);
+    }
+    return v;
+  };
+  const w = document.createTreeWalker(root.nodeType === 3 ? (root.parentElement as Node) : root, NodeFilter.SHOW_TEXT);
+  const hits: Text[] = [];
+  let n: Node | null;
+  while ((n = w.nextNode())) {
+    const t = n as Text;
+    const el = t.parentElement;
+    if (!el || !TR.test(t.nodeValue || '') || el.closest('script,style,textarea,input,.tg,[data-no-tg]')) continue;
+    if (isDisplay(el)) hits.push(t);
+  }
+  hits.forEach((t) => {
+    const frag = document.createDocumentFragment();
+    (t.nodeValue || '').split(/([ŞşĞğİıi])/).forEach((part) => {
+      const m = TR_MAP[part];
+      if (m) {
+        const sp = document.createElement('span');
+        sp.className = `tg ${m[1]}`.trim();
+        sp.setAttribute('data-ch', part);
+        sp.textContent = m[0];
+        frag.appendChild(sp);
+      } else if (part) frag.appendChild(document.createTextNode(part));
+    });
+    t.replaceWith(frag);
+  });
+}
+
 export function Motion() {
   const path = usePathname();
   const bar = useRef<HTMLDivElement>(null);
@@ -82,13 +124,30 @@ export function Motion() {
         window.setTimeout(() => document.querySelectorAll('[data-rv]:not([data-rv="in"])').forEach((el) => el.setAttribute('data-rv', 'in')), 8000),
       );
     }
-    const mo = new MutationObserver(() => scanImgs());
+    let gt = 0;
+    const pend = new Set<Node>();
+    const flush = () => {
+      pend.forEach((nd) => nd.isConnected && fixGlyphs(nd));
+      pend.clear();
+    };
+    const mo = new MutationObserver((ms) => {
+      scanImgs();
+      ms.forEach((m) => m.addedNodes.forEach((nd) => (nd.nodeType === 1 || nd.nodeType === 3) && pend.add(nd)));
+      if (pend.size) {
+        window.clearTimeout(gt);
+        gt = window.setTimeout(flush, 30);
+      }
+    });
     mo.observe(document.body, { childList: true, subtree: true });
+    timers.push(window.setTimeout(() => fixGlyphs(document.body), 60));
+    // yazı tipi geç yüklenirse (hesaplanan font değişir) bir kez daha tara
+    document.fonts?.ready.then(() => fixGlyphs(document.body));
 
     return () => {
       document.removeEventListener('load', imgDone, true);
       document.removeEventListener('error', imgDone, true);
       window.clearTimeout(imgFail);
+      window.clearTimeout(gt);
       timers.forEach(window.clearTimeout);
       io?.disconnect();
       mo.disconnect();
