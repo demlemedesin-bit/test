@@ -257,6 +257,13 @@ export const FIELDS: Field[] = [
   "def": "Hesabım"
  },
  {
+  "id": "nav_login",
+  "group": "Menü",
+  "label": "Menü: Giriş yap (üye değilken)",
+  "kind": "text",
+  "def": "Giriş yap"
+ },
+ {
   "id": "shop_title",
   "group": "Ana sayfa · Mağaza",
   "label": "Başlık (alt satır için Enter)",
@@ -654,6 +661,9 @@ export const DEFAULT_FOOTER: FooterData = {
   }
  ],
  "legal": [
+  {"label": "Sipariş takibi", "href": "/siparis-takip"},
+  {"label": "Kargo ve iade", "href": "/kargo-ve-iade"},
+  {"label": "Mesafeli satış sözleşmesi", "href": "/mesafeli-satis-sozlesmesi"},
   {
    "label": "KVKK",
    "href": "/kvkk"

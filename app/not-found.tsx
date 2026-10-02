@@ -1,12 +1,11 @@
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
+import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import { D } from '@/components/Display';
 import './(shop)/shop.css';
 
 export default function NotFound() {
   return (
     <>
-      <Header />
+      <SiteHeader />
       <main className="err-page">
         <h1>
           <D>Bulamadık</D>
@@ -16,7 +15,7 @@ export default function NotFound() {
           Ana sayfaya dön
         </a>
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   );
 }
