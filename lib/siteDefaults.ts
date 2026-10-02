@@ -651,7 +651,7 @@ export const DEFAULT_FAQ: Faq[] = [
  },
  {
   "q": "Programa konuk olmak ya da iş birliği yapmak istiyorum, nasıl ulaşırım?",
-  "a": "merhaba@demleme.com adresine yazabilirsin. Konuk önerilerini ve iş birliği taleplerini buradan değerlendiriyoruz."
+  "a": "garen@demlemedesin.com adresine yazabilirsin. Konuk önerilerini ve iş birliği taleplerini buradan değerlendiriyoruz."
  },
  {
   "q": "E-posta bültenine katılırsam neler gönderiyorsunuz?",

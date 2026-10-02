@@ -16,7 +16,7 @@ export function OrderDone() {
       .then((s) => setCfg(s.map))
       .catch(() => {});
   }, []);
-  const config = { contactEmail: cfg.contact_email || 'merhaba@demleme.com' };
+  const config = { contactEmail: cfg.contact_email || 'garen@demlemedesin.com' };
   const bank = { holder: cfg.bank_holder || '', bankName: cfg.bank_name || '', iban: cfg.bank_iban || '' };
 
   // Sunucuda undefined (yükleniyor), tarayıcıda kayıtlı sipariş ya da null
