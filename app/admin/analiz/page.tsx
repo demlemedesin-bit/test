@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { loadData, PERIODS, kpis, productPerf, brandPerf, customers, campaignPerf, recPerf, REC_LABEL, DAY, startOfDay, type Data } from '@/lib/analytics';
 import { tl } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
-import { Loading, TopBar } from '@/components/admin/ui';
+import { Kpi, Loading, TopBar } from '@/components/admin/ui';
+import { AreaChart, Donut } from '@/components/admin/Charts';
+import { Activity, Banknote, ShoppingBag, ShoppingCart, Percent, UserPlus, Undo2, Users, Eye, Package } from 'lucide-react';
 import { Card, Delta, Tabs, Tbl, n1 } from '@/components/admin/Tbl';
 
 const TABS = [['ozet', 'Özet'], ['urun', 'Ürün performansı'], ['marka', 'Markalar'], ['stok', 'Stok'], ['iade', 'İade'], ['musteri', 'Müşteri'], ['kampanya', 'Kampanya'], ['oneri', 'Öneri performansı']] as const;
@@ -29,6 +31,17 @@ export default function Analiz() {
   const camps = useMemo(() => (d ? campaignPerf(d) : []), [d]);
   const recs = useMemo(() => (d ? recPerf(d, r) : []), [d, r]);
 
+  const ICONS = [<Banknote key="a" size={17} />, <ShoppingBag key="b" size={17} />, <ShoppingCart key="c" size={17} />, <Percent key="d" size={17} />, <Eye key="e" size={17} />, <Package key="f" size={17} />, <Activity key="g" size={17} />, <UserPlus key="h" size={17} />, <Users key="i" size={17} />, <Undo2 key="j" size={17} />];
+  const daily = useMemo(() => {
+    if (!d) return [];
+    const days = Math.min(90, Math.max(1, Math.round((Math.min(r.to, Date.now() + DAY) - r.from) / DAY)));
+    return Array.from({ length: days }, (_, i) => {
+      const t0 = r.from + i * DAY;
+      const os = d.orders.filter((o) => o.status !== 'iptal' && new Date(o.created_at).getTime() >= t0 && new Date(o.created_at).getTime() < t0 + DAY);
+      return { label: new Date(t0).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }), value: os.reduce((n, o) => n + Number(o.total), 0), note: `${os.length} sipariş` };
+    });
+  }, [d, r]);
+
   const body = () => {
     if (!d || !k || !kp) return <Loading />;
     if (tab === 'ozet') {
@@ -45,9 +58,19 @@ export default function Analiz() {
       return (
         <>
           <div className="kpis">
-            {items.map(([l, v, c, p, inv]) => (
-              <div className="kpi" key={l}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div><div className="kpi-sub"><Delta cur={c} prev={p} invert={inv} /> <span style={{ color: 'var(--tx3)' }}>önceki dönem</span></div></div>
+            {items.map(([l, v, c, p, inv], i) => (
+              <Kpi key={l} label={l} value={v} tone={(['ac', 'green', 'blue', 'amber'] as const)[i % 4]} icon={ICONS[i % ICONS.length]}
+                trend={p ? ((c - p) / p) * 100 * (inv ? -1 : 1) : undefined} sub="önceki dönem" spark={i < 2 ? daily.map((d) => (i === 0 ? d.value : Number(d.note?.split(' ')[0] ?? 0))) : undefined} />
             ))}
+          </div>
+          <Card title="Günlük ciro" meta={per.label}>
+            <div style={{ padding: '14px 16px 6px' }}><AreaChart data={daily} fmt={tl} /></div>
+          </Card>
+          <div className="grid2 even">
+            <Card title="Yeni / tekrar müşteri"><div style={{ padding: 18 }}><Donut size={130} center={{ big: String(k.newCust + k.repeatCust), small: 'müşteri' }} segs={[{ label: 'Yeni', value: k.newCust, color: '#f0674f' }, { label: 'Tekrar', value: k.repeatCust, color: '#25d6a0' }]} /></div></Card>
+            <Card title="Dönem özeti"><div style={{ padding: 18, display: 'grid', gap: 8, fontSize: 13.5 }}>
+              <div>Satılan adet: <b>{k.unitsSold}</b></div><div>İade tutarı: <b>{tl(k.retAmt)}</b></div><div>Ziyaretçi (oturum): <b>{k.visitors}</b></div><div>Sepete ekleyen: <b>{k.carts}</b> · Checkout: <b>{k.checkout}</b></div>
+            </div></Card>
           </div>
           <Card title="Satış hunisi" meta={per.label}>
             <div style={{ padding: 18, display: 'grid', gap: 10 }}>

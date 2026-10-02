@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { AdminShell } from '@/components/admin/Shell';
 import './admin.css';
+import './pro.css';
 
 export const metadata: Metadata = {
   title: 'Yönetim paneli · Demleme',
