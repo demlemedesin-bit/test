@@ -27,7 +27,8 @@
   var render=function(){ var slug=location.pathname.replace(/\/+$/,'').split('/').pop(), p=P.filter(function(x){ return x.slug===slug; })[0]||P[0]; cur=p; col=0; size=-1; q=1;
     document.title=p.name+' · Demleme Mağaza';
     $('crumb').innerHTML='<a href="/#magaza">Mağaza</a><span>/</span>'+esc(p.cat)+'<span>/</span>'+esc(p.name);
-    $('ppCat').textContent=p.cat; $('ppName').textContent=p.name; $('ppPrice').textContent=p.price; $('ppDesc').textContent=p.desc; $('ppBadge').textContent=p.badge||'';
+    $('ppCat').textContent=p.cat; $('ppName').textContent=p.name; (function(){ var e=$('ppPrice'); e.textContent=''; if(p.was){ var w=document.createElement('s'); w.textContent=p.was; w.style.cssText='opacity:.5;margin-right:8px;font-weight:400'; e.appendChild(w); } e.appendChild(document.createTextNode(p.price));
+      var o=$('pxSale'); if(o) o.remove(); if(p.was && p.saleEnds){ o=document.createElement('div'); o.id='pxSale'; o.style.cssText='font-size:13px;color:#9a2f24;margin:4px 0'; e.parentNode.insertBefore(o,e.nextSibling); var end=new Date(p.saleEnds).getTime(); var tick=function(){ var ms=end-Date.now(); if(ms<=0){ o.textContent='Kampanya sona erdi'; return; } var h=Math.floor(ms/36e5), m=Math.floor(ms%36e5/6e4), sc=Math.floor(ms%6e4/1e3); o.textContent='Kampanya bitimine '+(h>=48?Math.floor(h/24)+' gün '+(h%24)+' sa':h+' sa '+m+' dk '+sc+' sn'); }; tick(); if(window.__pxSaleT) clearInterval(window.__pxSaleT); window.__pxSaleT=setInterval(tick,1000); } })();  $('ppDesc').textContent=p.desc; $('ppBadge').textContent=p.badge||'';
     // colours: swatches + one thumbnail per colour (the photo swaps)
     var c=p.colors;
     $('ppColors').innerHTML='<div class="pp-opt-h"><b>Renk</b><span id="colName"></span></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+'"></button>'; }).join('')+'</div>' : '');
@@ -43,7 +44,7 @@
     [].forEach.call(document.querySelectorAll('#ppSizes button[data-i]'), function(b){ b.addEventListener('click', function(){ size=+b.getAttribute('data-i'); [].forEach.call(document.querySelectorAll('#ppSizes button[data-i]'), function(x){ x.classList.toggle('on', x===b); }); $('ppMsg').textContent=''; $('ppMsg').classList.remove('warn'); }); });
     if($('chartBtn')) $('chartBtn').addEventListener('click', function(){ var t=$('chart'); t.hidden=!t.hidden; });
     $('ppDet').innerHTML=p.details.map(function(d,i){ return '<details'+(i===0?' open':'')+'><summary>'+esc(d[0])+'</summary><p>'+esc(d[1])+'</p></details>'; }).join('');
-    $('qN').textContent=q; $('ppAdd').disabled=!!(p.soon||p.out); $('ppMsg').textContent=p.soon ? 'Çok yakında. Stoklara girince haber vereceğiz.' : p.out ? 'Şu an stokta yok.' : ''; $('ppMsg').classList.remove('warn');
+    $('qN').textContent=q; $('ppAdd').disabled=!!(p.soon||p.out); $('ppMsg').textContent=p.soon ? 'Çok yakında. Stoklara girince haber vereceğiz.' : p.out ? 'Şu an stokta yok.' : p.left ? 'Son '+p.left+' ürün kaldı!' : ''; $('ppMsg').classList.remove('warn');
     /* "Bunu da beğenebilirsin" kartları artık sunucuda çiziliyor (#more yalnızca eski sayfa kalıplarında olabilir) */
     if($('more')){ var start=P.indexOf(p), pick=[]; for(var k=1;k<=4;k++) pick.push(P[(start+k)%P.length]);
       $('more').innerHTML=pick.map(function(x){ return '<a href="/urun/'+x.slug+'"><div class="th"><img src="'+x.colors[0].img+'" alt="" loading="lazy"></div><p>'+esc(x.name)+'</p><span>'+x.price+'</span></a>'; }).join(''); }

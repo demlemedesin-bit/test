@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { dt, tl, useAdmin, type AdminOrder, type AdminProduct } from '@/lib/admin';
 import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
+import { DashAlerts } from '@/components/admin/Alerts';
 import { Empty, Kpi, Loading, STATUS_TONE, TopBar } from '@/components/admin/ui';
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -98,6 +99,7 @@ function FullDashboard() {
             <Loading />
           ) : (
             <>
+              <DashAlerts />
               <div className="kpis">
                 <Kpi label="Bugün" value={String(s.todayCount)} sub={`${tl(s.todaySum)} ciro`} tone="ac" icon={<ShoppingBag size={17} />} />
                 <Kpi label="Bu ay ciro" value={tl(s.monthSum)} sub={`${s.monthCount} sipariş · ort. ${tl(Math.round(s.avg))}`} tone="green" icon={<Banknote size={17} />} />

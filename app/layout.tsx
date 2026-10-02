@@ -6,6 +6,8 @@ import { getSeoBundle } from '@/lib/seoServer';
 import { baseUrl } from '@/lib/seo';
 import { siteUrl } from '@/lib/siteUrl';
 import { Popups } from '@/components/Popups';
+import { CustomScripts } from '@/components/CustomScripts';
+import { parseScripts } from '@/lib/design';
 import { AdsLoader, ConsentBanner } from '@/components/Consent';
 
 // Başlık, açıklama ve paylaşım bilgisi panelden (İçerik → SEO) değiştirilir.
@@ -52,6 +54,7 @@ export const viewport: Viewport = { themeColor: '#F8F4EA' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { ads, consent } = await getSeoBundle();
+  const sc = parseScripts(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.scripts')) ?? [])[0]?.value);
   return (
     <html lang="tr">
       <head>
@@ -72,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AdsLoader ads={ads} />
         <ConsentBanner cfg={consent} />
         <Popups />
+        <CustomScripts cfg={sc} />
         <Script src="/demleme/track.js" strategy="afterInteractive" />
       </body>
     </html>

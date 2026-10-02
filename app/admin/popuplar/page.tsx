@@ -8,6 +8,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, TopBar, useToast } from '@/components/admin/ui';
 import { ImageInput } from '@/components/admin/Editors';
 import { PopupCard } from '@/components/Popups';
+import { toIso, toLocalInput } from '@/lib/design';
 import { BGS, DEVICES, FREQS, KINDS, PAGES, POPUP_TEMPLATES, TRIGGERS, emptyPopup, parsePopupsLoose, type Popup } from '@/lib/popups';
 
 export default function PopupAdmin() {
@@ -70,7 +71,7 @@ export default function PopupAdmin() {
                   <Field label="Buton yazısı"><input className="inp" value={p.cta_label} onChange={(e) => up({ cta_label: e.target.value })} /></Field>
                   <Field label="Buton bağlantısı"><input className="inp" value={p.cta_url} onChange={(e) => up({ cta_url: e.target.value })} /></Field>
                   <Field label="Kupon kodu" hint="Bülten türünde kayıttan sonra gösterilir."><input className="inp" value={p.coupon_code} onChange={(e) => up({ coupon_code: e.target.value.toUpperCase() })} /></Field>
-                  {p.kind === 'countdown' && <Field label="Geri sayım bitişi"><input className="inp" type="datetime-local" value={p.countdown_to} onChange={(e) => up({ countdown_to: e.target.value })} /></Field>}
+                  {p.kind === 'countdown' && <Field label="Geri sayım bitişi"><input className="inp" type="datetime-local" value={toLocalInput(p.countdown_to)} onChange={(e) => up({ countdown_to: toIso(e.target.value) })} /></Field>}
                   {(p.kind === 'newsletter' || p.kind === 'exit') && <Field label="Onay metni (KVKK)"><textarea className="inp" rows={2} value={p.consent_text} onChange={(e) => up({ consent_text: e.target.value })} /></Field>}
                   <Field label="Renk">{sl(p.bg, BGS, (v) => up({ bg: v }))}</Field>
                 </div></section>
@@ -83,8 +84,8 @@ export default function PopupAdmin() {
                 <Field label="Cihaz">{sl(p.devices, DEVICES, (v) => up({ devices: v }))}</Field>
                 <Field label="Sıklık">{sl(p.frequency, FREQS, (v) => up({ frequency: v }))}</Field>
                 {p.frequency === 'days' && <Field label="Gün"><input className="inp" type="number" min={1} value={p.days} onChange={(e) => up({ days: Math.max(1, Number(e.target.value) || 1) })} /></Field>}
-                <Field label="Başlangıç"><input className="inp" type="datetime-local" value={p.starts_at} onChange={(e) => up({ starts_at: e.target.value })} /></Field>
-                <Field label="Bitiş"><input className="inp" type="datetime-local" value={p.ends_at} onChange={(e) => up({ ends_at: e.target.value })} /></Field>
+                <Field label="Başlangıç"><input className="inp" type="datetime-local" value={toLocalInput(p.starts_at)} onChange={(e) => up({ starts_at: toIso(e.target.value) })} /></Field>
+                <Field label="Bitiş"><input className="inp" type="datetime-local" value={toLocalInput(p.ends_at)} onChange={(e) => up({ ends_at: toIso(e.target.value) })} /></Field>
                 <label className="chk"><input type="checkbox" checked={p.hide_after_subscribe} onChange={(e) => up({ hide_after_subscribe: e.target.checked })} /> Abone olan ziyaretçiye bülten popup’ı gösterme</label>
               </div></section>
               <section className="card"><div className="card-h"><h2 className="card-t">Önizleme</h2></div><div className="card-b" style={{ display: 'grid', placeItems: 'center', background: 'var(--s3)', padding: 24 }}><PopupCard p={p} preview /></div></section>

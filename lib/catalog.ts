@@ -18,6 +18,9 @@ export type SiteProduct = {
   shopCat: 'sofra' | 'giyim' | 'aksesuar';
   price: string; // "₺2.400"
   priceNum: number;
+  was?: string; // süreli kampanyada eski fiyat
+  saleEnds?: string; // kampanya bitişi (ISO)
+  left?: number; // az kalan stok adedi
   desc: string;
   badge?: string;
   soon: boolean;
@@ -69,7 +72,13 @@ export async function rest<T>(query: string): Promise<T | null> {
 
 function fromRow(r: Row): SiteProduct {
   const d = r.data ?? {};
-  const price = Number(r.price);
+  const base = Number(r.price);
+  const sale = (d as { sale?: { price?: unknown; starts_at?: string; ends_at?: string } }).sale;
+  const sp = sale ? Number(sale.price) : NaN;
+  const t = Date.now();
+  const onSale = isFinite(sp) && sp >= 0 && sp < base && (!sale?.starts_at || new Date(sale.starts_at).getTime() <= t) && (!sale?.ends_at || new Date(sale.ends_at).getTime() > t);
+  const price = onSale ? sp : base;
+  const crit = Number((d as { crit?: number }).crit) > 0 ? Number((d as { crit?: number }).crit) : 5;
   const sizes: SizeBlock | undefined = r.sizes?.length
     ? { label: d.size_label || 'Beden', items: r.sizes.map((s) => [s, '']), pick: true }
     : d.sizes;
@@ -80,6 +89,8 @@ function fromRow(r: Row): SiteProduct {
     shopCat: r.shop_cat ?? 'sofra',
     price: tlStr(price),
     priceNum: price,
+    ...(onSale ? { was: tlStr(base), saleEnds: sale?.ends_at || undefined } : {}),
+    ...(r.stock != null && r.stock > 0 && r.stock <= crit ? { left: r.stock } : {}),
     desc: d.desc ?? '',
     badge: d.badge || undefined,
     soon: !!r.soon,

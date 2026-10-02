@@ -58,7 +58,7 @@ export function RecentlyViewed({ exclude = [], enabled, limit = 4, title = 'Son 
       <h2 className="px-h">{title}</h2>
       <div className="px-row">
         {list.map((p) => (
-          <a className="px-card" href={`/urun/${p.slug}`} key={p.slug}>
+          <a className="px-card" data-rec="recent" href={`/urun/${p.slug}`} key={p.slug}>
             <span className="px-th">{p.thumb || p.colors?.[0]?.img ? <img src={p.thumb || p.colors?.[0]?.img} alt="" loading="lazy" /> : null}</span>
             <span className="px-nm">{p.name}</span>
             <span className="px-pr">{tl(Number(p.price))}</span>
