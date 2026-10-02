@@ -8,6 +8,7 @@ import { RET_REASON, RET_STATUS, type Ret } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 import { Card, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 export default function Iadeler() {
   const menu = useMenu();
@@ -45,7 +46,7 @@ export default function Iadeler() {
       <TopBar title="İade ve değişim" sub="Gelen iadeler, hasarlı ürünler, durum takibi" onMenu={menu}>
         <button className="btn" onClick={() => setOpen(true)}><Plus size={15} /> Kayıt ekle</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <Card title={`${rows.length} kayıt`}>
           <Tbl min={900} cols={[['Sipariş', '100px'], ['Ürün', 'minmax(0,1fr)'], ['Tür', '70px'], ['Adet', '50px'], ['Tutar', '90px'], ['Sebep', '140px'], ['Tarih', '100px'], ['Durum', '150px']]}
             rows={rows.map((r) => [r.order_no, r.product_slug || '—', r.kind === 'iade' ? 'İade' : 'Değişim', r.qty, tl(r.amount), RET_REASON[r.reason] ?? r.reason, dt(r.created_at),

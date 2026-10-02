@@ -8,6 +8,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { Card } from '@/components/admin/Insights';
 import { Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Kind = 'percent' | 'fixed' | 'free_shipping';
 type Coupon = {
@@ -236,7 +237,7 @@ export default function Campaigns() {
         </button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {list && (
             <div className="kpis">

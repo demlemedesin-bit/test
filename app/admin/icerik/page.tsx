@@ -22,6 +22,7 @@ import {
 } from '@/lib/siteDefaults';
 
 import './icerik.css';
+import { PageHero } from '@/components/admin/PageHero';
 const TABS = ['Metin ve görseller', 'Sıkça sorulan sorular', 'Konuklar', 'Ayın demleyenleri', 'Menü ve footer'] as const;
 const GROUPS = [...new Set(FIELDS.map((f) => f.group))];
 const COVER = '/demleme/04-konuklar/reel-covers/';
@@ -108,7 +109,7 @@ export default function Content() {
         <button className="btn" onClick={save} disabled={busy}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner" style={{ maxWidth: 940 }}>
+        <div className="adm-inner" style={{ maxWidth: 940 }}><PageHero />
           <div className="ic-top">
             {TABS.map((x) => (
               <button key={x} type="button" className={tab === x ? 'on' : ''} onClick={() => setTab(x)}>{x}</button>

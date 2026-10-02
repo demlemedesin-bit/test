@@ -9,6 +9,7 @@ import { DAY, startOfDay, ymd, type Ret } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Loading, TopBar } from '@/components/admin/ui';
 import { Card, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Pay = { order_no: string; status: string; paid_price: number | null; created_at: string };
 const PAY: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme', kart: 'Kredi kartı' };
@@ -66,7 +67,7 @@ export default function Muhasebe() {
         <label className="fld" style={{ margin: 0, width: 90 }}><input className="inp" type="number" min={0} max={30} value={kdv} onChange={(e) => setKdv(+e.target.value || 0)} title="KDV oranı %" /></label>
         <button className="btn ghost" onClick={csv}><Download size={15} /> CSV</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="kpis">{kp.map(([l, v]) => <div className="kpi" key={l}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}</div>
         <div className="grid2 even">
           <Card title="Ödeme yöntemleri"><Tbl min={0} cols={[['Yöntem', 'minmax(0,1fr)'], ['Sipariş', '70px'], ['Tutar', '110px']]} rows={m.byPay.map(([k, v]) => [PAY[k] ?? k, v.n, tl(v.t)])} empty="Veri yok" /></Card>

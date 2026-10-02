@@ -8,6 +8,7 @@ import { CHECKS, qualityIssues, seoScore } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Loading, TopBar } from '@/components/admin/ui';
 import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS = [['ozet', 'Özet'], ['icerik', 'İçerik'], ['katalog', 'Katalog'], ['seo', 'SEO skoru']] as const;
 
@@ -46,7 +47,7 @@ export default function Kalite() {
   return (
     <>
       <TopBar title="Ürün kalitesi ve SEO" sub="Eksik ve hatalı ürün içeriklerini otomatik tespit eder" onMenu={menu} />
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="kpis">{kp.map(([l, v]) => <div className="kpi" key={String(l)}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}</div>
         <Tabs items={TABS} value={tab} onChange={(v) => { setTab(v); setOnly(''); }} />
         {tab === 'ozet' && (

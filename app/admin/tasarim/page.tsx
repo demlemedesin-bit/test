@@ -10,6 +10,7 @@ import { ImageInput } from '@/components/admin/Editors';
 import { Tabs } from '@/components/admin/Tbl';
 import { BannerPreview, PlacementMap, bannerState } from '@/components/admin/Preview';
 import { emptyBanner, parseBanners, parseScripts, toIso, toLocalInput, type Banner, type Scripts } from '@/lib/design';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS = [['banner', 'Ana sayfa banner'], ['script', 'Özel betikler'], ['harita', 'Sitede nerede görünür?']] as const;
 
@@ -50,7 +51,7 @@ export default function Tasarim() {
       <TopBar title="Sayfa tasarımı" sub="Banner yönetimi ve özel betikler" onMenu={menu}>
         <button className="btn" onClick={save} disabled={busy}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 1000 }}>
+      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 1000 }}><PageHero />
         <Tabs items={TABS} value={tab} onChange={setTab} />
         {tab === 'banner' && (
           <div style={{ display: 'grid', gridTemplateColumns: '230px minmax(0,1fr)', gap: 18, alignItems: 'start' }}>

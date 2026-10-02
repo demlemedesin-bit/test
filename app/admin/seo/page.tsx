@@ -29,6 +29,7 @@ import {
   type Seo,
 } from '@/lib/seo';
 import './seo.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS = ['Genel ve şablonlar', 'Kurumsal bilgi', 'Sitemap ve robots', 'Reklam ve izleme', '404 izleme', 'SEO denetimi'] as const;
 type Tab = (typeof TABS)[number];
@@ -146,7 +147,7 @@ export default function SeoAdmin() {
         )}
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner" style={{ maxWidth: 1060 }}>
+        <div className="adm-inner" style={{ maxWidth: 1060 }}><PageHero />
           <div className="tabs" style={{ marginBottom: 18 }}>
             {TABS.map((x) => (
               <button key={x} type="button" className={`tab${tab === x ? ' on' : ''}`} onClick={() => setTab(x)}>
@@ -229,6 +230,12 @@ function General({ f, up, origin }: { f: Form; up: Up; origin: string }) {
           </Field>
           <Field label="Paylaşım görseli (OG)" hint="1200×630 önerilir; sayfanın kendi görseli yoksa bu kullanılır">
             <ImageInput value={s.og_image} onChange={(v) => set({ og_image: v })} folder="seo" />
+          </Field>
+          <Field label="Favicon (site simgesi)" hint="Kare, en az 192×192 PNG/WebP önerilir; tarayıcı sekmesinde ve Google sonuçlarında görünür. Boşsa varsayılan simge kullanılır">
+            <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, border: '1px solid var(--bdr)', background: 'var(--s2)', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>{s.favicon ? <img src={s.favicon} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} /> : <span style={{ fontSize: 11, color: 'var(--tx3)' }}>yok</span>}</div>
+              <div style={{ flex: 1 }}><ImageInput value={s.favicon} onChange={(v) => set({ favicon: v })} folder="seo" /></div>
+            </div>
           </Field>
           <div className="row2">
             <Field label="X (Twitter) kullanıcı adı" hint="@ olmadan">
@@ -708,6 +715,7 @@ function Audit({ f, toast }: { f: Form; toast: Toast }) {
     if (s.noindex_site) o.push({ t: 'Site arama motorlarından gizli (noindex açık)', w: 40 });
     if (!s.default_title && !s.title_template) o.push({ t: 'Ana sayfa başlığı ve başlık şablonu tanımlı değil', w: 4 });
     if (!s.default_desc) o.push({ t: 'Varsayılan açıklama boş', w: 5 });
+    if (!s.favicon) o.push({ t: 'Favicon yüklenmemiş', w: 3 });
     if (!s.og_image) o.push({ t: 'Paylaşım görseli (OG) yok', w: 6 });
     if (!s.org.name && !s.org.legal_name) o.push({ t: 'Kurumsal bilgi (Organization) doldurulmamış', w: 4 });
     if (!s.org.logo) o.push({ t: 'Kurumsal logo yok', w: 3 });

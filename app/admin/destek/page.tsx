@@ -8,6 +8,7 @@ import { RET_STATUS, type Ret } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Ticket = { id: string; email: string; name: string; order_no: string | null; category: string; subject: string; body: string; status: string; reply: string | null; created_at: string };
 const CAT: Record<string, string> = { siparis: 'Sipariş durumu', kargo: 'Kargo problemi', iade: 'İade', degisim: 'Değişim', urun: 'Ürün sorusu', odeme: 'Ödeme problemi', sikayet: 'Şikayet', genel: 'Genel bilgi' };
@@ -65,7 +66,7 @@ export default function Destek() {
       <TopBar title="Müşteri hizmetleri" sub="Talepler ve müşteri geçmişi" onMenu={menu}>
         <button className="btn" onClick={() => setIsNew(true)}><Plus size={15} /> Talep ekle</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <Tabs items={TABS} value={tab} onChange={setTab} />
         {tab === 'talep' && (
           <>

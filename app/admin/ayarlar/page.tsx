@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { refreshSite } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 const KEYS = [
   'free_shipping_threshold', 'shipping_fee', 'contact_email',
@@ -93,7 +94,7 @@ export default function Settings() {
         <button className="btn" onClick={save} disabled={busy}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner" style={{ maxWidth: 860 }}>
+        <div className="adm-inner" style={{ maxWidth: 860 }}><PageHero />
           <section className="card" style={{ marginBottom: 18 }}>
             <div className="card-h"><h2 className="card-t">Kargo</h2></div>
             <div className="card-b row2">

@@ -9,6 +9,7 @@ import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
 import { CustomersInsight } from '@/components/admin/Insights';
 import { Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Seg = 'vip' | 'sadik' | 'yeni' | 'pasif' | 'siparissiz' | 'standart';
 type Meta = { email: string; tags: string[]; note: string };
@@ -225,7 +226,7 @@ export default function Customers() {
         </button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {list && list.length > 0 && <CustomersInsight list={list} now={now} />}
           <div className="toolbar">

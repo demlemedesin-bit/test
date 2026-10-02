@@ -39,7 +39,7 @@
 .dpop-x{ position:absolute; right:8px; top:8px; z-index:2; width:40px; height:40px; display:grid; place-items:center; border:0; background:rgba(0,0,0,.0); color:var(--dp-fg); cursor:pointer; font-size:26px; line-height:1; }
 .dpop-x:hover{ opacity:.7; }
 .dpop-x:focus-visible, .dpop-cta:focus-visible, .dpop-copy:focus-visible{ outline:2px solid var(--dp-fg); outline-offset:2px; }
-.dpop-title{ margin:0; padding-right:28px; font-family:var(--font-display,'Fraunces',Georgia,serif); font-weight:400; font-size:clamp(26px,5vw,34px); line-height:1.1; }
+.dpop-title{ margin:0; padding-right:28px; font-family:var(--font-display,'Kodchasan',Georgia,serif); font-weight:400; font-size:clamp(26px,5vw,34px); line-height:1.1; }
 .dpop-text{ margin:0; color:var(--dp-mute); font-size:15px; line-height:1.55; white-space:pre-line; }
 .dpop-cta{ display:inline-flex; align-items:center; justify-content:center; height:48px; padding:0 24px; border:1px solid var(--dp-btn-bg); background:var(--dp-btn-bg); color:var(--dp-btn-fg); font:inherit; font-size:14px; font-weight:500; text-decoration:none; cursor:pointer; justify-self:start; }
 .dpop-cta:hover{ opacity:.88; }

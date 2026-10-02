@@ -8,6 +8,7 @@ import { Kpi, Loading, TopBar } from '@/components/admin/ui';
 import { AreaChart, Donut } from '@/components/admin/Charts';
 import { Activity, Banknote, ShoppingBag, ShoppingCart, Percent, UserPlus, Undo2, Users, Eye, Package } from 'lucide-react';
 import { Card, Delta, Tabs, Tbl, n1 } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS = [['ozet', 'Özet'], ['urun', 'Ürün performansı'], ['marka', 'Markalar'], ['stok', 'Stok'], ['iade', 'İade'], ['musteri', 'Müşteri'], ['kampanya', 'Kampanya'], ['oneri', 'Öneri performansı']] as const;
 type Tab = (typeof TABS)[number][0];
@@ -211,7 +212,7 @@ export default function Analiz() {
       <TopBar title="Analiz ve raporlar" sub="Satış, ürün, marka, stok, iade, müşteri, kampanya" onMenu={menu}>
         <select className="inp" style={{ width: 'auto' }} value={pk} onChange={(e) => setPk(e.target.value)}>{PERIODS.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}</select>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <Tabs items={TABS} value={tab} onChange={setTab} />
         {body()}
       </div></div>

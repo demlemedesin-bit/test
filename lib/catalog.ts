@@ -28,6 +28,7 @@ export type SiteProduct = {
   soon: boolean;
   out: boolean; // stok bitti
   thumb: string;
+  gallery?: string[];
   colors: Color[];
   sizes?: SizeBlock;
   chart?: unknown;
@@ -46,7 +47,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string };
+  data?: { gallery?: string[]; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -97,6 +98,7 @@ function fromRow(r: Row): SiteProduct {
     out: r.stock != null && r.stock <= 0,
     thumb: r.thumb || r.colors?.[0]?.img || '',
     colors: r.colors ?? [],
+    ...(Array.isArray(d.gallery) && d.gallery.length ? { gallery: d.gallery.filter((g) => typeof g === 'string').slice(0, 10) } : {}),
     sizes,
     chart: d.chart,
     details: d.details ?? [],

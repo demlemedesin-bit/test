@@ -8,6 +8,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { Card } from '@/components/admin/Insights';
 import { Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Item = { slug: string; name: string; qty: number; color?: string | null; size?: string | null; price: number };
 type Cart = {
@@ -132,7 +133,7 @@ export default function Carts() {
         </button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {list && (
             <div className="kpis">

@@ -9,6 +9,7 @@ import { Kpi, Loading, TopBar, useToast } from '@/components/admin/ui';
 import { toIso, toLocalInput } from '@/lib/design';
 import { Card, Tbl } from '@/components/admin/Tbl';
 import { SalePreview } from '@/components/admin/Preview';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Sale = { price?: number | string; starts_at?: string; ends_at?: string };
 const saleOf = (p: AdminProduct) => ((p.data as { sale?: Sale }).sale ?? {}) as Sale;
@@ -100,7 +101,7 @@ export default function Sureli() {
       <TopBar title="Süreli kampanya" sub="Başlangıç ve bitişte kendiliğinden devreye girer, çıkar" onMenu={menu}>
         <button className="btn" onClick={save} disabled={busy || !dirty.length}><Save size={15} /> {busy ? 'Kaydediliyor…' : `Kaydet${dirty.length ? ` (${dirty.length})` : ''}`}</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="kpis">
           <Kpi label="Aktif kampanya" value={String(counts.Aktif)} sub="şu an sitede indirimli" tone="green" icon={<Timer size={17} />} />
           <Kpi label="Zamanlanmış" value={String(counts.Zamanlandı)} sub="başlangıcı bekliyor" tone="amber" icon={<CalendarClock size={17} />} />
