@@ -52,7 +52,7 @@ export async function homeHtml(): Promise<string> {
     covers: covers.map((f) => (isUrl(f) ? f : `${KONUK}reel-covers/${f}`)),
     teas: tea,
   };
-  const dm = { month: site.dm.month, photos: site.dm.photos };
+  const dm = { month: site.dm.month, photos: site.dm.photos, sehpa_base: site.dm.sehpa_base, sehpa_colors: site.dm.sehpa_colors };
   const banners = parseBanners(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.banners')) ?? [])[0]?.value);
   const html = fill(read('home.html'), site)
     .replace('{{BANNERS}}', () => bannersHtml(banners))
@@ -185,7 +185,7 @@ function reviewsHtml(reviews: Review[]): string {
 /** Ürün sayfasının Product JSON-LD verisi (script içine güvenle gömülür: "<" kaçışlı). */
 export function productJsonLd(p: SiteProduct, reviews: Review[], origin: string): string {
   const abs = (u: string) => (/^https?:\/\//i.test(u) ? u : `${origin}${u.startsWith('/') ? '' : '/'}${u}`);
-  const images = [...new Set([...p.colors.map((c) => c.img || ''), p.thumb, ...(p.gallery ?? [])].filter(Boolean))].slice(0, 8).map(abs);
+  const images = [...new Set([...p.colors.flatMap((c) => [c.img || '', ...(c.imgs ?? [])]), p.thumb, ...(p.gallery ?? [])].filter(Boolean))].slice(0, 8).map(abs);
   const ld: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',

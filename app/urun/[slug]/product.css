@@ -139,3 +139,10 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .sale-card.ended .sc-fire{ background:#8a8478; animation:none; }
 @keyframes scDot{ 0%{ box-shadow:0 0 0 0 rgba(221,38,44,.35); } 70%,100%{ box-shadow:0 0 0 8px rgba(221,38,44,0); } }
 @media (prefers-reduced-motion:reduce){ .sc-fire{ animation:none; } }
+
+/* Renge özel ek görseller */
+.pp-thumbs button{ position:relative; }
+.th-n{ position:absolute; right:4px; bottom:4px; font-style:normal; font-size:10px; font-weight:600; line-height:1; padding:3px 6px; border-radius:99px; background:#17130F; color:#fff; }
+.th-x{ display:contents; }
+.th-x:not(:empty)::before{ content:""; align-self:stretch; width:1px; margin:0 2px; background:rgba(23,19,15,.18); }
+.pp-thumbs .th-c img, .pp-thumbs .th-g img{ object-fit:cover; border-radius:4px; }

@@ -10,7 +10,7 @@ import { saleOf } from './sale';
 
 export const CATALOG_TAG = 'catalog';
 
-export type Color = { key: string; name: string; hex?: string; img?: string };
+export type Color = { key: string; name: string; hex?: string; img?: string; imgs?: string[] };
 export type SizeBlock = { label: string; items: string[][]; pick?: boolean };
 export type SiteProduct = {
   slug: string;

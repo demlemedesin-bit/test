@@ -50,7 +50,7 @@ export default function Content() {
     if (Array.isArray(m.faq)) setFaq(m.faq as Faq[]);
     if (Array.isArray(m.guests) && m.guests.length) setGuests(m.guests as Guest[]);
     const d = m.demleyen as Partial<Demleyen> | undefined;
-    if (d) setDm({ month: d.month || DEFAULT_DM.month, photos: Array.isArray(d.photos) ? d.photos : DEFAULT_DM.photos });
+    if (d) setDm({ month: d.month || DEFAULT_DM.month, photos: Array.isArray(d.photos) ? d.photos : DEFAULT_DM.photos, sehpa_base: d.sehpa_base, sehpa_colors: Array.isArray(d.sehpa_colors) ? d.sehpa_colors : [] });
     const f = m.footer as Partial<FooterData> | undefined;
     if (f) setFooter({ cols: Array.isArray(f.cols) ? f.cols : DEFAULT_FOOTER.cols, legal: Array.isArray(f.legal) ? f.legal : DEFAULT_FOOTER.legal });
   }, []);
@@ -256,6 +256,26 @@ export default function Content() {
           )}
 
           {tab === TABS[3] && (
+            <>
+              <section className="card" style={{ marginBottom: 14 }}>
+                <div className="card-h"><h2 className="card-t">Sehpa renkleri</h2><AddBtn onClick={() => setDm((d) => ({ ...d, sehpa_colors: [...(d.sehpa_colors ?? []), { name: '', hex: '#8B1D1D', img: '' }] }))}>Renk ekle</AddBtn></div>
+                <div className="card-b">
+                  <p className="hint" style={{ marginBottom: 12 }}>Ana sayfada sehpanın üzerinde fareyi gezdirince (telefonda alttaki noktalara dokununca) bu renkler görünür. İlk renk, “Metin ve görseller → Sehpa görseli” alanındaki görseldir; onun adını ve rengini aşağıdan yaz. Her renk için sehpanın aynı boyutta, şeffaf arka planlı (WebP/PNG) görselini yükle.</p>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingBottom: 12 }}>
+                    <span style={{ fontSize: 12.5, color: 'var(--tx3)', minWidth: 130 }}>Varsayılan renk</span>
+                    <input className="inp" style={{ maxWidth: 200 }} placeholder="Ad (örn. Kırmızı)" value={dm.sehpa_base?.name ?? ''} onChange={(e) => setDm((d) => ({ ...d, sehpa_base: { name: e.target.value, hex: d.sehpa_base?.hex || '#8B1D1D' } }))} />
+                    <input className="hex" type="color" value={dm.sehpa_base?.hex || '#8B1D1D'} onChange={(e) => setDm((d) => ({ ...d, sehpa_base: { name: d.sehpa_base?.name ?? '', hex: e.target.value } }))} aria-label="Varsayılan renk" />
+                  </div>
+                  {(dm.sehpa_colors ?? []).map((c, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', paddingTop: 12, borderTop: '1px solid var(--bdr)' }}>
+                      <div style={{ width: 150, flexShrink: 0 }}><ImageInput value={c.img} onChange={(v) => setDm((d) => ({ ...d, sehpa_colors: setAt(d.sehpa_colors ?? [], i, { img: v }) }))} onError={(m) => show(m, true)} folder="demleyenler/sehpa" /></div>
+                      <input className="inp" style={{ maxWidth: 200 }} placeholder="Renk adı" value={c.name} onChange={(e) => setDm((d) => ({ ...d, sehpa_colors: setAt(d.sehpa_colors ?? [], i, { name: e.target.value }) }))} />
+                      <input className="hex" type="color" value={c.hex || '#8B1D1D'} onChange={(e) => setDm((d) => ({ ...d, sehpa_colors: setAt(d.sehpa_colors ?? [], i, { hex: e.target.value }) }))} aria-label="Renk" />
+                      <RowTools i={i} n={(dm.sehpa_colors ?? []).length} move={(x) => setDm((d) => ({ ...d, sehpa_colors: moved(d.sehpa_colors ?? [], i, x) }))} remove={() => setDm((d) => ({ ...d, sehpa_colors: without(d.sehpa_colors ?? [], i) }))} />
+                    </div>
+                  ))}
+                </div>
+              </section>
             <section className="card">
               <div className="card-h"><h2 className="card-t">Ayın demleyenleri</h2><AddBtn onClick={() => setDm((d) => ({ ...d, photos: [...d.photos, { name: '', city: '', img: '', icon: 'heart', tilt: 0 }] }))}>Fotoğraf ekle</AddBtn></div>
               <div className="card-b">
@@ -274,6 +294,7 @@ export default function Content() {
                 ))}
               </div>
             </section>
+            </>
           )}
 
           {tab === TABS[4] && (
