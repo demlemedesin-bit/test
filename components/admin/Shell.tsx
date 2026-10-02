@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
@@ -26,6 +26,8 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
       { href: '/admin/kampanyalar', label: 'Kampanya ve indirim', Icon: BadgePercent, perm: 'campaigns' },
       { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone, perm: 'tracking' },
       { href: '/admin/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'reports' },
+      { href: '/admin/vitrin', label: 'Vitrin ve popup', Icon: LayoutTemplate, perm: 'content' },
+      { href: '/admin/abonelikler', label: 'Bülten ve stok haberi', Icon: MailPlus, perm: 'customers' },
     ],
   },
   {
@@ -33,6 +35,9 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
     items: [
       { href: '/admin/icerik', label: 'Site içeriği', Icon: FileText, perm: 'content' },
       { href: '/admin/sayfalar', label: 'Sayfa, blog, yönlendirme', Icon: Newspaper, perm: 'content' },
+      { href: '/admin/yorumlar', label: 'Ürün yorumları', Icon: Star, perm: 'content' },
+      { href: '/admin/seo', label: 'SEO ve reklam', Icon: Search, perm: 'content' },
+      { href: '/admin/medya', label: 'Medya', Icon: ImageIcon, perm: 'content' },
     ],
   },
   {
