@@ -31,7 +31,8 @@ function summarize(r: NotifyOut): Out {
   const sent = r.results.some((x) => x.status === 'sent');
   const failed = r.results.find((x) => x.status === 'failed');
   if (failed && !sent) return { ok: false, error: failed.error || 'Gönderilemedi' };
-  return { ok: true, skipped: !sent };
+  const why = r.results.find((x) => x.status === 'skipped')?.error;
+  return sent ? { ok: true } : { ok: true, skipped: true, ...(why ? { error: why } : {}) };
 }
 
 // Sipariş / sepet bildirimleri. order_created herkese açıktır ama sipariş no + e-posta eşleşmesi ister;
