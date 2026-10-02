@@ -1,5 +1,6 @@
 import type { FooterLink } from '@/lib/siteDefaults';
 import { NewsletterForm } from './NewsletterForm';
+import { D } from './Display';
 
 const DEFAULT_LINKS: FooterLink[] = [
   { label: 'Sipariş takibi', href: '/siparis-takip' },
@@ -7,6 +8,7 @@ const DEFAULT_LINKS: FooterLink[] = [
   { label: 'Mesafeli satış sözleşmesi', href: '/mesafeli-satis-sozlesmesi' },
   { label: 'KVKK', href: '/kvkk' },
   { label: 'Gizlilik politikası', href: '/gizlilik-politikasi' },
+  { label: 'Çerez politikası', href: '/cerez-politikasi' },
   { label: 'Kullanım şartları', href: '/kullanim-sartlari' },
 ];
 
@@ -20,7 +22,9 @@ export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', li
     <footer className="pf">
       <div className="pf-news">
         <div>
-          <b className="pf-news-t">Bültene katıl</b>
+          <b className="pf-news-t">
+            <D>Bültene katıl</D>
+          </b>
           <p className="pf-news-p">Yeni ürünlerden ve kampanyalardan ilk sen haberdar ol.</p>
         </div>
         <NewsletterForm source="footer" tone="dark" />

@@ -16,6 +16,16 @@ const safe = (v: unknown) => JSON.stringify(v).replace(/</g, '\\u003c');
 
 const KONUK = '/demleme/04-konuklar/';
 
+/** İlk `skip` görsel hemen yüklenir (ilk ekran); kalanı lazy + async decode. */
+function lazyImgs(html: string, skip: number): string {
+  let n = 0;
+  return html.replace(/<img\b([^>]*)>/g, (m, attrs: string) => {
+    n++;
+    if (n <= skip || /\bloading\s*=/.test(attrs)) return m;
+    return `<img loading="lazy" decoding="async"${attrs.startsWith(' ') ? '' : ' '}${attrs}>`;
+  });
+}
+
 const isUrl = (c: string) => /^(https?:)?\/\//.test(c) || c.startsWith('/');
 
 /** Ana sayfa gövdesi: handoff HTML'i + panelden gelen metin/görsel/SSS/konuk/footer verisi. */
@@ -54,7 +64,7 @@ export async function homeHtml(): Promise<string> {
     .replace('{{ANIM}}', () => safe(animCfg(site)))
     .replaceAll('{{FREE_FROM}}', String(Number(cfg.freeFrom) || 0))
     .replaceAll('{{contactEmail}}', esc(cfg.contactEmail));
-  return html.replace('{{KR_DATA}}', () => safe(data)).replace('{{SHOP_CARDS}}', () => shopCards(list));
+  return lazyImgs(html.replace('{{KR_DATA}}', () => safe(data)).replace('{{SHOP_CARDS}}', () => shopCards(list)), 8);
 }
 
 export type Product = SiteProduct;
@@ -215,8 +225,8 @@ export async function productHtml(list: SiteProduct[] | undefined, slug: string,
   const cur = all.find((p) => p.slug === slug);
   const together = sf.related_on && cur && sf.related_mode === 'together' ? ((await rest<string[]>(`rpc/co_purchased?p_slug=${encodeURIComponent(slug)}&p_limit=8`)) ?? []) : [];
   const related = sf.related_on && cur ? relatedHtml(pickRelated(all, cur, meta, sf, together), sf.related_title) : '';
-  return fill(read('product.html'), site)
+  return lazyImgs(fill(read('product.html'), site)
     .replace('{{REVIEWS}}', () => (sf.reviews_on ? reviewsHtml(reviews) : ''))
     .replace('{{RELATED}}', () => related)
-    .replace('{{PRODUCT_DATA}}', () => `<script type="application/json" id="productData">${safe(all)}</script>`);
+    .replace('{{PRODUCT_DATA}}', () => `<script type="application/json" id="productData">${safe(all)}</script>`), 3);
 }
