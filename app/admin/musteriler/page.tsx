@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Banknote, ClipboardCopy, Download, Mail, Search, UserCheck, UserRound, Users } from 'lucide-react';
+import { ClipboardCopy, Download, Mail, Search, Users } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { dt, tl, type Customer } from '@/lib/admin';
 import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
-import { Empty, Field, Kpi, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
+import { CustomersInsight } from '@/components/admin/Insights';
+import { Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
 
 type Seg = 'vip' | 'sadik' | 'yeni' | 'pasif' | 'siparissiz' | 'standart';
 type Meta = { email: string; tags: string[]; note: string };
@@ -194,8 +195,6 @@ export default function Customers() {
     return m;
   }, [list, segOf]);
 
-  const members = list?.filter((c) => c.registered).length ?? 0;
-  const total = list?.reduce((n, c) => n + Number(c.spent), 0) ?? 0;
   const allSel = shown.length > 0 && shown.every((c) => sel.has(c.email));
   const openC = open ? list?.find((c) => c.email === open) : undefined;
 
@@ -228,14 +227,7 @@ export default function Customers() {
       <div className="adm-scroll">
         <div className="adm-inner">
           {err && <div className="alert err">{err}</div>}
-          {list && (
-            <div className="kpis">
-              <Kpi label="Toplam müşteri" value={String(list.length)} tone="ac" icon={<Users size={17} />} />
-              <Kpi label="Üye" value={String(members)} sub="hesabı olanlar" tone="green" icon={<UserCheck size={17} />} />
-              <Kpi label="Misafir" value={String(list.length - members)} sub="üyeliksiz sipariş verenler" tone="blue" icon={<UserRound size={17} />} />
-              <Kpi label="Toplam harcama" value={tl(total)} sub="iptaller hariç" tone="amber" icon={<Banknote size={17} />} />
-            </div>
-          )}
+          {list && list.length > 0 && <CustomersInsight list={list} now={now} />}
           <div className="toolbar">
             <div className="search">
               <Search size={15} />

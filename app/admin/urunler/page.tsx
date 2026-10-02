@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, ImagePlus, Package, Pencil, Plus, Trash2, X } from 
 import { supabase } from '@/lib/supabase';
 import { refreshSite, slugify, tl, uploadImage, type AdminProduct, type Color } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
+import { ProductsInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 
 type Draft = {
@@ -352,6 +353,7 @@ export default function Products() {
       <div className="adm-scroll">
         <div className="adm-inner">
           {err && <div className="alert err">{err}</div>}
+          {list && list.length > 0 && <ProductsInsight list={list} />}
           <div className="card">
             {!list ? (
               <Loading />

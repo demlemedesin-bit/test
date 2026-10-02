@@ -5,6 +5,8 @@ import { Bell, Download, Search, ShoppingCart, Trash2, Wallet, Mail } from 'luci
 import { supabase } from '@/lib/supabase';
 import { dt, tl } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
+import { Card } from '@/components/admin/Insights';
+import { Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 
 type Item = { slug: string; name: string; qty: number; color?: string | null; size?: string | null; price: number };
@@ -139,6 +141,27 @@ export default function Carts() {
               <Kpi label="Hatırlatılan" value={String(abandoned.filter((c) => c.remind_count > 0).length)} sub="en az bir kez e-posta gönderildi" tone="blue" icon={<Bell size={17} />} />
             </div>
           )}
+          {list && list.length > 0 && (() => {
+            const age = (c: Cart) => (now - new Date(c.updated_at).getTime()) / HOUR;
+            const pm = new Map<string, number>();
+            abandoned.forEach((c) => c.items.forEach((i) => pm.set(i.name, (pm.get(i.name) ?? 0) + i.qty)));
+            const top = [...pm].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([label, value]) => ({ label, value }));
+            return (
+              <div className="grid2 even">
+                <Card title="Sepet yaşı" meta={`${list.length} sepet`}>
+                  <Donut size={138} center={{ big: String(abandoned.length), small: 'terk' }} segs={[
+                    { label: 'Aktif (1 sa. içinde)', value: list.filter((c) => age(c) <= 1).length, color: 'var(--green)' },
+                    { label: '1–24 saat', value: list.filter((c) => age(c) > 1 && age(c) <= 24).length, color: 'var(--amber)' },
+                    { label: '1–3 gün', value: list.filter((c) => age(c) > 24 && age(c) <= 72).length, color: 'var(--blue)' },
+                    { label: '3 günden eski', value: list.filter((c) => age(c) > 72).length, color: 'var(--red)' },
+                  ]} />
+                </Card>
+                <Card title="Terk edilen ürünler" meta="adet">
+                  {top.length ? <HBars rows={top} /> : <p className="muted">Terk edilen ürün yok.</p>}
+                </Card>
+              </div>
+            );
+          })()}
           <div className="toolbar">
             <div className="search">
               <Search size={15} />

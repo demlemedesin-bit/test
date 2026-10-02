@@ -5,6 +5,7 @@ import { Check, Copy, Link2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { slugify, tl } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
+import { AreaChart, Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 
 type TLink = { id: string; code: string; name: string; dest: string; utm_source: string; utm_medium: string; utm_campaign: string; utm_term: string; utm_content: string; active: boolean; created_at: string };
@@ -104,7 +105,6 @@ export default function Tracking() {
     <button type="button" className="icon-btn" title="Kopyala" onClick={() => copy(text, id)}>{copied === id ? <Check size={15} color="var(--green)" /> : <Copy size={15} />}</button>
   );
 
-  const maxV = Math.max(1, ...(rep?.daily ?? []).map((d) => d.views));
 
   return (
     <>
@@ -132,14 +132,25 @@ export default function Tracking() {
                 <div className="card-h"><h2 className="card-t">Günlük ziyaret</h2></div>
                 <div className="card-b">
                   {rep.daily.length === 0 ? <Empty title="Henüz veri yok" text="Siteye gelen ziyaretler burada görünür." /> : (
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120 }}>
-                      {rep.daily.map((d) => (
-                        <div key={d.day} title={`${d.day}: ${d.views} görüntüleme, ${d.visitors} ziyaretçi, ${d.orders} sipariş`} style={{ flex: 1, minWidth: 3, height: Math.max(3, (d.views / maxV) * 120), background: 'var(--ac)', opacity: 0.85, borderRadius: '3px 3px 0 0' }} />
-                      ))}
-                    </div>
+                    <AreaChart height={190} data={rep.daily.map((d) => ({ label: d.day.slice(5), value: d.views, note: `${d.visitors} ziyaretçi · ${d.orders} sipariş` }))} />
                   )}
                 </div>
               </section>
+
+              {rep.rows.length > 0 && (() => {
+                const bySrc = new Map<string, { v: number; r: number }>();
+                rep.rows.forEach((r) => { const k = r.source || 'doğrudan'; const o = bySrc.get(k) ?? { v: 0, r: 0 }; o.v += r.visitors; o.r += r.revenue; bySrc.set(k, o); });
+                const arr = [...bySrc].sort((a, b) => b[1].v - a[1].v);
+                const pal = ['var(--ac)', 'var(--green)', 'var(--blue)', 'var(--amber)', 'var(--red)', 'var(--tx3)'];
+                return (
+                  <div className="grid2 even">
+                    <section className="card"><div className="card-h"><h2 className="card-t">Trafik kaynakları</h2><span className="card-m">ziyaretçi</span></div>
+                      <div className="card-b"><Donut size={138} center={{ big: String(tot.visitors), small: 'ziyaretçi' }} segs={arr.slice(0, 6).map(([label, o], i) => ({ label, value: o.v, color: pal[i % pal.length] }))} /></div></section>
+                    <section className="card"><div className="card-h"><h2 className="card-t">Kaynağa göre ciro</h2><span className="card-m">₺</span></div>
+                      <div className="card-b"><HBars rows={arr.map(([label, o]) => ({ label, value: o.r })).filter((r) => r.value > 0).slice(0, 6)} fmt={tl} /></div></section>
+                  </div>
+                );
+              })()}
 
               <section className="card" style={{ marginBottom: 18 }}>
                 <div className="card-h"><h2 className="card-t">Kaynak / kampanya performansı</h2><span className="card-m">UTM’li her ziyaret otomatik buraya düşer</span></div>

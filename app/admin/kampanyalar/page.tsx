@@ -5,6 +5,8 @@ import { BadgePercent, Dices, Pencil, Plus, Search, Ticket, Trash2, Wallet } fro
 import { supabase } from '@/lib/supabase';
 import { dt, tl } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
+import { Card } from '@/components/admin/Insights';
+import { Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 
 type Kind = 'percent' | 'fixed' | 'free_shipping';
@@ -241,6 +243,20 @@ export default function Campaigns() {
               <Kpi label="Aktif kampanya" value={String(activeCount)} tone="green" icon={<BadgePercent size={17} />} />
               <Kpi label="Toplam kullanım" value={String(totalUse)} tone="blue" icon={<Ticket size={17} />} />
               <Kpi label="Verilen indirim" value={tl(totalDisc)} sub="kullanım geçmişine göre" tone="amber" icon={<Wallet size={17} />} />
+            </div>
+          )}
+          {list && list.length > 0 && (
+            <div className="grid2 even">
+              <Card title="Kampanya durumu" meta={`${list.length} kampanya`}>
+                <Donut size={138} center={{ big: String(activeCount), small: 'aktif' }} segs={[
+                  { label: 'Aktif', value: activeCount, color: 'var(--green)' },
+                  { label: 'Otomatik', value: list.filter((c) => c.auto).length, color: 'var(--ac)' },
+                  { label: 'Diğer', value: Math.max(list.length - activeCount - list.filter((c) => c.auto).length, 0), color: 'var(--tx3)' },
+                ]} />
+              </Card>
+              <Card title="En çok kullanılanlar" meta="kullanım">
+                {list.some((c) => c.used_count > 0) ? <HBars rows={[...list].sort((a, b) => b.used_count - a.used_count).filter((c) => c.used_count > 0).slice(0, 5).map((c) => ({ label: c.name, value: c.used_count }))} /> : <p className="muted">Henüz kullanım yok.</p>}
+              </Card>
             </div>
           )}
           <div className="toolbar">
