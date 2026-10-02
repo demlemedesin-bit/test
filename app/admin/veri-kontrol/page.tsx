@@ -46,7 +46,8 @@ export default function VeriKontrol() {
         if (x.soon) r.push('“yakında” (satışta değil)');
         return r.join(', ');
       };
-      setBad(prods.map((x) => ({ name: x.name, why: why(x) })).filter((x) => x.why));
+      const badList = prods.map((x) => ({ name: x.name, why: why(x) })).filter((x) => x.why);
+      setBad(badList);
       const has = (k: string) => typeof ads[k] === 'string' && (ads[k] as string).trim() !== '';
       const diff = ordSum ? Math.abs(evSum - ordSum) / ordSum : 0;
       setRows([
@@ -63,7 +64,7 @@ export default function VeriKontrol() {
         { name: 'TikTok Pixel', ok: has('tiktok_pixel'), detail: has('tiktok_pixel') ? String(ads.tiktok_pixel) : 'Tanımlı değil' },
         { name: 'Çerez onayı', ok: consent.on !== false, detail: consent.on === false ? 'Kapalı: izleme betikleri onaysız çalışır' : 'Açık (KVKK uyumlu)' },
         { name: 'Google Search Console doğrulaması', ok: !!ver.verify_google, detail: ver.verify_google ? 'Doğrulama kodu ekli' : 'Kod girilmemiş', fix: 'Entegrasyonlar → Site doğrulama; sonra /sitemap.xml gönder.' },
-        { name: 'Google Merchant Center beslemesi', ok: prods.length > 0 && prods.length - bad.length >= 0, detail: `/feed/google.xml · ${prods.length} aktif ürün`, fix: 'Merchant Center’da bu adresi zamanlanmış besleme olarak ekle.' },
+        { name: 'Google Merchant Center beslemesi', ok: prods.length > 0 && badList.length === 0, detail: `/feed/google.xml · ${prods.length} aktif ürün${badList.length ? ` · ${badList.length} üründe eksik var (aşağıdaki listeye bak)` : ''}`, fix: prods.length === 0 ? 'Aktif ürün yok.' : 'Eksik ürünleri tamamla; sonra Merchant Center’da bu adresi zamanlanmış besleme olarak ekle.' },
       ]);
     })();
   }, []);
