@@ -39,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const cf = c.changefreq;
 
   const out: Entry[] = [{ url: base, changeFrequency: cf, priority: c.priorities.home }];
+  if (products.length) out.push({ url: `${base}/urunler`, changeFrequency: cf, priority: c.priorities.products });
   for (const p of products) {
     const imgs = c.include_images ? [p.thumb, ...p.colors.map((x) => x.img)].filter((x): x is string => !!x).map(abs) : [];
     out.push({
