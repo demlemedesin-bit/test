@@ -2,12 +2,12 @@
 export type Carrier = { name: string; url: string };
 
 export const CARRIERS: Carrier[] = [
+  { name: 'UPS', url: 'https://www.ups.com/track?loc=tr_TR&tracknum={no}' },
   { name: 'Yurtiçi Kargo', url: 'https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code={no}' },
   { name: 'Aras Kargo', url: 'https://www.araskargo.com.tr/trs-kargo-takip?kargo_takip_no={no}' },
   { name: 'MNG Kargo', url: 'https://www.mngkargo.com.tr/gonderi-takip/?q={no}' },
   { name: 'PTT Kargo', url: 'https://gonderitakip.ptt.gov.tr/Track/Verify?q={no}' },
   { name: 'Sürat Kargo', url: 'https://www.suratkargo.com.tr/gonderi-takip?takipNo={no}' },
-  { name: 'UPS', url: 'https://www.ups.com/track?loc=tr_TR&tracknum={no}' },
   { name: 'HepsiJet', url: 'https://www.hepsijet.com/gonderi-takibi/{no}' },
   { name: 'Trendyol Express', url: 'https://www.trendyolexpress.com/gonderi-takip?trackingNo={no}' },
   { name: 'Diğer', url: '' },

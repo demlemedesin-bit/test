@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     order_no: 'DM-0000',
     total: '₺1.250',
     track_url: `${base}/siparis-takip?no=DM-0000`,
-    carrier: 'Yurtiçi Kargo',
+    carrier: 'UPS',
     tracking_no: '1234567890',
     carrier_url: 'https://www.yurticikargo.com/',
     payment_info: 'Ödemeyi havale / EFT ile yapabilirsin. (Örnek metin)',
