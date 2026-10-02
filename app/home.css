@@ -677,3 +677,6 @@ em{ font-style:normal; font-weight:400; }
 .cart-rec-p{ color:var(--ink-2); }
 .cart-rec-b{ margin-top:2px; padding:5px 0; border:1px solid var(--line); border-radius:99px; font-size:var(--t-12); cursor:pointer; background:none; }
 .cart-rec-b:hover{ border-color:var(--ink); }
+
+#cartShip p{ margin:0 0 6px; font-size:var(--t-14); color:var(--ink-2); } #cartShip b{ color:var(--ink); }
+.cs-bar{ height:6px; border-radius:99px; background:#E8DFCC; overflow:hidden; } .cs-bar i{ display:block; height:100%; background:#DD262C; border-radius:99px; transition:width .35s ease; }
