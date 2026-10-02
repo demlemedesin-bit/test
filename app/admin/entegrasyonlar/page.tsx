@@ -296,7 +296,7 @@ const SAMPLE = `{
     "items": [{ "name": "Demleme Kupa", "qty": 2, "unit_price": 420, "line_total": 840 }],
     "subtotal": 840, "shipping": 59.9, "discount": 0, "coupon_code": null,
     "total": 899.9, "payment_method": "kart",
-    "tracking_carrier": "Yurtiçi Kargo", "tracking_no": "1234567890"
+    "tracking_carrier": "UPS", "tracking_no": "1234567890"
   }
 }`;
 const VERIFY = `// Node.js / n8n Code düğümü
