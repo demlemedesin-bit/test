@@ -172,6 +172,24 @@
       var ra=function(){ rp.disabled=rt.scrollLeft<4; rn.disabled=rt.scrollLeft+rt.clientWidth>rt.scrollWidth-4; }; rt.addEventListener('scroll', ra, {passive:true}); ra(); }
   })();
 
+  // Reels: a card with an Instagram reel/post link plays it in a popup (Instagram's own embed, so plays count on Instagram)
+  (function(){
+    var rt=document.getElementById('reelTrack'); if(!rt) return;
+    var RX=/instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i, box=null;
+    var close=function(){ if(!box) return; box.remove(); box=null; document.documentElement.style.overflow=''; };
+    rt.addEventListener('click', function(e){
+      var a=e.target.closest('a.rl-card'); if(!a) return; var m=RX.exec(a.getAttribute('href')||''); if(!m) return;
+      e.preventDefault(); close();
+      var type=m[1].toLowerCase()==='p'?'p':(m[1].toLowerCase()==='tv'?'tv':'reel');
+      var src='https://www.instagram.com/'+type+'/'+m[2]+'/embed/';
+      box=document.createElement('div'); box.className='rl-modal';
+      box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button><iframe src="'+src+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" title="Instagram"></iframe><a class="rl-m-ig" href="'+a.href+'" target="_blank" rel="noopener">Instagram\u2019da a\u00e7</a></div>';
+      box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); });
+      document.body.appendChild(box); document.documentElement.style.overflow='hidden';
+    });
+    addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  })();
+
   // Shop: categories filter the rail (the red circle moves), arrows scroll it by one card
   (function(){
     var cats=document.getElementById('shopCats'), track=document.getElementById('shopTrack'); if(!cats || !track) return;
