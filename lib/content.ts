@@ -66,10 +66,15 @@ export function shopCards(list: SiteProduct[]): string {
     .map((p) => {
       const c0 = p.colors[0];
       const choose = p.colors.length > 1 || p.sizes?.pick || p.soon || p.out;
-      const tag = p.soon ? ' <span class="sh-tag">Yakında</span>' : p.out ? ' <span class="sh-tag">Tükendi</span>' : '';
+      const tag = p.soon
+        ? ' <span class="sh-tag">Yakında</span>'
+        : p.out
+          ? ' <span class="sh-tag">Tükendi</span>'
+          : (p.was ? ` <span class="sh-tag sh-sale">%${p.salePct ?? ''} indirim</span>` : '') + (p.left ? ` <span class="sh-tag sh-low">Son ${p.left} adet</span>` : '');
+      const priceHtml = p.was && !p.out && !p.soon ? `<s>${esc(p.was)}</s> ${esc(p.price)}` : esc(p.price);
       return `            <article class="sh-card" data-cat="${esc(p.shopCat)}">
               <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
-              <p class="sh-name">${esc(p.name)}${tag}</p></a><p class="sh-price">${esc(p.price)}</p>
+              <p class="sh-name">${esc(p.name)}${tag}</p></a><p class="sh-price">${priceHtml}</p>
               <button type="button" class="link link-muted add-to-cart" data-name="${esc(p.name)}" data-price="${esc(p.price)}" data-slug="${esc(p.slug)}" data-color="${esc(c0?.key ?? '')}" data-img="${esc(c0?.img ?? p.thumb)}"${choose ? ' data-choose="1"' : ''}>Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
             </article>`;
     })
@@ -132,7 +137,7 @@ function relatedHtml(items: SiteProduct[], title: string): string {
   const cards = items
     .map((x) => {
       const img = x.colors[0]?.img || x.thumb;
-      return `<a href="/urun/${esc(x.slug)}" data-rec="related"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
+      return `<a href="/urun/${esc(x.slug)}" data-rec="related"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${x.was && !x.out ? `<s style="opacity:.55">${esc(x.was)}</s> ` : ''}${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
     })
     .join('');
   return `<section class="more px-related"><div class="more-h"><h2>${esc(title)}</h2><a href="/#magaza">Tüm ürünler →</a></div><div class="more-row">${cards}</div></section>`;
@@ -182,6 +187,7 @@ export function productJsonLd(p: SiteProduct, reviews: Review[], origin: string)
       '@type': 'Offer',
       price: p.priceNum.toFixed(2),
       priceCurrency: 'TRY',
+      ...(p.was && p.saleEnds ? { priceValidUntil: p.saleEnds.slice(0, 10) } : {}),
       availability: p.out || p.soon ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
       url: `${origin}/urun/${p.slug}`,
     },

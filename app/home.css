@@ -654,3 +654,7 @@ em{ font-style:normal; font-weight:400; }
   .newsletter-form{ flex-direction:column; }
   .newsletter-form .btn{ border-left:0; border-top:1px solid var(--ink); justify-content:center; }
 }
+
+.sh-price s{ opacity:.5; margin-right:4px; font-weight:400; }
+.sh-sale{ background:#DD262C; color:#fff; padding:1px 6px; border-radius:99px; font-size:10px; letter-spacing:.04em; margin-left:6px; }
+.sh-low{ color:#9a2f24; }

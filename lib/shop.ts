@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import type { CartItem } from './cart';
 import { lineKey } from './cart';
+import { saleOf } from './sale';
 
 export type DbProduct = {
   slug: string;
@@ -15,6 +16,9 @@ export type DbProduct = {
   soon: boolean;
   active: boolean;
   stock?: number | null;
+  data?: { sale?: unknown } | null;
+  /** Süreli kampanyadaki eski fiyat (price indirimli fiyattır) */
+  was?: number;
 };
 
 export type Settings = { freeFrom: number; fee: number; map: Record<string, string> };
@@ -34,13 +38,18 @@ export async function fetchProducts(slugs: string[]): Promise<DbProduct[]> {
   if (!slugs.length) return [];
   const { data, error } = await supabase().from('products').select('*').in('slug', slugs);
   if (error) throw error;
-  return (data ?? []).map((p) => ({ ...p, price: Number(p.price) })) as DbProduct[];
+  const now = Date.now();
+  return (data ?? []).map((p) => {
+    const s = saleOf(Number(p.price), p.data, now);
+    return { ...p, price: s.price, was: s.on ? s.base : undefined };
+  }) as DbProduct[];
 }
 
 export type PricedLine = {
   item: CartItem;
   key: string;
   unit: number;
+  was?: number;
   total: number;
   problem: string | null; // satışta değil / renk geçersiz / beden gerekli
 };
@@ -66,7 +75,7 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     else if (p.sizes.length && !p.sizes.includes(item.size)) problem = 'Beden seçilmesi gerekiyor.';
     else if (p.stock != null && p.stock < item.qty) problem = p.stock <= 0 ? 'Bu ürün tükendi.' : `Stokta yalnızca ${p.stock} adet var.`;
     const unit = p ? p.price : 0;
-    return { item, key: lineKey(item), unit, total: problem ? 0 : unit * item.qty, problem };
+    return { item, key: lineKey(item), unit, was: p?.was, total: problem ? 0 : unit * item.qty, problem };
   });
   const subtotal = lines.reduce((n, l) => n + l.total, 0);
   const shipping = subtotal === 0 || subtotal >= s.freeFrom ? 0 : s.fee;

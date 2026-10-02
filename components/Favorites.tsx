@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { saleOf } from '@/lib/sale';
 import { useWishlist } from '@/lib/wishlist';
 import { Alert } from './ui';
 import './ShopExtras.css';
 
-type P = { slug: string; name: string; price: number | string; thumb: string | null; colors: { img?: string }[] | null; stock: number | null; soon: boolean };
+type P = { slug: string; name: string; price: number | string; thumb: string | null; colors: { img?: string }[] | null; stock: number | null; soon: boolean; data?: { sale?: unknown } | null };
 
 const tl = (n: number) => '₺' + n.toLocaleString('tr-TR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
 
@@ -22,7 +23,7 @@ export function Favorites() {
     let off = false;
     supabase()
       .from('products')
-      .select('slug,name,price,thumb,colors,stock,soon')
+      .select('slug,name,price,thumb,colors,stock,soon,data')
       .in('slug', key.split(','))
       .then(({ data, error: e }) => {
         if (off) return;
@@ -79,7 +80,7 @@ export function Favorites() {
                 <span className="sr-img">{img ? <img src={img} alt="" loading="lazy" /> : null}</span>
                 <span className="sr-name">{p.name}</span>
                 <span className="sr-meta">{out ? 'Tükendi' : p.soon ? 'Yakında' : ' '}</span>
-                <span className="sr-price">{tl(Number(p.price))}</span>
+                <span className="sr-price">{(() => { const s = saleOf(Number(p.price), p.data); return <>{s.on && <s style={{ opacity: 0.5, marginRight: 6 }}>{tl(s.base)}</s>}{tl(s.price)}</>; })()}</span>
               </a>
               <div className="fav-actions">
                 <a className="link" href={`/urun/${p.slug}`}>

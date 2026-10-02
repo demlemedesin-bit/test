@@ -23,7 +23,7 @@ function ProductCard({ p }: { p: SiteProduct }) {
           {p.cat || CAT[p.shopCat]}
           {p.out ? ' · Tükendi' : p.soon ? ' · Yakında' : ''}
         </span>
-        <span className="sr-price">{p.price}</span>
+        <span className="sr-price">{p.was && !p.out && !p.soon ? <s style={{ opacity: 0.5, marginRight: 6 }}>{p.was}</s> : null}{p.price}</span>
       </a>
     </li>
   );
