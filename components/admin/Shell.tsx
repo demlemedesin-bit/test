@@ -2,14 +2,15 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
 import { Spinner } from './ui';
+import { initTheme } from './Tools';
 
-const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users; perm?: string; badge?: boolean }[] }[] = [
+export const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users; perm?: string; badge?: boolean }[] }[] = [
   { g: 'Genel', items: [{ href: '/admin', label: 'Genel bakış', Icon: LayoutDashboard }] },
   {
     g: 'Mağaza',
@@ -129,12 +130,45 @@ function Login({ denied, email }: { denied?: boolean; email?: string }) {
   );
 }
 
+
+function Palette({ perms }: { perms: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const [i, setI] = useState(0);
+  const router = useRouter();
+  useEffect(() => {
+    const kd = (e: KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setOpen((o) => !o); setQ(''); setI(0); } if (e.key === 'Escape') setOpen(false); };
+    const op = () => { setOpen(true); setQ(''); setI(0); };
+    window.addEventListener('keydown', kd);
+    window.addEventListener('adm-palette', op);
+    return () => { window.removeEventListener('keydown', kd); window.removeEventListener('adm-palette', op); };
+  }, []);
+  const all = NAV.flatMap((g) => g.items.filter((x) => !x.perm || perms.includes(x.perm)).map((x) => ({ ...x, group: g.g })));
+  const k = q.trim().toLocaleLowerCase('tr');
+  const list = (k ? all.filter((x) => (x.label + ' ' + x.group).toLocaleLowerCase('tr').includes(k)) : all).slice(0, 12);
+  if (!open) return null;
+  const go = (h: string) => { setOpen(false); router.push(h); };
+  return (
+    <div className="pal-back" onMouseDown={() => setOpen(false)}>
+      <div className="pal" onMouseDown={(e) => e.stopPropagation()}>
+        <input autoFocus placeholder="Sayfa ara… (örn. kupon, depo, SEO)" value={q} onChange={(e) => { setQ(e.target.value); setI(0); }}
+          onKeyDown={(e) => { if (e.key === 'ArrowDown') { e.preventDefault(); setI((x) => Math.min(x + 1, list.length - 1)); } else if (e.key === 'ArrowUp') { e.preventDefault(); setI((x) => Math.max(x - 1, 0)); } else if (e.key === 'Enter' && list[i]) go(list[i].href); }} />
+        <ul>
+          {list.map((x, n) => <li key={x.href}><button type="button" className={n === i ? 'on' : ''} onMouseEnter={() => setI(n)} onClick={() => go(x.href)}><x.Icon size={16} />{x.label}<span>{x.group}</span></button></li>)}
+          {list.length === 0 && <li className="pal-empty">Sonuç yok</li>}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
   const { user, loading, admin, perms, isAdmin } = useAdmin();
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const counts = usePendingCounts(admin && perms.includes('orders'));
 
+  useEffect(() => { initTheme(); }, []);
   useEffect(() => {
     const t = setTimeout(() => setOpen(false), 0);
     return () => clearTimeout(t);
@@ -162,6 +196,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="adm-wrap">
+      <Palette perms={perms} />
       {open && <div className="drawer-back" onClick={() => setOpen(false)} />}
       <aside className={`sb${open ? ' open' : ''}`}>
         <div className="sb-logo">

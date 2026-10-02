@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { CheckCircle2, X, AlertTriangle, Inbox } from 'lucide-react';
+import { Sparkline, useCountUp } from './Charts';
+import { AdminTools } from './Tools';
 
 export const STATUS_TONE: Record<string, string> = {
   odeme_bekleniyor: 'b-amber',
@@ -17,9 +19,9 @@ export function Spinner({ size = 18 }: { size?: number }) {
 
 export function Loading({ text = 'Yükleniyor…' }: { text?: string }) {
   return (
-    <div className="empty">
-      <Spinner size={24} />
-      <b style={{ fontWeight: 500, color: 'var(--tx3)', fontSize: 13.5 }}>{text}</b>
+    <div aria-busy="true" aria-label={text}>
+      <div className="kpis">{[0, 1, 2, 3].map((i) => <div key={i} className="skel" style={{ height: 112, borderRadius: 16 }} />)}</div>
+      <div className="skel" style={{ height: 260, borderRadius: 16 }} />
     </div>
   );
 }
@@ -46,25 +48,34 @@ export function TopBar({ title, sub, children, onMenu }: { title: string; sub?: 
         {title}
         {sub && <span className="tb-sub">{sub}</span>}
       </h1>
-      <div className="tb-right">{children}</div>
+      <div className="tb-right">{children}<AdminTools /></div>
     </header>
   );
 }
 
-export function Kpi({ label, value, sub, tone, icon }: { label: string; value: string; sub?: string; tone: 'ac' | 'green' | 'amber' | 'blue' | 'red'; icon: ReactNode }) {
+export function Kpi({ label, value, sub, tone, icon, spark, trend }: { label: string; value: string; sub?: string; tone: 'ac' | 'green' | 'amber' | 'blue' | 'red'; icon: ReactNode; spark?: number[]; trend?: number }) {
+  // "₺12.400" / "%3,2" / "48" → sayı kısmı animasyonla artar
+  const m = value.match(/^([^\d-]*)(-?[\d.]+)(?:,(\d+))?(.*)$/);
+  const num = m ? parseFloat(m[2].replace(/\./g, '') + (m[3] ? '.' + m[3] : '')) : NaN;
+  const anim = useCountUp(isFinite(num) ? num : 0);
+  const dec = m?.[3]?.length ?? 0;
+  const shown = m && isFinite(num) ? `${m[1]}${anim.toLocaleString('tr-TR', { minimumFractionDigits: dec, maximumFractionDigits: dec })}${m[4]}` : value;
   return (
-    <div className="kpi fade-in">
+    <div className={`kpi fade-in kpi-${tone}`}>
       <div className="kpi-top">
         <span className="kpi-label">{label}</span>
         <span className={`kpi-ic tone-${tone}`}>{icon}</span>
       </div>
-      <div className="kpi-val">{value}</div>
-      {sub && <div className="kpi-sub">{sub}</div>}
+      <div className="kpi-val">{shown}</div>
+      <div className="kpi-foot">
+        {sub && <div className="kpi-sub">{sub}</div>}
+        {trend !== undefined && isFinite(trend) && <span className={`kpi-tr ${trend >= 0 ? 'up' : 'dn'}`}>{trend >= 0 ? '▲' : '▼'} {Math.abs(trend).toFixed(0)}%</span>}
+        {spark && spark.length > 1 && <span className="kpi-sp"><Sparkline data={spark} color={`var(--${tone === 'ac' ? 'ac' : tone})`} /></span>}
+      </div>
     </div>
   );
 }
 
-/** Sağdan açılan çekmece. Esc ve dış tıklama ile kapanır. */
 export function Panel({ title, onClose, children, footer, wide }: { title: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose();

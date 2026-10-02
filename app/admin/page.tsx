@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { dt, tl, useAdmin, type AdminOrder, type AdminProduct } from '@/lib/admin';
 import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
+import { AreaChart, Donut, HBars } from '@/components/admin/Charts';
 import { DashAlerts } from '@/components/admin/Alerts';
 import { Empty, Kpi, Loading, STATUS_TONE, TopBar } from '@/components/admin/ui';
 
@@ -71,6 +72,16 @@ function FullDashboard() {
           sold.set(k, r);
         }),
       );
+    const since30 = orders ? now.getTime() - 30 * 86400000 : 0;
+    const last30 = (orders ?? []).filter((o) => new Date(o.created_at).getTime() >= since30);
+    const stLabel: Record<string, [string, string]> = { odeme_bekleniyor: ['Ödeme bekliyor', '#f3ad4a'], hazirlaniyor: ['Hazırlanıyor', '#5aaefc'], kargoda: ['Kargoda', '#f0674f'], teslim_edildi: ['Teslim edildi', '#25d6a0'], iptal: ['İptal', '#6c6c85'] };
+    const statusSegs = Object.entries(stLabel).map(([k, [label, color]]) => ({ label, color, value: last30.filter((o) => o.status === k).length }));
+    const payMap = new Map<string, number>();
+    last30.filter((o) => o.status !== 'iptal').forEach((o) => payMap.set(o.payment_method, (payMap.get(o.payment_method) ?? 0) + Number(o.total)));
+    const payName: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme', kart: 'Kredi kartı' };
+    const payRows = [...payMap.entries()].map(([k, v]) => ({ label: payName[k] ?? k, value: v })).sort((a, b) => b.value - a.value);
+    const w1 = days.slice(7).reduce((n, d) => n + d.total, 0), w0 = days.slice(0, 7).reduce((n, d) => n + d.total, 0);
+    const trend = w0 ? ((w1 - w0) / w0) * 100 : w1 ? 100 : 0;
     const lowStock = products.filter((p) => p.active && !p.soon && p.stock != null && p.stock <= 5);
     return {
       todayCount: todayOrders.length,
@@ -80,6 +91,9 @@ function FullDashboard() {
       pay,
       ship,
       days,
+      statusSegs,
+      payRows,
+      trend,
       top: [...sold.values()].sort((a, b) => b.qty - a.qty).slice(0, 5),
       lowStock,
       avg: month.length ? month.reduce((n, o) => n + Number(o.total), 0) / month.length : 0,
@@ -101,8 +115,8 @@ function FullDashboard() {
             <>
               <DashAlerts />
               <div className="kpis">
-                <Kpi label="Bugün" value={String(s.todayCount)} sub={`${tl(s.todaySum)} ciro`} tone="ac" icon={<ShoppingBag size={17} />} />
-                <Kpi label="Bu ay ciro" value={tl(s.monthSum)} sub={`${s.monthCount} sipariş · ort. ${tl(Math.round(s.avg))}`} tone="green" icon={<Banknote size={17} />} />
+                <Kpi label="Bugün" value={String(s.todayCount)} sub={`${tl(s.todaySum)} ciro`} tone="ac" icon={<ShoppingBag size={17} />} spark={s.days.map((d) => d.count)} />
+                <Kpi label="Bu ay ciro" value={tl(s.monthSum)} sub={`${s.monthCount} sipariş · ort. ${tl(Math.round(s.avg))}`} tone="green" icon={<Banknote size={17} />} spark={s.days.map((d) => d.total)} trend={s.trend} />
                 <Kpi label="Ödeme bekleyen" value={String(s.pay.length)} sub={tl(s.pay.reduce((n, o) => n + Number(o.total), 0))} tone="amber" icon={<Clock size={17} />} />
                 <Kpi label="Hazırlanacak" value={String(s.ship.length)} sub="kargoya verilecek" tone="blue" icon={<PackageCheck size={17} />} />
               </div>
@@ -114,18 +128,7 @@ function FullDashboard() {
                     <span className="card-m">{tl(s.days.reduce((n, d) => n + d.total, 0))}</span>
                   </div>
                   <div className="card-b">
-                    <div className="bars" role="img" aria-label="Son 14 günün günlük cirosu">
-                      {s.days.map((d, i) => (
-                        <div className="bar" key={i}>
-                          <div className={`bar-fill${d.total ? '' : ' zero'}`} style={{ height: `${Math.max(2, (d.total / max) * 100)}%` }}>
-                            <span className="bar-tip">
-                              {d.label}: {tl(d.total)} · {d.count} sipariş
-                            </span>
-                          </div>
-                          <span className="bar-x">{i % 2 === 0 ? d.label.split(' ')[0] : ''}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <AreaChart data={s.days.map((d) => ({ label: d.label, value: d.total, note: `${d.count} sipariş` }))} fmt={tl} />
                   </div>
                 </section>
 
@@ -169,6 +172,19 @@ function FullDashboard() {
                       ))}
                     </div>
                   )}
+                </section>
+              </div>
+
+              <div className="grid2 even">
+                <section className="card">
+                  <div className="card-h"><h2 className="card-t">Sipariş durumları</h2><span className="card-m">son 30 gün</span></div>
+                  <div className="card-b">
+                    <Donut size={150} center={{ big: String(s.statusSegs.reduce((n, x) => n + x.value, 0)), small: 'sipariş' }} segs={s.statusSegs} />
+                  </div>
+                </section>
+                <section className="card">
+                  <div className="card-h"><h2 className="card-t">Ödeme yöntemleri</h2><span className="card-m">son 30 gün · ciro</span></div>
+                  <div className="card-b"><HBars rows={s.payRows} fmt={tl} /></div>
                 </section>
               </div>
 
