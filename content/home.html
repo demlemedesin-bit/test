@@ -1,0 +1,363 @@
+
+<!-- Lucide icon sprite (https://lucide.dev) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+  <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></symbol>
+  <symbol id="i-youtube" viewBox="0 0 24 24"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+</svg>
+
+<!-- ============================================================ -->
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="nav-logo" id="navLogo"><span class="word">Demleme</span> <span class="mark markbox"><img class="fr" src="/demleme/01-brand/logo/animation-frames/frame-00.png" alt=""><img class="st" src="/demleme/01-brand/logo/logo-still.png" alt="" style="left:21.9%;top:1.5%;height:88.6%"></span></a>
+    <nav class="nav-links" aria-label="Ana menü">
+      <a href="#magaza">Mağaza</a>
+      <a href="#konuklar">Konuklar</a>
+      <a href="#hakkinda">Hakkında</a>
+      <a href="#iletisim">İletişim</a>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-draw nav-draw--yt" href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><img src="/demleme/01-brand/icons/youtube.png" alt=""></a>
+      <a class="nav-draw nav-draw--ig" href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><img src="/demleme/01-brand/icons/instagram.png" alt=""></a>
+      <button class="nav-cart" id="cartBtn" type="button" aria-label="Sepet" aria-expanded="false" aria-controls="cartPanel">
+        <img src="/demleme/01-brand/icons/cart.png" alt="">
+        <span class="nav-cart-count" id="cartCount" hidden>0</span>
+      </button>
+      <button class="nav-icon nav-toggle" id="navToggle" aria-label="Menü" aria-expanded="false" type="button">
+        <svg class="icon icon-20" id="navToggleIcon"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile wrap" aria-label="Mobil menü">
+    <a href="#magaza">Mağaza</a>
+    <a href="#konuklar">Konuklar</a>
+    <a href="#hakkinda">Hakkında</a>
+    <a href="#iletisim">İletişim</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ============================================================ -->
+<!-- HERO -->
+<div class="stage" id="stage">
+  <section class="hero hero--b hero--d" id="heroB">
+    <div class="hero-b-copy">
+      <div class="hero-lead">
+      <h1 class="title title--b"><span class="line">Bir demin 40 yıllık hatırı var.</span><br><em class="line">Gel, beraber demleyelim.</em></h1>
+      <div class="hero-links hero-links--left">
+        <a class="hero-link" href="https://youtube.com" target="_blank" rel="noopener"><img src="/demleme/01-brand/hero-buttons/youtube-button.png" alt=""><span>YouTube kanalına bir bak</span></a>
+        <a class="hero-link" href="#magaza"><img src="/demleme/01-brand/hero-buttons/shop-button.png" alt=""><span>Kendine demlik bir şeyler bak</span></a>
+      </div>
+      </div>
+      <div class="hero-about" id="hakkinda">
+        <h2>Merhaba. Ben Garen.</h2>
+        <p>Seni burda görmek çok güzel. Herkesin hikâyesinin özel olduğuna inanıyorum. Sen dahil. Demleme benim sofram. Sana belki burayı seveceğinin sözünü veremem, ama gördüğün her şeyin gerçek olduğu sözünü verebilirim.</p>
+        <h3>Burada ne var</h3>
+        <p>Bazen misafirlerim, bazen ailem, kimi zaman da sırf beni görebilirsin. Hikâyeler, tecrübeler, hayata dair sorularım, her şey. Bu sofrada bir şeyler bulmanın yanı sıra, sen de çok şey ekleyebilirsin.</p>
+        <h3>Bir de elle tutulur tarafı</h3>
+        <p>Ailem İstanbul'da üç kuşaktır metal işliyor. Demleme'nin tepsilerini, sehpalarını, küçük ev parçalarını orada üretiyorum. Sohbetin geçtiği masaya ait şeyler. Anlayacağın, ben masayı kurdum.</p>
+        <p>Seni bekliyorum…</p>
+        <p class="signature">Garen</p>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat" style="--i:0"><b data-count="40">0</b><span>bölüm</span></div>
+        <div class="stat" style="--i:1"><b data-count="15">0</b><span>farklı konuk</span></div>
+        <div class="stat" style="--i:2"><b data-count="410" data-suffix="k">0</b><span>farklı izleyen</span></div>
+        <div class="stat" style="--i:3"><b data-count="3.3" data-decimals="1" data-suffix="M">0</b><span>izlenme</span></div>
+      </div>
+    </div>
+    <div class="hero-b-art" id="pourArt">
+      <div class="landing" id="landing"><img src="/demleme/02-hero-pour/garen-photo.jpg" alt="Garen, elinde çay bardağıyla"><svg class="steam" viewBox="0 0 100 160" aria-hidden="true"><path class="w1" d="M58 150 C44 128 70 112 54 90 C40 70 60 56 46 34"/><path class="w2" d="M42 152 C30 132 50 118 36 98 C24 80 40 66 28 46"/><path class="w3" d="M70 148 C62 130 80 118 68 100 C58 86 72 74 62 58"/></svg></div>
+      <canvas id="pourCanvas" width="800" height="1039" aria-hidden="true"></canvas>
+      <span id="pourMeta" data-frames="96" data-fw="800" data-fh="1039" data-spout-x="0.369" data-tips="0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0" hidden></span>
+    </div>
+  </section>
+</div>
+
+
+
+<!-- ============================================================ -->
+<!-- HAKKINDA -->
+
+<!-- ============================================================ -->
+<!-- MAĞAZA -->
+<section class="shop" id="magaza">
+  <!-- DEMLEME SHOP (mockup for the dev). Assets: assets/03-shop/ — hero, 10 product PNGs (transparent), SVG buttons & marks. -->
+  <div class="shop-top">
+    <div class="shop-copy">
+      <h2 class="shop-title">Demleme<br>Shop</h2>
+      <p class="shop-sub">Sohbetin en güzel eşlikçileri.</p>
+      <ul class="shop-cats" id="shopCats">
+        <li><button type="button" class="is-active" data-cat="sofra">Ev &amp; Sofra<img class="shop-circle" src="/demleme/03-shop/svg/scribble-circle-red.svg" alt=""></button></li>
+        <li><button type="button" data-cat="giyim">Giyim<img class="shop-circle" src="/demleme/03-shop/svg/scribble-circle-red.svg" alt=""></button></li>
+        <li><button type="button" data-cat="aksesuar">Aksesuar<img class="shop-circle" src="/demleme/03-shop/svg/scribble-circle-red.svg" alt=""></button></li>
+      </ul>
+      <a class="shop-btn" href="#magaza"><span class="dbtn"><img src="/demleme/03-shop/svg/btn-tum-urunleri-gor-drawn-base.svg" alt="Tüm ürünleri gör"><img class="dbtn-arr" src="/demleme/03-shop/svg/btn-tum-urunleri-gor-drawn-arrow.svg" alt=""></span></a>
+      <img class="shop-cat" src="/demleme/03-shop/illustrations/cat-tea-720.webp" alt="">
+    </div>
+    <div class="shop-art">
+      <img class="shop-hero" src="/demleme/03-shop/hero/shop-hero-1800.webp" alt="Demleme ürünleri: kavanozlar, tepsi, çay bardağı, bez çanta, şapka">
+      <img class="shop-note" src="/demleme/03-shop/svg/note-iyi-sohbet-her-yerde.svg" alt="iyi sohbet, her yerde.">
+      <div class="shop-rail">
+        <button type="button" class="shop-arrow" id="shopPrev" aria-label="Önceki"><img src="/demleme/07-shared-ui/svg/arrow-prev.svg" alt=""></button>
+        <div class="shop-track" id="shopTrack">
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/cam-kavanoz-uzun"><div class="sh-thumb"><img src="/demleme/03-shop/products/p01-cam-kavanoz-uzun-720.webp" alt="Cam Kavanoz · Uzun" loading="lazy"></div>
+              <p class="sh-name">Cam Kavanoz · Uzun</p></a><p class="sh-price">₺420</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Cam Kavanoz · Uzun" data-price="₺420">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/cam-kavanoz-basik"><div class="sh-thumb"><img src="/demleme/03-shop/products/p02-cam-kavanoz-basik-720.webp" alt="Cam Kavanoz · Basık" loading="lazy"></div>
+              <p class="sh-name">Cam Kavanoz · Basık</p></a><p class="sh-price">₺390</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Cam Kavanoz · Basık" data-price="₺390">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/demleme-sehpasi"><div class="sh-thumb"><img src="/demleme/03-shop/products/p03-demleme-sehpasi-720.webp" alt="Demleme Sehpası" loading="lazy"></div>
+              <p class="sh-name">Demleme Sehpası</p></a><p class="sh-price">₺2.400</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Demleme Sehpası" data-price="₺2.400">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/katli-saklama-kabi"><div class="sh-thumb"><img src="/demleme/03-shop/products/p04-katli-saklama-kabi-720.webp" alt="Katlı Saklama Kabı" loading="lazy"></div>
+              <p class="sh-name">Katlı Saklama Kabı</p></a><p class="sh-price">₺1.150</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Katlı Saklama Kabı" data-price="₺1.150">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/sofra-tepsisi-buyuk"><div class="sh-thumb"><img src="/demleme/03-shop/products/p05-sofra-tepsisi-buyuk-720.webp" alt="Sofra Tepsisi · Büyük" loading="lazy"></div>
+              <p class="sh-name">Sofra Tepsisi · Büyük</p></a><p class="sh-price">₺980</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Sofra Tepsisi · Büyük" data-price="₺980">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/sofra-tepsisi-kucuk"><div class="sh-thumb"><img src="/demleme/03-shop/products/p06-sofra-tepsisi-kucuk-720.webp" alt="Sofra Tepsisi · Küçük" loading="lazy"></div>
+              <p class="sh-name">Sofra Tepsisi · Küçük</p></a><p class="sh-price">₺690</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Sofra Tepsisi · Küçük" data-price="₺690">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="giyim">
+              <a class="sh-link" href="/urun/demleme-tisort"><div class="sh-thumb"><img src="/demleme/03-shop/products/p07-demleme-tisort-720.webp" alt="Demleme Tişört" loading="lazy"></div>
+              <p class="sh-name">Demleme Tişört</p></a><p class="sh-price">₺650</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Demleme Tişört" data-price="₺650">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="giyim">
+              <a class="sh-link" href="/urun/demleme-sapka"><div class="sh-thumb"><img src="/demleme/03-shop/products/p08-demleme-sapka-720.webp" alt="Demleme Şapka" loading="lazy"></div>
+              <p class="sh-name">Demleme Şapka</p></a><p class="sh-price">₺520</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Demleme Şapka" data-price="₺520">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="aksesuar">
+              <a class="sh-link" href="/urun/demleme-bez-canta"><div class="sh-thumb"><img src="/demleme/03-shop/products/p09-demleme-bez-canta-720.webp" alt="Demleme Bez Çanta" loading="lazy"></div>
+              <p class="sh-name">Demleme Bez Çanta</p></a><p class="sh-price">₺380</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Demleme Bez Çanta" data-price="₺380">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+            <article class="sh-card" data-cat="sofra">
+              <a class="sh-link" href="/urun/demleme-cay-bardagi"><div class="sh-thumb"><img src="/demleme/03-shop/products/p10-demleme-cay-bardagi-720.webp" alt="Demleme Çay Bardağı" loading="lazy"></div>
+              <p class="sh-name">Demleme Çay Bardağı <span class="sh-tag">Yakında</span></p></a><p class="sh-price">₺240</p>
+              <button type="button" class="link link-muted add-to-cart" data-name="Demleme Çay Bardağı" data-price="₺240">Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
+            </article>
+        </div>
+        <button type="button" class="shop-arrow" id="shopNext" aria-label="Sonraki"><img src="/demleme/07-shared-ui/svg/arrow-next.svg" alt=""></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- KONUKLAR -->
+<section class="konuk" id="konuklar">
+  <!-- KONUKLAR, v16 = the turning table; on each press the guest leaving stands up and the one arriving sits down. Guests = #krData in seat order (name, url, drawing, stand/sit clips, reels). Assets: assets/04-konuklar/ -->
+  <div class="konuk-head">
+    <div><p class="label">Konuklar</p><h2>Demlemedeki konuklar</h2></div>
+    <span class="meta">15 konuk ağırlandı</span>
+  </div>
+  <div class="kr" id="kr">
+    <div class="kr-stage" id="krStage" aria-roledescription="carousel" aria-label="Konuklar masası">
+      <div class="kr-seats" id="krSeats"></div>
+      <img class="kr-table" src="/demleme/04-konuklar/table/table-2000.webp" alt="">
+    </div>
+    <div class="konuk-controls kr-controls">
+      <a class="konuk-all" href="/konuklar"><span class="dbtn"><img src="/demleme/04-konuklar/svg/btn-konuklarin-tamamini-gor-base.svg" alt="Konukların tamamını gör"><img class="dbtn-arr" src="/demleme/04-konuklar/svg/btn-konuklarin-tamamini-gor-arrow.svg" alt=""></span></a>
+      <div class="konuk-nav"><button type="button" id="krPrev" aria-label="Masayı geri çevir"><img src="/demleme/07-shared-ui/svg/arrow-prev.svg" alt=""></button><button type="button" id="krNext" aria-label="Masayı bir koltuk çevir"><img src="/demleme/07-shared-ui/svg/arrow-next.svg" alt=""></button></div>
+    </div>
+  </div>
+  <script type="application/json" id="krData">{{KR_DATA}}</script>
+  <div class="reels">
+    <div class="reels-head"><p class="label">Reels'lerden · <span id="krReelName"></span></p><span class="reels-line"></span>
+      <button type="button" class="shop-arrow" id="reelPrev" aria-label="Önceki"><img src="/demleme/07-shared-ui/svg/arrow-prev.svg" alt=""></button><button type="button" class="shop-arrow" id="reelNext" aria-label="Sonraki"><img src="/demleme/07-shared-ui/svg/arrow-next.svg" alt=""></button></div>
+    <div class="reels-track" id="reelTrack"></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SSS -->
+<!-- ============================================================ -->
+<!-- AYIN DEMLEYENLERİ -->
+<section class="demley" id="demleyenler">
+  <!-- AYIN DEMLEYENLERİ, sehpa version (mockup for the dev): the 5 photos lie on the tray of the Demleme sehpa. The 5 finalists = #demleyenData (Garen picks them by hand each week:
+       name, city, photo, icon, tilt). Click a polaroid = zoom view.
+       Assets: assets/05-demleyenler/ -->
+  <div class="dm-top dm-top--sehpa">
+    <div class="dm-sehpa" id="dmSehpa">
+      <img class="dm-sehpa-img" src="/demleme/05-demleyenler/sehpa/sehpa-1100.webp" alt="Demleme sehpası: çıkarılabilir tepsi, altında saklama alanı">
+      <div class="dm-tray" id="dmTray"></div>
+      <img class="dm-n dm-n1" src="/demleme/05-demleyenler/svg/note-cikarilabilir-tepsi.svg" alt="">
+      <img class="dm-n dm-n2" src="/demleme/05-demleyenler/svg/note-her-pazar-yenilenir.svg" alt="">
+      <img class="dm-n dm-n3" src="/demleme/05-demleyenler/svg/note-saklama-alani.svg" alt="">
+      <img class="dm-n dm-joy" src="/demleme/05-demleyenler/svg/joy-marks.svg" alt="">
+      <img class="dm-n dm-hd" src="/demleme/05-demleyenler/svg/heart-doodle.svg" alt="">
+    </div>
+    <div class="dm-copy dm-copy--c">
+      <h2 class="dm-title"><span class="dm-l1"><img class="bl" src="/demleme/07-shared-ui/svg/burst-left.svg" alt="">Demlemede <span id="dmMonth">Eylül</span> ayının<img class="br" src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></span><br>demleyenleri</h2>
+      <p class="dm-sub">Demleme izlerken çektiğin fotoğrafı bizimle paylaş, sen de ayın demleyenleri arasında yerini al.</p>
+      <div class="dm-actions dm-actions--c">
+        <span class="dm-join-row"><img src="/demleme/07-shared-ui/svg/burst-left.svg" alt=""><a class="dm-join" href="https://demlemedesin.com" target="_blank" rel="noopener"><span class="dbtn"><img src="/demleme/05-demleyenler/svg/btn-demleyenlere-katil-base.svg" alt="Demleyenlere katıl"><img class="dbtn-arr" src="/demleme/05-demleyenler/svg/btn-demleyenlere-katil-arrow.svg" alt=""></span></a><img src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></span>
+        <a class="dm-site" href="https://demlemedesin.com" target="_blank" rel="noopener"><img src="/demleme/07-shared-ui/svg/burst-left.svg" alt="">demlemedesin.com<img src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></a>
+        <span class="dm-weekly">Her pazar güncellenir</span>
+      </div>
+    </div>
+  </div>
+  <script type="application/json" id="demleyenData">{"month": "Eylül", "photos": [{"name": "Zeynep", "city": "İstanbul", "img": "/demleme/05-demleyenler/viewer-photos/viewer01-640.webp", "icon": "heart", "tilt": -3}, {"name": "Emir", "city": "Ankara", "img": "/demleme/05-demleyenler/viewer-photos/viewer02-640.webp", "icon": "mug", "tilt": 2}, {"name": "Merve", "city": "İzmir", "img": "/demleme/05-demleyenler/viewer-photos/viewer03-640.webp", "icon": "heart", "tilt": -1}, {"name": "Ali", "city": "Bursa", "img": "/demleme/05-demleyenler/viewer-photos/viewer04-640.webp", "icon": "mug", "tilt": 3}, {"name": "Deniz", "city": "Eskişehir", "img": "/demleme/05-demleyenler/viewer-photos/viewer05-640.webp", "icon": "heart", "tilt": -2}]}</script>
+</section>
+
+<div class="dm-lb" id="dmLb" role="dialog" aria-modal="true" aria-label="Fotoğraf" hidden>
+  <button class="dm-lb-close" type="button" id="dmLbClose" aria-label="Kapat"><img src="/demleme/05-demleyenler/svg/icon-close.svg" alt=""></button>
+  <button class="dm-lb-nav dm-lb-prev" type="button" id="dmLbPrev" aria-label="Önceki"><img src="/demleme/07-shared-ui/svg/arrow-prev.svg" alt=""></button>
+  <div class="dm-lb-inner">
+    <figure class="dm-lb-card" id="dmLbCard"><img class="ph" id="dmLbImg" alt=""><figcaption class="dm-cap"><span id="dmLbCap"></span><img id="dmLbIcon" alt=""></figcaption></figure>
+  </div>
+  <button class="dm-lb-nav dm-lb-next" type="button" id="dmLbNext" aria-label="Sonraki"><img src="/demleme/07-shared-ui/svg/arrow-next.svg" alt=""></button>
+</div>
+
+
+<section class="section section--cream" id="sss">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="label">Merak edilenler</p>
+        <h2>Sıkça sorulan sorular</h2>
+      </div>
+    </div>
+    <div class="faq" id="faq">
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span class="faq-t">Demleme'nin yeni bölümleri ne zaman yayınlanıyor?</span> <svg class="icon icon-20"><use href="#i-plus"/></svg></button>
+        <div class="faq-a"><p>Yeni bölümler her hafta Cuma akşamı YouTube'da yayınlanıyor, ardından podcast platformlarına ekleniyor. Kaçırmamak için bültene katılabilir ya da bölümler listesini takip edebilirsin.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span class="faq-t">Demleme Shop ürünleri nereden ve nasıl sipariş edilir?</span> <svg class="icon icon-20"><use href="#i-plus"/></svg></button>
+        <div class="faq-a"><p>Ürünlere Mağaza bölümünden göz atabilirsin. Sipariş ve kargo süreci için mağaza sayfamız yakında tam entegrasyonla açılıyor.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span class="faq-t">Podcast bölümlerine hangi platformlardan ulaşabilirim?</span> <svg class="icon icon-20"><use href="#i-plus"/></svg></button>
+        <div class="faq-a"><p>Demleme Podcast; Spotify, Apple Podcasts ve YouTube Music üzerinden dinlenebiliyor.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span class="faq-t">Programa konuk olmak ya da iş birliği yapmak istiyorum, nasıl ulaşırım?</span> <svg class="icon icon-20"><use href="#i-plus"/></svg></button>
+        <div class="faq-a"><p>merhaba@demleme.com adresine yazabilirsin. Konuk önerilerini ve iş birliği taleplerini buradan değerlendiriyoruz.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" type="button" aria-expanded="false"><span class="faq-t">E-posta bültenine katılırsam neler gönderiyorsunuz?</span> <svg class="icon icon-20"><use href="#i-plus"/></svg></button>
+        <div class="faq-a"><p>Yeni bölüm duyuruları, konuk açıklamaları ve mağazadaki yeni ürünleri haber veriyoruz. Spam yok — haftada en fazla bir e-posta.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- İLETİŞİM / BÜLTEN -->
+<section class="section" id="iletisim">
+  <div class="wrap">
+    <div class="newsletter">
+      <div>
+        <p class="label">Bülten</p>
+        <h2>Sofraya davetlisin.</h2>
+        <p class="lead" style="margin-top:var(--s-16)">Yeni bölümler, konuk duyuruları ve mağaza yenilikleri e-postana gelsin.</p>
+      </div>
+      <div>
+        <form class="newsletter-form" id="newsletterForm">
+          <input type="email" placeholder="e-posta adresin" required aria-label="E-posta adresi">
+          <button type="submit" class="btn btn--solid">Katıl <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+        </form>
+        <p class="form-note small" id="newsletterNote">Haftada en fazla bir e-posta. İstediğin zaman ayrılabilirsin.</p>
+        <p class="meta" style="margin-top:var(--s-24)">İş birliği ve konuk önerileri için: <a class="link" href="mailto:merhaba@demleme.com">merhaba@demleme.com</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================ -->
+<!-- SEPET (cart panel) -->
+<div class="cart-backdrop" id="cartBackdrop" hidden></div>
+<aside class="cart" id="cartPanel" aria-label="Sepet" aria-hidden="true">
+  <div class="cart-head">
+    <h3>Sepet</h3>
+    <button class="nav-icon" id="cartClose" type="button" aria-label="Kapat"><svg class="icon icon-20"><use href="#i-x"/></svg></button>
+  </div>
+  <ul class="cart-list" id="cartList"></ul>
+  <p class="cart-empty" id="cartEmpty">Sepetin boş. <a class="link" href="#magaza" data-cart-close>Ürünlere göz at <svg class="icon"><use href="#i-arrow-right"/></svg></a></p>
+  <div class="cart-foot" id="cartFoot" hidden>
+    <div class="cart-row"><span>Ara toplam</span><b id="cartSubtotal">₺0</b></div>
+    <button class="btn btn--solid" id="cartCheckout" type="button" style="width:100%; justify-content:center">Sepeti onayla</button>
+    <p class="small" id="cartNote">Ödeme sayfası yakında. Şimdilik siparişini merhaba@demleme.com adresine yazabilirsin.</p>
+  </div>
+</aside>
+
+<!-- ============================================================ -->
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="footer-logo">Demleme <img class="mark mark-lg" src="/demleme/01-brand/logo/logo-still-footer.png" alt=""></a>
+        <p>İyi bir sohbet, iyi bir dünyaya katkı olsun.</p>
+        <div class="footer-social">
+          <a class="footer-draw footer-draw--yt" href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><img src="/demleme/01-brand/icons/youtube-on-dark.png" alt=""></a>
+          <a class="footer-draw footer-draw--ig" href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><img src="/demleme/01-brand/icons/instagram-on-dark.png" alt=""></a>
+          <a class="footer-draw footer-draw--mail" href="mailto:merhaba@demleme.com" aria-label="E-posta"><img src="/demleme/01-brand/icons/mail-on-dark.png" alt=""></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Keşfet</h5>
+        <ul>
+          <li></li>
+          <li><a href="#konuklar">Konuklar</a></li>
+          <li><a href="#hakkinda">Hakkında</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Mağaza</h5>
+        <ul>
+          <li><a href="#magaza">Tüm ürünler</a></li>
+          <li><a href="#magaza">Tişört</a></li>
+          <li><a href="#magaza">Kupa</a></li>
+          <li><a href="#magaza">Hediye kartı</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Yardım</h5>
+        <ul>
+          <li><a href="#sss">Sıkça sorulan sorular</a></li>
+          <li><a href="#">Kargo &amp; teslimat</a></li>
+          <li><a href="#">İade &amp; değişim</a></li>
+          <li><a href="#iletisim">İletişim</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Demleme. Tüm hakları saklıdır.</p>
+      <div>
+        <a href="#">KVKK</a>
+        <a href="#">Kullanım şartları</a>
+        <a href="#">Gizlilik politikası</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
