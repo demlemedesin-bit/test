@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { D } from './Display';
+import './ShopExtras.css';
 
 export type NavLabels = { shop: string; guests: string; about: string; contact: string; account: string; login: string };
 const DEFAULT_LABELS: NavLabels = { shop: 'Mağaza', guests: 'Konuklar', about: 'Hakkında', contact: 'İletişim', account: 'Hesabım', login: 'Giriş yap' };
@@ -29,6 +30,12 @@ export function Header({ active, labels = DEFAULT_LABELS }: { active?: 'sepet' |
         <a href="/#iletisim">{labels.contact}</a>
       </nav>
       <div className="pn-right">
+        <Link className="pn-search" href="/ara" aria-label="Ara">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4.5 4.5" />
+          </svg>
+        </Link>
         <Link className={`pn-acct${active === 'hesap' ? ' on' : ''}`} href={user ? '/hesabim' : '/giris'}>
           {acct}
         </Link>

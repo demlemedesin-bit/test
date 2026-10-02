@@ -1,0 +1,134 @@
+/* Ürün sayfası ve sepet eklentileri: yorumlar, favori, stok haberi, ilgili / son baktığın ürünler, çapraz satış, kargo çubuğu.
+   Renk ve yazı tipi ürün/mağaza sayfalarının belirteçlerini (--ink, --line, --cream …) kullanır; yoksa yedek değerler geçerlidir. */
+.px, .px-rev, .px-recent-slot {
+  --px-ink: var(--ink, #17130F);
+  --px-ink2: var(--ink-2, rgba(23, 19, 15, .62));
+  --px-ink3: var(--ink-3, rgba(23, 19, 15, .42));
+  --px-line: var(--line, rgba(23, 19, 15, .14));
+  --px-line2: var(--line-strong, rgba(23, 19, 15, .32));
+  --px-bg: #EFE8DA;
+  --px-star: #C9892B;
+  --px-red: #DD262C;
+  --px-ok: #2F6B3A;
+  color: var(--px-ink);
+}
+
+/* ── Yorumlar bölümü (sunucuda çizilir) ─────────────────────────── */
+.px-rev { margin: var(--s-96, 96px) var(--pad, 24px) 0; }
+.px-rev-h { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--px-line); padding-bottom: var(--s-16, 16px); margin-bottom: var(--s-24, 24px); }
+.px-rev-h h2 { font-size: clamp(28px, 3vw, 44px); }
+.px-rev-grid { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: clamp(24px, 5vw, 72px); align-items: start; }
+.px-sum { background: var(--px-bg); border-radius: 10px; padding: 22px; }
+.px-sum-avg { display: flex; align-items: baseline; gap: 10px; }
+.px-sum-avg b { font-size: 44px; font-weight: 500; line-height: 1; }
+.px-sum-avg span { color: var(--px-ink2); font-size: 14px; }
+.px-stars { color: var(--px-star); letter-spacing: 2px; font-size: 16px; white-space: nowrap; }
+.px-stars i { font-style: normal; color: var(--px-line2); }
+.px-dist { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 7px; font-size: 13px; color: var(--px-ink2); }
+.px-dist li { display: grid; grid-template-columns: 22px minmax(0, 1fr) 26px; gap: 8px; align-items: center; }
+.px-dist-bar { height: 6px; background: rgba(23, 19, 15, .1); border-radius: 3px; overflow: hidden; }
+.px-dist-bar span { display: block; height: 100%; background: var(--px-star); }
+.px-dist em { font-style: normal; text-align: right; }
+.px-rev-empty { margin: 0; color: var(--px-ink2); }
+.px-list { list-style: none; margin: 0; padding: 0; }
+.px-item { padding: 20px 0; border-bottom: 1px solid var(--px-line); }
+.px-item:first-child { padding-top: 0; }
+.px-item-top { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin-bottom: 6px; }
+.px-item-name { font-weight: 500; }
+.px-item-date { font-size: 12px; color: var(--px-ink3); }
+.px-verified { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--px-ok); border: 1px solid currentColor; border-radius: 99px; padding: 1px 8px; }
+.px-item-title { margin: 0 0 4px; font-weight: 500; }
+.px-item-body { margin: 0; color: var(--px-ink); white-space: pre-line; overflow-wrap: anywhere; max-width: 680px; }
+.px-reply { margin: 12px 0 0; padding: 10px 14px; background: var(--px-bg); border-left: 3px solid var(--px-ink); border-radius: 0 8px 8px 0; font-size: 14px; max-width: 680px; }
+.px-reply b { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--px-ink2); margin-bottom: 2px; font-weight: 500; }
+.px-reply span { white-space: pre-line; overflow-wrap: anywhere; }
+.px-more-rev { margin-top: 4px; }
+.px-more-rev > summary { list-style: none; cursor: pointer; padding: 16px 0; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; color: var(--px-ink2); }
+.px-more-rev > summary::-webkit-details-marker { display: none; }
+.px-more-rev[open] > summary { display: none; }
+#pxReviewForm { margin: 0 0 28px; }
+.px-rev-none { grid-template-columns: 1fr; }
+
+/* ── Formlar, düğmeler (adalar) ──────────────────────────────────── */
+.px-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 22px; border: 1px solid var(--px-ink); background: transparent; color: var(--px-ink); font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .01em; cursor: pointer; white-space: nowrap; transition: background 180ms ease-out, color 180ms ease-out; }
+.px-btn:hover { background: var(--px-ink); color: #fff; }
+.px-btn[disabled] { opacity: .5; cursor: not-allowed; }
+.px-btn-solid { background: var(--px-ink); color: #fff; }
+.px-btn-solid:hover { background: #000; }
+.px-btn-sm { height: 38px; padding: 0 16px; font-size: 13px; }
+.px-link { background: none; border: 0; padding: 0; font: inherit; font-size: 14px; color: var(--px-ink2); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.px-link:hover { color: var(--px-ink); }
+.px-form { max-width: 680px; padding: 22px; background: var(--px-bg); border-radius: 10px; }
+.px-form-t { font-family: var(--font-body, system-ui, sans-serif); font-size: 18px; font-weight: 500; letter-spacing: 0; line-height: 1.3; margin: 0 0 16px; }
+.px-field { display: block; margin-bottom: 14px; }
+.px-lbl { display: block; font-size: 13px; color: var(--px-ink2); margin-bottom: 6px; }
+.px-inp { width: 100%; font: inherit; font-size: 15px; color: var(--px-ink); background: #fff; border: 1px solid var(--px-line2); border-radius: 0; padding: 11px 12px; outline: none; }
+.px-inp:focus { border-color: var(--px-ink); box-shadow: 0 0 0 3px rgba(23, 19, 15, .1); }
+textarea.px-inp { resize: vertical; min-height: 110px; }
+.px-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.px-hint { display: block; font-size: 12px; color: var(--px-ink3); margin-top: 5px; }
+.px-err { margin: 10px 0 0; font-size: 14px; color: var(--px-red); }
+.px-ok { margin: 0; font-size: 14px; color: var(--px-ok); }
+.px-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
+.px-stars-in { display: inline-flex; gap: 2px; }
+.px-stars-in button { background: none; border: 0; padding: 2px 3px; font-size: 30px; line-height: 1; color: var(--px-line2); cursor: pointer; }
+.px-stars-in button.on { color: var(--px-star); }
+.px-stars-in button:hover { color: var(--px-star); }
+
+/* ── Favori kalbi ve stok haberi (ürün bilgisi sütunu) ───────────── */
+.px-fav { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+.px-heart { display: inline-flex; align-items: center; gap: 8px; background: none; border: 1px solid var(--px-line2); border-radius: 99px; padding: 8px 16px 8px 12px; font: inherit; font-size: 14px; cursor: pointer; color: var(--px-ink); transition: border-color 180ms ease-out, color 180ms ease-out; }
+.px-heart:hover { border-color: var(--px-ink); }
+.px-heart.on { color: var(--px-red); border-color: var(--px-red); }
+.px-heart[disabled] { opacity: .6; cursor: progress; }
+.px-fav-msg { font-size: 13px; color: var(--px-ink2); }
+.px-stock { margin-top: 18px; padding: 16px; background: var(--px-bg); border-radius: 10px; }
+.px-stock-t { margin: 0 0 10px; font-size: 14px; }
+.px-inline { display: flex; gap: 8px; }
+.px-inline .px-inp { flex: 1; min-width: 0; }
+
+/* ── Kartlar: son baktıkların, çapraz satış ──────────────────────── */
+.px-recent, .px-recent-slot > .px { margin: 0; }
+#pxRecent { margin: 0 var(--pad, 24px) var(--s-96, 96px); }
+#pxRecent:empty { display: none; }
+.px-upsell { margin-top: 48px; }
+.px-recent { margin-top: 48px; }
+#pxRecent .px-recent { margin-top: 0; }
+.px-h { font-family: var(--font-display, Georgia, serif); font-weight: 400; letter-spacing: -.01em; line-height: 1.05; font-size: clamp(24px, 2.4vw, 34px); margin: 0 0 20px; padding-bottom: 14px; border-bottom: 1px solid var(--px-line); }
+.px-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 2vw, 24px); }
+.px-row-up { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.px-card { display: flex; flex-direction: column; gap: 3px; min-width: 0; text-align: center; color: inherit; text-decoration: none; }
+.px-card-up { gap: 10px; }
+.px-card-link { display: flex; flex-direction: column; gap: 3px; color: inherit; text-decoration: none; }
+.px-th { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; padding: 12%; margin-bottom: 8px; background: var(--px-bg); border-radius: 10px; border: 1.5px solid transparent; }
+.px-card:hover .px-th, .px-card-link:hover .px-th { border-color: var(--px-ink); }
+.px-th img { max-height: 100%; width: auto; max-width: 100%; }
+.px-nm { font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.px-pr { font-size: 14px; color: var(--px-ink2); }
+.px-card-up .px-btn { align-self: center; }
+
+/* ── Kargo çubuğu (sepet) ────────────────────────────────────────── */
+.px-ship { margin: 0 0 20px; padding: 14px 16px; background: var(--cream, #F3EEE1); border-radius: 8px; }
+.px-ship-t { margin: 0 0 10px; font-size: 14px; }
+.px-ship-bar { height: 8px; background: rgba(23, 19, 15, .12); border-radius: 4px; overflow: hidden; }
+.px-ship-bar span { display: block; height: 100%; background: var(--px-ink); border-radius: 4px; transition: width 360ms ease-out; }
+
+@media (max-width: 900px) {
+  .px-rev { margin-top: var(--s-64, 64px); }
+  .px-rev-grid { grid-template-columns: 1fr; }
+  .px-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .px-row-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .px-two { grid-template-columns: 1fr; gap: 0; }
+  .px-inline { flex-direction: column; }
+  .px-inline .px-btn { width: 100%; }
+  .px-row-up { grid-template-columns: 1fr; }
+  .px-card-up { display: grid; grid-template-columns: 84px minmax(0, 1fr); text-align: left; align-items: center; gap: 4px 14px; }
+  .px-card-up .px-card-link { display: contents; }
+  .px-card-up .px-th { grid-row: span 3; margin: 0; padding: 8%; }
+  .px-card-up .px-btn { align-self: start; justify-self: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .px-btn, .px-heart, .px-ship-bar span { transition: none; }
+}

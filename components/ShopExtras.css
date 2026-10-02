@@ -1,0 +1,28 @@
+/* Mağaza eklentileri: üst menü arama simgesi, arama sayfası, favoriler. */
+.pn-search{ display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; margin:0 -8px; color:var(--ink-2); }
+.pn-search:hover, .pn-search:focus-visible{ color:var(--ink); }
+.pn-search:focus-visible{ outline:2px solid var(--ink); outline-offset:-2px; }
+
+.sr-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.sr-form{ display:flex; gap:8px; max-width:560px; margin:0 0 var(--s-24); }
+.sr-in{ flex:1; min-width:0; height:48px; padding:0 14px; border:1px solid var(--line-strong); background:rgba(255,255,255,.6); font:inherit; font-size:16px; border-radius:0; }
+.sr-in:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+.sr-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:var(--s-24) var(--s-16); }
+.sr-card{ display:grid; gap:4px; color:inherit; }
+.sr-img{ display:flex; align-items:center; justify-content:center; aspect-ratio:1; background:#EFE8DA; border-radius:8px; padding:10%; margin-bottom:8px; }
+.sr-img img{ max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; }
+.sr-name{ font-weight:500; } .sr-card:hover .sr-name{ text-decoration:underline; text-underline-offset:4px; }
+.sr-meta{ font-size:var(--t-14); color:var(--ink-2); }
+.sr-price{ font-size:var(--t-14); }
+.sr-posts{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+.sr-posts li{ border-bottom:1px solid var(--line); }
+.sr-posts a{ display:grid; gap:4px; padding:var(--s-16) 0; } .sr-posts a:hover b{ text-decoration:underline; text-underline-offset:4px; }
+.sr-posts span{ color:var(--ink-2); font-size:var(--t-14); }
+.sr-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0; }
+.sr-chip{ padding:8px 16px; border:1px solid var(--line-strong); font-size:var(--t-14); } .sr-chip:hover{ background:var(--ink); color:var(--white); }
+
+.fav-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:var(--s-24) var(--s-16); }
+.fav-card{ display:grid; gap:4px; align-content:start; }
+.fav-card .sr-card{ gap:4px; }
+.fav-actions{ display:flex; gap:16px; align-items:center; margin-top:6px; }
+@media (max-width:420px){ .sr-grid, .fav-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s-16) 12px; } }

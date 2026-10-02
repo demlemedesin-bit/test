@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { authMessage, useAuth } from '@/lib/auth';
 import { Alert, Field, phoneOk } from './ui';
+import { Favorites } from './Favorites';
 import { OrderBody, StatusBadge, dateTr, type OrderRow } from './OrderParts';
 
-type Tab = 'orders' | 'profile' | 'addresses';
+type Tab = 'orders' | 'favorites' | 'profile' | 'addresses';
 type Addr = { id: string; title: string; full_name: string; phone: string; city: string; district: string; address: string; zip: string | null };
 
 export function AccountView() {
@@ -60,6 +61,7 @@ export function AccountView() {
         {(
           [
             ['orders', 'Siparişlerim'],
+            ['favorites', 'Favorilerim'],
             ['profile', 'Bilgilerim'],
             ['addresses', 'Adreslerim'],
           ] as [Tab, string][]
@@ -71,6 +73,7 @@ export function AccountView() {
       </div>
 
       {tab === 'orders' && <Orders />}
+      {tab === 'favorites' && <Favorites />}
       {tab === 'profile' && (profile ? <Profile userId={user.id} profile={profile} onSaved={setProfile} /> : <p className="loading">Yükleniyor…</p>)}
       {tab === 'addresses' && <Addresses userId={user.id} />}
     </>

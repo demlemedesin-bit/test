@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import { useAuth } from './auth';
+import { compressImage, getMediaSettings, uploadImageDetailed } from './media';
 import type { OrderRow } from '@/components/OrderParts';
 
 export const tl = (n: number) =>
@@ -172,21 +173,15 @@ export const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-/** Görseli tarayıcıda WebP'ye çevirip küçültür (en çok 1400 px). */
-export async function toWebp(file: File, max = 1400): Promise<Blob> {
-  const bmp = await createImageBitmap(file);
-  const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
-  const c = document.createElement('canvas');
-  c.width = Math.round(bmp.width * k);
-  c.height = Math.round(bmp.height * k);
-  c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
-  return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('Görsel işlenemedi'))), 'image/webp', 0.86));
+/** Görseli tarayıcıda (Medya ayarlarına göre) küçültür. Eski imza korunur; max verilirse o sınır kullanılır. */
+export async function toWebp(file: File, max?: number): Promise<Blob> {
+  const s = await getMediaSettings();
+  return (await compressImage(file, s, { maxPx: max, force: true })).blob;
 }
 
+/** Medya ayarlarına göre sıkıştırıp yükler, herkese açık adresi döner. */
 export async function uploadImage(file: File, folder: string): Promise<string> {
-  const blob = await toWebp(file);
-  const name = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`;
-  const up = await supabase().storage.from('product-images').upload(name, blob, { contentType: 'image/webp', upsert: false });
-  if (up.error) throw up.error;
-  return supabase().storage.from('product-images').getPublicUrl(name).data.publicUrl;
+  return (await uploadImageDetailed(file, folder)).url;
 }
+
+export { uploadImageDetailed };
