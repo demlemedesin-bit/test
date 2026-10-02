@@ -189,9 +189,8 @@ export function legalDocs(config: ShopConfig): Doc[] {
 
           <h2>Madde 4 – Ödeme ve ödeme planı</h2>
           <p>
-            Alıcı, sipariş sırasında sunulan ödeme yöntemlerinden birini seçer: havale/EFT, kapıda ödeme ve (etkinleştirildiğinde) kredi/banka kartı. Kartla ödemelerde kart bilgileri Satıcı tarafından görülmez ve saklanmaz; ödeme,
-            lisanslı ödeme kuruluşunun güvenli altyapısı üzerinden gerçekleşir. Havale/EFT ile ödemede sipariş, ödemenin Satıcı’nın hesabına geçmesinden sonra hazırlanır; sipariş kodunu açıklamaya yazmak gerekir. Kapıda ödemede
-            bedel, teslimat sırasında kargo görevlisine ödenir; kargo firmasının uyguladığı ek hizmet bedeli varsa sipariş özetinde gösterilir.
+            Alıcı, sipariş sırasında sunulan ödeme yöntemlerinden birini seçer: havale/EFT ve (etkinleştirildiğinde) kredi/banka kartı. Kartla ödemelerde kart bilgileri Satıcı tarafından görülmez ve saklanmaz; ödeme,
+            lisanslı ödeme kuruluşunun güvenli altyapısı üzerinden gerçekleşir. Havale/EFT ile ödemede sipariş, ödemenin Satıcı’nın hesabına geçmesinden sonra hazırlanır; sipariş kodunu açıklamaya yazmak gerekir.
           </p>
 
           <h2>Madde 5 – Teslimat</h2>
