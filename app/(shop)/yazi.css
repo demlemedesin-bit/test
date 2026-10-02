@@ -1,0 +1,33 @@
+/* Sayfa ve blog yazıları (/sayfa/…, /blog, /blog/…). shop.css'in tipografisini (başlık fontu, .page, .prose) kullanır. */
+.yz{ max-width:760px; margin:0 auto; }
+.yz .page-title{ margin-bottom:var(--s-24); overflow-wrap:anywhere; }
+.yz-meta{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:var(--t-14); color:var(--ink-2); margin:0 0 var(--s-24); }
+.yz-tags{ display:flex; flex-wrap:wrap; gap:8px; list-style:none; margin:0; padding:0; }
+.yz-tags li{ border:1px solid var(--line-strong); padding:2px 10px; font-size:var(--t-12); letter-spacing:.04em; }
+.yz-cover{ display:block; width:100%; height:auto; max-height:480px; object-fit:cover; margin:0 0 var(--s-32); background:var(--cream); }
+
+/* markdown gövdesi: shop.css .prose üzerine eklemeler */
+.yz-body{ max-width:none; overflow-wrap:anywhere; }
+.yz-body > :first-child{ margin-top:0; }
+.yz-body h2{ margin-top:var(--s-48); }
+.yz-body h4{ font-family:var(--font-body); font-size:var(--t-14); font-weight:500; letter-spacing:.04em; text-transform:uppercase; margin:var(--s-24) 0 var(--s-8); }
+.yz-body ul{ list-style:disc; display:block; } .yz-body ol{ list-style:decimal; display:block; } .yz-body li{ margin:0 0 6px; }
+.yz-body blockquote{ margin:0 0 var(--s-16); padding:4px 0 4px var(--s-16); border-left:3px solid var(--ink); color:var(--ink-2); }
+.yz-body blockquote p:last-child{ margin-bottom:0; }
+.yz-body img{ display:block; max-width:100%; height:auto; margin:0 0 var(--s-16); }
+.yz-body hr{ border:0; border-top:1px solid var(--line-strong); margin:var(--s-32) 0; }
+
+/* blog listesi */
+.yz-list{ max-width:1100px; margin:0 auto; }
+.yz-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:var(--s-32) var(--s-24); list-style:none; margin:0; padding:0; }
+.yz-card{ display:flex; flex-direction:column; gap:var(--s-12); height:100%; }
+.yz-card-img{ aspect-ratio:3/2; width:100%; object-fit:cover; background:var(--cream); border:1px solid var(--line); display:block; }
+.yz-card-ph{ aspect-ratio:3/2; background:var(--cream); border:1px solid var(--line); }
+.yz-card h2{ font-size:clamp(22px,2.2vw,28px); line-height:1.1; }
+.yz-card a:hover h2{ text-decoration:underline; text-underline-offset:4px; }
+.yz-card p{ margin:0; color:var(--ink-2); font-size:var(--t-14); }
+.yz-card .small{ margin-top:auto; }
+
+@media (max-width:600px){
+  .yz-cover{ max-height:260px; }
+}

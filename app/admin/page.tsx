@@ -4,14 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Banknote, ShoppingBag, Clock, PackageCheck, AlertTriangle, ArrowRight, Wallet } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { dt, tl, type AdminOrder, type AdminProduct } from '@/lib/admin';
+import { dt, tl, useAdmin, type AdminOrder, type AdminProduct } from '@/lib/admin';
 import { STATUS } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
 import { Empty, Kpi, Loading, STATUS_TONE, TopBar } from '@/components/admin/ui';
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 
-export default function Dashboard() {
+function FullDashboard() {
   const menu = useMenu();
   const [orders, setOrders] = useState<AdminOrder[] | null>(null);
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -217,6 +217,23 @@ export default function Dashboard() {
               <p className="cell-muted" style={{ textAlign: 'center' }}>Son güncelleme: {dt(new Date().toISOString(), true)} · iptal edilen siparişler ciroya dahil değildir</p>
             </>
           )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default function Dashboard() {
+  const menu = useMenu();
+  const { perms, loading } = useAdmin();
+  if (loading) return <Loading />;
+  if (perms.includes('orders') && perms.includes('products')) return <FullDashboard />;
+  return (
+    <>
+      <TopBar title="Hoş geldin" onMenu={menu} />
+      <div className="adm-scroll">
+        <div className="adm-inner">
+          <Empty title="Panele hoş geldin" text="Sol menüden yetkin olan bölümlere geçebilirsin." />
         </div>
       </div>
     </>

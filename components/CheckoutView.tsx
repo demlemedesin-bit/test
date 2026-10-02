@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { useCart } from '@/lib/cart';
-import { tl, usePricedCart } from '@/lib/shop';
+import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
+import { CouponBox } from './CouponBox';
 import { Alert, Field, emailOk, phoneOk } from './ui';
 
 type Addr = { id: string; title: string; full_name: string; phone: string; city: string; district: string; address: string; zip: string | null };
 
 export const LAST_ORDER_KEY = 'demleme-last-order';
+export const CARD_PENDING_KEY = 'demleme-card-pending';
 
 export function CheckoutView() {
   const router = useRouter();
@@ -21,7 +23,7 @@ export function CheckoutView() {
 
   const [v, setV] = useState({ email: '', full_name: '', phone: '', city: '', district: '', address: '', zip: '', title: 'Teslimat adresi' });
   const [note, setNote] = useState('');
-  const [payment, setPayment] = useState<'havale' | 'kapida'>('havale');
+  const [payment, setPayment] = useState<'havale' | 'kapida' | 'kart'>('havale');
   const [agree, setAgree] = useState(false);
   const [saveAddr, setSaveAddr] = useState(false);
   const [saved, setSaved] = useState<Addr[]>([]);
@@ -29,6 +31,28 @@ export function CheckoutView() {
   const [formErr, setFormErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [placed, setPlaced] = useState(false);
+  const [code, setCode] = useCouponCode();
+  const [cardOn, setCardOn] = useState(false);
+  const { quote, busy: quoting } = useQuote(items, code, v.email, ready && !!priced && !priced.hasProblem);
+  useEffect(() => {
+    fetch('/api/odeme/durum')
+      .then((r) => r.json())
+      .then((d) => setCardOn(!!d.iyzico))
+      .catch(() => {});
+  }, []);
+  // Terk edilen sepet: geçerli e-posta girildiyse sepeti sessizce kaydet (sipariş verilince silinir)
+  const cartKey = JSON.stringify(items.map((i) => [i.slug, i.color, i.size, i.qty]));
+  useEffect(() => {
+    if (!ready || placed || !items.length || !emailOk(v.email)) return;
+    const t = setTimeout(() => {
+      supabase()
+        .rpc('save_cart', { p_email: v.email, p_items: items.map((i) => ({ slug: i.slug, color: i.color, size: i.size, qty: i.qty })) })
+        .then(() => {}, () => {});
+    }, 1500);
+    return () => clearTimeout(t);
+    // items içeriği cartKey ile izlenir
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, placed, v.email, cartKey]);
   const set = (k: keyof typeof v) => (val: string) => setV((s) => ({ ...s, [k]: val }));
 
   // Üyeysen e-posta, ad, telefon ve kayıtlı adresler hazır gelsin
@@ -81,7 +105,7 @@ export function CheckoutView() {
     setBusy(true);
     const { data, error: rpcErr } = await supabase().rpc('create_order', {
       p_items: items.map((i) => ({ slug: i.slug, color: i.color, size: i.size, qty: i.qty })),
-      p_customer: { email: v.email, full_name: v.full_name, phone: v.phone, title: v.title, city: v.city, district: v.district, address: v.address, zip: v.zip },
+      p_customer: { email: v.email, full_name: v.full_name, phone: v.phone, title: v.title, city: v.city, district: v.district, address: v.address, zip: v.zip, coupon: code },
       p_payment: payment,
       p_note: note,
     });
@@ -96,10 +120,36 @@ export function CheckoutView() {
     }
     try {
       sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(data));
+      sessionStorage.removeItem('demleme-coupon');
     } catch {
       /* sipariş yine de oluştu; takip sayfasından bakılabilir */
     }
+    if (payment !== 'kart') {
+      // Sipariş e-postası (anahtarlar tanımlı değilse sessizce atlanır)
+      fetch('/api/bildirim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'order_created', order_no: data.order_no, email: v.email }) }).catch(() => {});
+    }
     setPlaced(true);
+    supabase().rpc('save_cart', { p_email: v.email, p_items: [] }).then(() => {}, () => {});
+    if (payment === 'kart') {
+      // Sepet, ödeme onaylanınca temizlenir; dönüşte hata olursa sepet kaybolmaz.
+      try {
+        sessionStorage.setItem(CARD_PENDING_KEY, '1');
+      } catch {
+        /* sorun değil */
+      }
+      try {
+        const r = await fetch('/api/odeme/iyzico/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: data.order_no, email: v.email }) });
+        const j = (await r.json()) as { ok?: boolean; url?: string };
+        if (j.ok && j.url) {
+          window.location.href = j.url;
+          return;
+        }
+      } catch {
+        /* aşağıda sipariş sayfasına düşer; oradan tekrar denenebilir */
+      }
+      router.replace('/siparis-tamamlandi?durum=baslatilamadi');
+      return;
+    }
     clear();
     router.replace('/siparis-tamamlandi');
   }
@@ -202,11 +252,11 @@ export function CheckoutView() {
                 <span>Ürünler sana ulaştığında kurye ya da kargo görevlisine ödersin.</span>
               </div>
             </label>
-            <label className="pay-opt is-off" aria-disabled="true">
-              <input type="radio" name="pay" disabled />
+            <label className={`pay-opt${cardOn ? '' : ' is-off'}`} aria-disabled={cardOn ? undefined : 'true'}>
+              <input type="radio" name="pay" disabled={!cardOn} checked={payment === 'kart'} onChange={() => setPayment('kart')} />
               <div>
                 <b>Kredi / banka kartı</b>
-                <span>Çok yakında.</span>
+                <span>{cardOn ? 'iyzico güvencesiyle, 3D Secure ile ödersin. Kart bilgilerin bize ulaşmaz.' : 'Çok yakında.'}</span>
               </div>
             </label>
           </div>
@@ -248,17 +298,24 @@ export function CheckoutView() {
           <span>Ara toplam</span>
           <span>{tl(priced.subtotal)}</span>
         </div>
+        {quote && quote.discount > 0 && (
+          <div className="sum-row muted">
+            <span>İndirim{quote.coupon?.code ? ` (${quote.coupon.code})` : quote.coupon?.name ? ` (${quote.coupon.name})` : ''}</span>
+            <span>−{tl(quote.discount)}</span>
+          </div>
+        )}
         <div className="sum-row muted">
           <span>Kargo</span>
-          <span>{priced.shipping === 0 ? 'Ücretsiz' : tl(priced.shipping)}</span>
+          <span>{(quote ? quote.shipping : priced.shipping) === 0 ? 'Ücretsiz' : tl(quote ? quote.shipping : priced.shipping)}</span>
         </div>
+        <CouponBox code={code} setCode={setCode} quote={quote} busy={quoting} />
         {priced.remainingForFree > 0 && <p className="free-note">{tl(priced.remainingForFree)} daha ekle, kargo ücretsiz olsun.</p>}
         <div className="sum-row sum-total">
           <span>Toplam</span>
-          <span>{tl(priced.total)}</span>
+          <span>{tl(quote ? quote.total : priced.total)}</span>
         </div>
         <button className="btn btn--red btn--block" type="submit" disabled={busy || priced.hasProblem} style={{ marginTop: 20 }}>
-          {busy ? 'Siparişin oluşturuluyor…' : 'Siparişi tamamla'}
+          {busy ? 'Siparişin oluşturuluyor…' : payment === 'kart' ? 'Ödemeye geç' : 'Siparişi tamamla'}
         </button>
         <p className="small" style={{ margin: '12px 0 0' }}>
           <Link href="/sepet" className="link">

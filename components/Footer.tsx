@@ -12,13 +12,15 @@ const DEFAULT_LINKS: FooterLink[] = [
 const safe = (u: string) => (/^(\/|#|https?:\/\/|mailto:|tel:)/i.test(u.trim()) ? u.trim() : '#');
 
 /** Alt bilgi. Metin ve bağlantılar yönetim panelinden (İçerik → Menü ve footer) gelir; verilmezse varsayılanlar. */
-export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', links = DEFAULT_LINKS }: { copy?: string; links?: FooterLink[] }) {
+export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', links = DEFAULT_LINKS, extra = [] }: { copy?: string; links?: FooterLink[]; extra?: FooterLink[] }) {
+  // Panelden “Footer'da göster” denen sayfalar; aynı adrese giden bağlantı iki kez yazılmaz.
+  const all = [...links, ...extra.filter((e) => !links.some((l) => l.href === e.href))];
   return (
     <footer className="pf">
       <span>{copy}</span>
       <span className="pf-links">
         <a href="/">Ana sayfa</a>
-        {links.map((l, i) => (
+        {all.map((l, i) => (
           <a key={i} href={safe(l.href)}>
             {l.label}
           </a>
