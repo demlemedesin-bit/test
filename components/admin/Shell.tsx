@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { SelectSeg } from './SelectSeg';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
@@ -32,6 +32,7 @@ export const NAV: { g: string; items: { href: string; label: string; Icon: typeo
     items: [
       { href: '/admin/kampanyalar', label: 'Kampanya ve indirim', Icon: BadgePercent, perm: 'campaigns' },
       { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone, perm: 'tracking' },
+      { href: '/admin/puan', label: 'Puan ve hediye çeki', Icon: Gift, perm: 'campaigns' },
       { href: '/admin/sureli', label: 'Süreli kampanya', Icon: Timer, perm: 'campaigns' },
       { href: '/admin/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'reports' },
       { href: '/admin/analiz', label: 'Analiz', Icon: Activity, perm: 'reports' },
