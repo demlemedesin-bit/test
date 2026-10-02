@@ -51,7 +51,7 @@ export const CHANGEFREQ_TR: Record<ChangeFreq, string> = { always: 'Her zaman', 
 /** Yapay zekâ tarayıcıları (robots.txt'te "YZ botlarını engelle" açıkken). */
 export const AI_BOTS = ['GPTBot', 'ClaudeBot', 'CCBot', 'Google-Extended', 'PerplexityBot', 'Bytespider'];
 /** Her zaman taranmaz: yönetim, API, kısa linkler, sepet/ödeme/hesap yolları. */
-export const ALWAYS_DISALLOW = ['/admin', '/api/', '/t/', '/sepet', '/odeme', '/hesabim', '/siparis-', '/sifre-sifirla'];
+export const ALWAYS_DISALLOW = ['/admin', '/api/', '/t/', '/sepet', '/odeme', '/hesabim', '/giris', '/kayit', '/ara', '/siparis-', '/sifre-sifirla', '/sifremi-unuttum'];
 
 // ── Küçük yardımcılar ──────────────────────────────────────────────────
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
