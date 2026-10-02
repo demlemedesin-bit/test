@@ -691,3 +691,10 @@ em{ font-style:normal; font-weight:400; }
 .dm-sw button:hover{ transform:scale(1.15); } .dm-sw button.on{ box-shadow:0 0 0 2px #17130F; transform:scale(1.12); }
 .dm-sw-n{ font-size:12px; color:rgba(23,19,15,.7); min-width:0; }
 .dm-sw-n:empty{ display:none; }
+
+.rl-modal{ position:fixed; inset:0; z-index:9999; background:rgba(23,19,15,.82); display:flex; align-items:center; justify-content:center; padding:16px; animation:rlm .25s ease; }
+@keyframes rlm{ from{opacity:0} to{opacity:1} }
+.rl-m-in{ position:relative; width:min(400px,100%); height:min(86vh,720px); background:#fff; border-radius:18px; overflow:hidden; display:flex; flex-direction:column; border:2px solid #17130F; }
+.rl-m-in iframe{ flex:1; width:100%; border:0; background:#fff; }
+.rl-m-x{ position:absolute; top:8px; right:8px; z-index:2; width:34px; height:34px; border-radius:50%; border:2px solid #17130F; background:#F8F4EA; font-size:22px; line-height:1; cursor:pointer; }
+.rl-m-ig{ display:block; text-align:center; padding:10px; font-size:14px; color:#17130F; background:#F8F4EA; border-top:1px solid rgba(23,19,15,.15); text-decoration:none; }
