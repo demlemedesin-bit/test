@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   if (!token || !url || !key) return NextResponse.json({ ok: false }, { status: 401 });
 
   const sb = createClient(url, key, { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false } });
-  const { data, error } = await sb.rpc('is_admin');
+  const { data, error } = await sb.rpc('is_staff');
   if (error || data !== true) return NextResponse.json({ ok: false }, { status: 403 });
 
   revalidateTag(CATALOG_TAG, { expire: 0 });

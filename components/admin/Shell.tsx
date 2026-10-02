@@ -3,31 +3,54 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
 import { Spinner } from './ui';
 
-const NAV = [
+const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users; perm?: string; badge?: boolean }[] }[] = [
   { g: 'Genel', items: [{ href: '/admin', label: 'Genel bakış', Icon: LayoutDashboard }] },
   {
     g: 'Mağaza',
     items: [
-      { href: '/admin/siparisler', label: 'Siparişler', Icon: ShoppingBag, badge: true },
-      { href: '/admin/urunler', label: 'Ürünler', Icon: Package },
-      { href: '/admin/musteriler', label: 'Müşteriler', Icon: Users },
+      { href: '/admin/siparisler', label: 'Siparişler', Icon: ShoppingBag, badge: true, perm: 'orders' },
+      { href: '/admin/urunler', label: 'Ürünler', Icon: Package, perm: 'products' },
+      { href: '/admin/musteriler', label: 'Müşteriler', Icon: Users, perm: 'customers' },
+      { href: '/admin/sepetler', label: 'Terk edilen sepetler', Icon: ShoppingCart, perm: 'customers' },
     ],
   },
   {
-    g: 'İçerik ve pazarlama',
+    g: 'Pazarlama',
     items: [
-      { href: '/admin/icerik', label: 'İçerik', Icon: FileText },
-      { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone },
+      { href: '/admin/kampanyalar', label: 'Kampanya ve indirim', Icon: BadgePercent, perm: 'campaigns' },
+      { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone, perm: 'tracking' },
+      { href: '/admin/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'reports' },
     ],
   },
-  { g: 'Sistem', items: [{ href: '/admin/ayarlar', label: 'Ayarlar', Icon: Settings }] },
+  {
+    g: 'İçerik',
+    items: [
+      { href: '/admin/icerik', label: 'Site içeriği', Icon: FileText, perm: 'content' },
+      { href: '/admin/sayfalar', label: 'Sayfa, blog, yönlendirme', Icon: Newspaper, perm: 'content' },
+    ],
+  },
+  {
+    g: 'Sistem',
+    items: [
+      { href: '/admin/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug, perm: 'integrations' },
+      { href: '/admin/sistem', label: 'Kullanıcılar ve kayıtlar', Icon: ShieldCheck, perm: 'system' },
+      { href: '/admin/ayarlar', label: 'Ayarlar', Icon: Settings, perm: 'system' },
+    ],
+  },
 ];
+
+/** Bir yola girmek için gereken yetki (en uzun önek eşleşir). */
+function needPerm(path: string): string | undefined {
+  let best: { len: number; perm?: string } = { len: -1 };
+  for (const g of NAV) for (const i of g.items) if (i.perm && (path === i.href || path.startsWith(i.href + '/')) && i.href.length > best.len) best = { len: i.href.length, perm: i.perm };
+  return best.perm;
+}
 
 function Login({ denied, email }: { denied?: boolean; email?: string }) {
   const [e, setE] = useState('');
@@ -92,10 +115,10 @@ function Login({ denied, email }: { denied?: boolean; email?: string }) {
 }
 
 export function AdminShell({ children }: { children: ReactNode }) {
-  const { user, loading, admin } = useAdmin();
+  const { user, loading, admin, perms, isAdmin } = useAdmin();
   const path = usePathname();
   const [open, setOpen] = useState(false);
-  const counts = usePendingCounts(admin);
+  const counts = usePendingCounts(admin && perms.includes('orders'));
 
   useEffect(() => {
     const t = setTimeout(() => setOpen(false), 0);
@@ -118,6 +141,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+  const need = needPerm(path);
+  const blocked = !!need && !perms.includes(need);
   const active = (h: string) => (h === '/admin' ? path === h : path.startsWith(h));
 
   return (
@@ -132,7 +157,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="sb-nav">
-          {NAV.map((g) => (
+          {NAV.map((g) => ({ ...g, items: g.items.filter((i) => !i.perm || perms.includes(i.perm)) })).filter((g) => g.items.length).map((g) => (
             <div key={g.g}>
               <p className="sb-group">{g.g}</p>
               {g.items.map(({ href, label, Icon, ...rest }) => (
@@ -158,7 +183,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="sb-av">{init}</div>
           <div className="sb-who">
             <b>{name}</b>
-            <span>Yönetici</span>
+            <span>{isAdmin ? 'Yönetici' : 'Ekip üyesi'}</span>
           </div>
           <button className="sb-out" onClick={() => supabase().auth.signOut()} title="Çıkış yap" aria-label="Çıkış yap">
             <LogOut size={16} />
@@ -166,7 +191,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <MenuCtx.Provider value={() => setOpen(true)}>
-        <div className="adm-main">{children}</div>
+        <div className="adm-main">
+          {blocked ? (
+            <div className="empty" style={{ margin: 'auto' }}>
+              <ShieldCheck size={30} strokeWidth={1.5} />
+              <b>Bu sayfaya erişim yetkin yok</b>
+              <span>Gerekirse yöneticiden yetki iste.</span>
+            </div>
+          ) : (
+            children
+          )}
+        </div>
       </MenuCtx.Provider>
     </div>
   );
