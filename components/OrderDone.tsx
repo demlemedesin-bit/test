@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { fetchSettings } from '@/lib/shop';
-import { LAST_ORDER_KEY } from './CheckoutView';
+import { CARD_PENDING_KEY, LAST_ORDER_KEY } from './CheckoutView';
+import { writeCart } from '@/lib/cart';
 import { OrderBody, type OrderRow } from './OrderParts';
 
 type Placed = OrderRow & { email: string };
@@ -30,6 +31,15 @@ export function OrderDone() {
     },
     () => undefined,
   );
+  const qs = useSyncExternalStore(
+    () => () => {},
+    () => window.location.search,
+    () => '',
+  );
+  const durum = new URLSearchParams(qs).get('durum') || '';
+  const qno = new URLSearchParams(qs).get('no') || '';
+  const [retryBusy, setRetryBusy] = useState(false);
+  const [retryErr, setRetryErr] = useState('');
   const order = useMemo<Placed | null | undefined>(() => {
     if (raw === undefined) return undefined;
     try {
@@ -42,8 +52,22 @@ export function OrderDone() {
   // Satışı kaynağa (UTM / kısa link) bağlamak için bir kez bildir
   const ono = order?.order_no;
   const total = order?.total;
+  const isCard = order?.payment_method === 'kart';
+  // Kart ödemesi onaylanınca sepet temizlenir
+  useEffect(() => {
+    if (durum !== 'ok') return;
+    try {
+      if (sessionStorage.getItem(CARD_PENDING_KEY)) {
+        sessionStorage.removeItem(CARD_PENDING_KEY);
+        writeCart([]);
+      }
+    } catch {
+      /* sorun değil */
+    }
+  }, [durum]);
   useEffect(() => {
     if (!ono) return;
+    if (isCard && durum !== 'ok') return; // kart satışı yalnızca ödeme onayında sayılır
     try {
       if (sessionStorage.getItem('dm-tracked-' + ono)) return;
       sessionStorage.setItem('dm-tracked-' + ono, '1');
@@ -51,9 +75,40 @@ export function OrderDone() {
       /* sorun değil */
     }
     (window as unknown as { dmTrack?: (t: string, e: object) => void }).dmTrack?.('order', { order_no: ono, value: Number(total) });
-  }, [ono, total]);
+  }, [ono, total, isCard, durum]);
+
+  async function retry() {
+    if (!order) return;
+    setRetryBusy(true);
+    setRetryErr('');
+    try {
+      const r = await fetch('/api/odeme/iyzico/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: order.order_no, email: order.email }) });
+      const j = (await r.json()) as { ok?: boolean; url?: string; error?: string };
+      if (j.ok && j.url) {
+        window.location.href = j.url;
+        return;
+      }
+      setRetryErr(j.error || 'Ödeme sayfası açılamadı.');
+    } catch {
+      setRetryErr('Bağlantı hatası. Tekrar dene.');
+    }
+    setRetryBusy(false);
+  }
 
   if (order === undefined) return <p className="loading">Yükleniyor…</p>;
+  if (!order && durum === 'ok')
+    return (
+      <div className="done-box">
+        <p className="eyebrow">Teşekkürler</p>
+        {qno && <p className="ono">{qno}</p>}
+        <p style={{ margin: 0 }}>Ödemen alındı, siparişini hazırlamaya başlıyoruz. Siparişini numaran ve e-postanla takip edebilirsin.</p>
+        <p style={{ marginTop: 16 }}>
+          <Link className="link" href="/siparis-takip">
+            Sipariş takibi
+          </Link>
+        </p>
+      </div>
+    );
   if (!order)
     return (
       <div className="empty">
@@ -70,12 +125,33 @@ export function OrderDone() {
   return (
     <>
       <div className="done-box">
-        <p className="eyebrow">Teşekkürler</p>
+        <p className="eyebrow">{isCard && durum !== 'ok' ? 'Ödeme bekleniyor' : 'Teşekkürler'}</p>
         <p className="ono">{order.order_no}</p>
         <p style={{ margin: 0 }}>
-          Siparişin alındı. Bu numarayı sipariş takibi için sakla.
+          {isCard && durum === 'ok' ? 'Ödemen alındı, siparişin hazırlanıyor. Bu numarayı sipariş takibi için sakla.' : 'Siparişin alındı. Bu numarayı sipariş takibi için sakla.'}
         </p>
       </div>
+
+      {isCard && durum !== 'ok' && (
+        <div className="done-box">
+          <h2 className="section-h">Ödeme: Kredi / banka kartı</h2>
+          <p style={{ margin: '0 0 12px' }}>
+            {durum === 'bekliyor'
+              ? 'Ödemen doğrulanıyor. Sonuç birkaç dakika içinde siparişine yansır; bu sayfayı kapatabilirsin.'
+              : durum === 'tutar'
+                ? 'Ödemen alındı ancak otomatik doğrulanamadı. Ekibimiz siparişini elle kontrol edecek; gerekirse seninle iletişime geçeriz.'
+                : durum === 'hata'
+                  ? 'Ödeme tamamlanamadı. Kartından para çekilmedi. Tekrar deneyebilirsin.'
+                  : 'Siparişin oluşturuldu, ödemeyi tamamlamak için kart sayfasına geçebilirsin.'}
+          </p>
+          {durum !== 'bekliyor' && durum !== 'tutar' && (
+            <button type="button" className="btn btn--red" onClick={retry} disabled={retryBusy}>
+              {retryBusy ? 'Yönlendiriliyor…' : 'Ödemeyi tamamla'}
+            </button>
+          )}
+          {retryErr && <p className="fld-err">{retryErr}</p>}
+        </div>
+      )}
 
       {order.payment_method === 'havale' && (
         <div className="done-box">

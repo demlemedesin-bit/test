@@ -1,4 +1,6 @@
 import { getSite, text } from '@/lib/site';
+import { getFooterPages } from '@/lib/cms';
+import { AnnounceBar } from './AnnounceBar';
 import { Footer } from './Footer';
 import { Header } from './Header';
 
@@ -6,21 +8,24 @@ import { Header } from './Header';
 export async function SiteHeader() {
   const s = await getSite();
   return (
-    <Header
-      labels={{
-        shop: text(s, 'nav_shop'),
-        guests: text(s, 'nav_guests'),
-        about: text(s, 'nav_about'),
-        contact: text(s, 'nav_contact'),
-        account: text(s, 'nav_account'),
-        login: text(s, 'nav_login'),
-      }}
-    />
+    <>
+      <AnnounceBar a={s.announce} />
+      <Header
+        labels={{
+          shop: text(s, 'nav_shop'),
+          guests: text(s, 'nav_guests'),
+          about: text(s, 'nav_about'),
+          contact: text(s, 'nav_contact'),
+          account: text(s, 'nav_account'),
+          login: text(s, 'nav_login'),
+        }}
+      />
+    </>
   );
 }
 
 /** Alt bilgi: telif satırı ve bağlantılar panelden (İçerik → Footer, Menü ve footer). */
 export async function SiteFooter() {
-  const s = await getSite();
-  return <Footer copy={text(s, 'footer_copy')} links={s.footer.legal} />;
+  const [s, extra] = await Promise.all([getSite(), getFooterPages()]);
+  return <Footer copy={text(s, 'footer_copy')} links={s.footer.legal} extra={extra} />;
 }

@@ -19,7 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = (await getProducts()).find((x) => x.slug === slug);
   if (!p) return {};
-  return { title: `${p.name} · Demleme Mağaza`, description: p.desc };
+  const title = p.seoTitle || `${p.name} · Demleme Mağaza`;
+  const description = p.seoDesc || p.desc;
+  return { title, description, openGraph: { type: 'website', title, description, siteName: 'Demleme', ...(p.thumb ? { images: [p.thumb] } : {}) } };
 }
 
 export default async function ProductPage({ params }: Props) {

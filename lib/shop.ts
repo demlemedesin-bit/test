@@ -114,3 +114,63 @@ export function usePricedCart(items: CartItem[], ready: boolean) {
 
   return state;
 }
+
+export const COUPON_KEY = 'demleme-coupon';
+
+export type Quote = {
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+  coupon: { code: string | null; name: string; kind: string; auto: boolean } | null;
+  error: string | null;
+};
+
+/** Kupon kodu (oturum boyunca sepet ve ödeme sayfası arasında paylaşılır). */
+export function useCouponCode() {
+  const [code, setCodeState] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try {
+        setCodeState(sessionStorage.getItem(COUPON_KEY) || '');
+      } catch {
+        /* sorun değil */
+      }
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+  const setCode = (c: string) => {
+    const v = c.trim().toUpperCase();
+    setCodeState(v);
+    try {
+      if (v) sessionStorage.setItem(COUPON_KEY, v);
+      else sessionStorage.removeItem(COUPON_KEY);
+    } catch {
+      /* sorun değil */
+    }
+  };
+  return [code, setCode] as const;
+}
+
+/** Sunucu hesabı: kupon / otomatik kampanya dahil sepet özeti (quote_cart). Sorun olursa null döner, sayfa yerel hesaba düşer. */
+export function useQuote(items: CartItem[], code: string, email: string, enabled: boolean) {
+  const [state, setState] = useState<{ quote: Quote | null; busy: boolean }>({ quote: null, busy: false });
+  const key = JSON.stringify([items.map((i) => [i.slug, i.qty]), code, email.trim().toLowerCase()]);
+  useEffect(() => {
+    if (!enabled || !items.length) return;
+    let off = false;
+    const t = setTimeout(async () => {
+      setState((s) => ({ ...s, busy: true }));
+      const { data, error } = await supabase().rpc('quote_cart', { p_items: items.map((i) => ({ slug: i.slug, qty: i.qty })), p_code: code || null, p_email: email.trim() || null });
+      if (off) return;
+      setState({ quote: error || !data ? null : (data as Quote), busy: false });
+    }, 300);
+    return () => {
+      off = true;
+      clearTimeout(t);
+    };
+    // items içeriği key ile izlenir
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, enabled]);
+  return enabled && items.length ? state : { quote: null, busy: false };
+}

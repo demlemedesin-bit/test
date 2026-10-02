@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import { useCart, lineKey, MAX_QTY } from '@/lib/cart';
-import { tl, usePricedCart } from '@/lib/shop';
+import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
+import { CouponBox } from './CouponBox';
 import { Alert } from './ui';
 
 export function CartView() {
   const { items, ready, setQty, remove } = useCart();
   const { priced, error, loading } = usePricedCart(items, ready);
+  const [code, setCode] = useCouponCode();
+  const { quote, busy } = useQuote(items, code, '', ready && !!priced && !priced.hasProblem);
 
   if (!ready) return <p className="loading">Sepetin yükleniyor…</p>;
 
@@ -71,14 +74,21 @@ export function CartView() {
           <span>Ara toplam</span>
           <span>{tl(priced.subtotal)}</span>
         </div>
+        {quote && quote.discount > 0 && (
+          <div className="sum-row">
+            <span>İndirim{quote.coupon?.code ? ` (${quote.coupon.code})` : quote.coupon?.name ? ` (${quote.coupon.name})` : ''}</span>
+            <span>−{tl(quote.discount)}</span>
+          </div>
+        )}
         <div className="sum-row">
           <span>Kargo</span>
-          <span>{priced.subtotal === 0 ? '—' : priced.shipping === 0 ? 'Ücretsiz' : tl(priced.shipping)}</span>
+          <span>{priced.subtotal === 0 ? '—' : (quote ? quote.shipping : priced.shipping) === 0 ? 'Ücretsiz' : tl(quote ? quote.shipping : priced.shipping)}</span>
         </div>
+        <CouponBox code={code} setCode={setCode} quote={quote} busy={busy} />
         {priced.remainingForFree > 0 && <p className="free-note">{tl(priced.remainingForFree)} daha ekle, kargo ücretsiz olsun.</p>}
         <div className="sum-row sum-total">
           <span>Toplam</span>
-          <span>{tl(priced.total)}</span>
+          <span>{tl(quote ? quote.total : priced.total)}</span>
         </div>
         <p className="small" style={{ margin: '8px 0 20px' }}>
           Ödeme seçeneğini bir sonraki adımda seçersin.

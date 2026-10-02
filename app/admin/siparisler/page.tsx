@@ -2,10 +2,11 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronRight, Download, Printer, Search, ShoppingBag, Truck } from 'lucide-react';
+import { ChevronRight, Download, FileText, Printer, Search, ShoppingBag, Truck, Undo2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { dt, tl, type AdminOrder } from '@/lib/admin';
 import { PAY, STATUS } from '@/components/OrderParts';
+import { CARRIER_NAMES } from '@/lib/carriers';
 import { useMenu } from '@/components/admin/Shell';
 import { Confirm, Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
 
@@ -18,7 +19,31 @@ const TABS: [string, string][] = [
   ['iptal', 'İptal'],
 ];
 const FLOW = ['odeme_bekleniyor', 'hazirlaniyor', 'kargoda', 'teslim_edildi'];
-const CARRIERS = ['Yurtiçi Kargo', 'Aras Kargo', 'MNG Kargo', 'PTT Kargo', 'Sürat Kargo', 'UPS', 'Diğer'];
+
+type Pay = { status: string; payment_id: string | null; paid_price: number | null; created_at: string };
+const PAY_STATUS: Record<string, string> = { init: 'Başlatıldı', paid: 'Ödendi', failed: 'Başarısız', review: 'İncelemede', refunded: 'İade edildi', cancelled: 'İptal edildi' };
+const PAY_TONE: Record<string, string> = { init: 'b-gray', paid: 'b-green', failed: 'b-red', review: 'b-amber', refunded: 'b-blue', cancelled: 'b-gray' };
+
+type NotifyEvent = 'order_paid' | 'order_shipped' | 'order_delivered' | 'order_cancelled';
+
+/** Durum değişince müşteriye bildirim (e-posta/SMS/webhook). Hata siparişi bozmaz; sonuç yalnızca bilgi olarak gösterilir. */
+async function notify(event: NotifyEvent, orderNo: string): Promise<string> {
+  try {
+    const { data } = await supabase().auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return '';
+    const r = await fetch('/api/bildirim', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, order_no: orderNo }),
+    });
+    const j = (await r.json().catch(() => ({}))) as { ok?: boolean; skipped?: boolean; error?: string };
+    if (!r.ok || j.ok === false) return 'Bildirim gönderilemedi';
+    return j.skipped ? 'Bildirim atlandı' : 'Bildirim gönderildi';
+  } catch {
+    return 'Bildirim gönderilemedi';
+  }
+}
 
 function csv(rows: AdminOrder[]) {
   const q = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -39,9 +64,27 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
   const [trackNo, setTrackNo] = useState(order.tracking_no ?? '');
   const [note, setNote] = useState(order.admin_note ?? '');
   const [busy, setBusy] = useState(false);
-  const [ask, setAsk] = useState<null | 'iptal'>(null);
+  const [ask, setAsk] = useState<null | 'iptal' | 'iade'>(null);
+  const [pay, setPay] = useState<Pay | null>(null);
 
-  async function save(patch: Record<string, unknown>, ok: string) {
+  useEffect(() => {
+    if (order.payment_method !== 'kart') return;
+    let off = false;
+    supabase()
+      .from('payments')
+      .select('status,payment_id,paid_price,created_at')
+      .eq('order_no', order.order_no)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (!off) setPay(((data ?? [])[0] as Pay | undefined) ?? null);
+      });
+    return () => {
+      off = true;
+    };
+  }, [order.order_no, order.payment_method, order.updated_at]);
+
+  async function save(patch: Record<string, unknown>, ok: string, event?: NotifyEvent) {
     setBusy(true);
     const { error } = await supabase().from('orders').update(patch).eq('id', order.id);
     setBusy(false);
@@ -52,6 +95,32 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
     }
     toast(ok);
     onChanged();
+    if (event) {
+      const n = await notify(event, order.order_no);
+      if (n) toast(`${ok} · ${n.toLocaleLowerCase('tr-TR')}`, n.includes('edilemedi'));
+    }
+  }
+
+  async function refund() {
+    setBusy(true);
+    try {
+      const { data } = await supabase().auth.getSession();
+      const r = await fetch('/api/odeme/iyzico/iade', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + (data.session?.access_token ?? ''), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_no: order.order_no }),
+      });
+      const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!r.ok || !j.ok) toast(j.error || 'İade yapılamadı. Tekrar dene.', true);
+      else {
+        toast('İade / iptal iyzico\'ya iletildi');
+        onChanged();
+      }
+    } catch {
+      toast('İade yapılamadı. Tekrar dene.', true);
+    }
+    setBusy(false);
+    setAsk(null);
   }
 
   const meta = { tracking_carrier: carrier.trim() || null, tracking_no: trackNo.trim() || null, admin_note: note.trim() || null };
@@ -73,6 +142,9 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           <button className="btn ghost" onClick={() => window.print()}>
             <Printer size={15} /> Yazdır
           </button>
+          <a className="btn ghost" href={`/admin/siparisler/fatura?no=${encodeURIComponent(order.order_no)}`} target="_blank" rel="noopener noreferrer">
+            <FileText size={15} /> Fatura / irsaliye yazdır
+          </a>
           <button className="btn" disabled={busy} onClick={() => save(meta, 'Bilgiler kaydedildi')}>
             Notu ve kargo bilgisini kaydet
           </button>
@@ -97,17 +169,17 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           <p className="sec-t">İşlem</p>
           <div className="actions">
             {order.status === 'odeme_bekleniyor' && (
-              <button className="btn" disabled={busy} onClick={() => save({ status: 'hazirlaniyor', ...meta }, 'Ödeme alındı olarak işaretlendi')}>
+              <button className="btn" disabled={busy} onClick={() => save({ status: 'hazirlaniyor', ...meta }, 'Ödeme alındı olarak işaretlendi', 'order_paid')}>
                 Ödeme alındı
               </button>
             )}
             {(order.status === 'hazirlaniyor' || order.status === 'odeme_bekleniyor') && (
-              <button className="btn ghost" disabled={busy} onClick={() => save({ status: 'kargoda', ...meta }, 'Kargoya verildi')}>
+              <button className="btn ghost" disabled={busy} onClick={() => save({ status: 'kargoda', ...meta }, 'Kargoya verildi', 'order_shipped')}>
                 <Truck size={15} /> Kargoya ver
               </button>
             )}
             {order.status === 'kargoda' && (
-              <button className="btn" disabled={busy} onClick={() => save({ status: 'teslim_edildi', ...meta }, 'Teslim edildi')}>
+              <button className="btn" disabled={busy} onClick={() => save({ status: 'teslim_edildi', ...meta }, 'Teslim edildi', 'order_delivered')}>
                 Teslim edildi
               </button>
             )}
@@ -162,9 +234,37 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
         <div style={{ marginTop: 10 }}>
           <div className="sumr"><span>Ara toplam</span><span>{tl(Number(order.subtotal))}</span></div>
           <div className="sumr"><span>Kargo</span><span>{Number(order.shipping) === 0 ? 'Ücretsiz' : tl(Number(order.shipping))}</span></div>
+          {Number(order.discount) > 0 && (
+            <div className="sumr"><span>İndirim{order.coupon_code ? ` (${order.coupon_code})` : ''}</span><span>−{tl(Number(order.discount))}</span></div>
+          )}
           <div className="sumr tot"><span>Toplam · {PAY[order.payment_method]}</span><span>{tl(Number(order.total))}</span></div>
         </div>
       </div>
+
+      {order.payment_method === 'kart' && (
+        <div className="sec no-print">
+          <p className="sec-t">Kart ödemesi (iyzico)</p>
+          {pay ? (
+            <dl className="kv">
+              <dt>Durum</dt>
+              <dd><span className={`badge ${PAY_TONE[pay.status] ?? 'b-gray'}`}>{PAY_STATUS[pay.status] ?? pay.status}</span></dd>
+              <dt>Ödeme no</dt>
+              <dd className="mono">{pay.payment_id || '—'}</dd>
+              <dt>Ödenen tutar</dt>
+              <dd>{pay.paid_price != null ? tl(Number(pay.paid_price)) : '—'}</dd>
+            </dl>
+          ) : (
+            <p className="cell-muted">Bu sipariş için ödeme kaydı yok.</p>
+          )}
+          {pay && (pay.status === 'paid' || pay.status === 'review') && (
+            <div className="actions" style={{ marginTop: 12 }}>
+              <button className="btn danger" disabled={busy} onClick={() => setAsk('iade')}>
+                <Undo2 size={15} /> İade et / iptal et (iyzico)
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="sec no-print">
         <p className="sec-t">Kargo takibi</p>
@@ -172,7 +272,8 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           <Field label="Kargo firması">
             <select className="inp" value={carrier} onChange={(e) => setCarrier(e.target.value)} disabled={cancelled}>
               <option value="">Seç…</option>
-              {CARRIERS.map((c) => (<option key={c}>{c}</option>))}
+              {carrier && !CARRIER_NAMES.includes(carrier) && <option>{carrier}</option>}
+              {CARRIER_NAMES.map((c) => (<option key={c}>{c}</option>))}
             </select>
           </Field>
           <Field label="Takip numarası">
@@ -191,7 +292,17 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           confirmText="Evet, iptal et"
           busy={busy}
           onCancel={() => setAsk(null)}
-          onConfirm={() => save({ status: 'iptal', ...meta }, 'Sipariş iptal edildi')}
+          onConfirm={() => save({ status: 'iptal', ...meta }, 'Sipariş iptal edildi', 'order_cancelled')}
+        />
+      )}
+      {ask === 'iade' && (
+        <Confirm
+          title="iyzico üzerinden iade / iptal edilsin mi?"
+          text={`${order.order_no} için kart ödemesi iyzico'da iade ya da iptal edilir. Bu işlem geri alınamaz.`}
+          confirmText="Evet, iade et"
+          busy={busy}
+          onCancel={() => setAsk(null)}
+          onConfirm={refund}
         />
       )}
     </Panel>

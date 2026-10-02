@@ -16,7 +16,11 @@ import {
  * Site içeriği (site_content tablosu). Panelde kaydedilmeyen her şey siteDefaults.ts'teki varsayılandır;
  * veritabanına ulaşılamazsa da site varsayılanlarla açılır.
  */
-export type Site = { t: Record<string, string>; faq: Faq[]; footer: FooterData; dm: Demleyen; guests: Guest[] };
+export type { Announce } from './announce';
+export { toAnnounce } from './announce';
+import type { Announce } from './announce';
+import { toAnnounce as _toAnnounce } from './announce';
+export type Site = { t: Record<string, string>; faq: Faq[]; footer: FooterData; dm: Demleyen; guests: Guest[]; announce: Announce };
 
 const arr = <T,>(v: unknown, d: T[]): T[] => (Array.isArray(v) && v.length ? (v as T[]) : d);
 
@@ -34,6 +38,7 @@ export async function getSite(): Promise<Site> {
     footer: { cols: arr(f?.cols, DEFAULT_FOOTER.cols), legal: Array.isArray(f?.legal) ? f.legal : DEFAULT_FOOTER.legal },
     dm: { month: dm?.month || DEFAULT_DM.month, photos: Array.isArray(dm?.photos) ? dm.photos : DEFAULT_DM.photos },
     guests: Array.isArray(m.guests) && m.guests.length ? (m.guests as Guest[]) : DEFAULT_GUESTS,
+    announce: _toAnnounce(m.announce),
   };
 }
 

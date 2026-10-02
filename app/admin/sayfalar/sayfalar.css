@@ -1,0 +1,22 @@
+/* Sayfa, blog, yönlendirme yönetimi (admin.css'e dokunmadan). */
+.sy-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 120px 140px; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid var(--bdr); }
+.sy-row:last-child { border-bottom: none; }
+.sy-row.hd { background: var(--s2); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--tx3); padding-top: 10px; padding-bottom: 10px; }
+.sy-row.rd { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 90px 90px 120px; }
+.sy-act { display: flex; gap: 6px; justify-content: flex-end; }
+.sy-ed { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.sy-ed textarea.inp { min-height: 260px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; }
+.sy-prev { border: 1px solid var(--bdr); border-radius: 10px; padding: 14px 16px; min-height: 260px; max-height: 420px; overflow: auto; background: #fff; color: #17130f; font-size: 14.5px; line-height: 1.6; overflow-wrap: anywhere; }
+.sy-prev h2 { font-size: 22px; margin: 18px 0 8px; } .sy-prev h3 { font-size: 18px; margin: 16px 0 6px; } .sy-prev h4 { font-size: 15px; margin: 14px 0 6px; }
+.sy-prev > :first-child { margin-top: 0; }
+.sy-prev p { margin: 0 0 10px; } .sy-prev ul, .sy-prev ol { margin: 0 0 10px; padding-left: 22px; } .sy-prev ul { list-style: disc; } .sy-prev ol { list-style: decimal; }
+.sy-prev a { color: var(--ac); text-decoration: underline; } .sy-prev img { max-width: 100%; height: auto; }
+.sy-prev blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 3px solid #17130f; color: #555; } .sy-prev hr { border: 0; border-top: 1px solid #ccc; margin: 14px 0; }
+.sy-empty-prev { color: var(--tx3); font-size: 13px; }
+.sy-ann-prev { border: 1px dashed var(--bdr2); border-radius: 10px; overflow: hidden; --ink: #17130f; --cream: #f3eee1; --cream-light: #f8f4ea; --red: #dd262c; }
+@media (max-width: 860px) {
+  .sy-ed { grid-template-columns: 1fr; }
+  .sy-row, .sy-row.rd { grid-template-columns: minmax(0, 1fr) auto; }
+  .sy-row.hd { display: none; }
+  .sy-hide-m { display: none; }
+}

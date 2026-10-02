@@ -4,7 +4,9 @@ import { TrackView } from '@/components/TrackView';
 
 export const metadata: Metadata = { title: 'Sipariş takibi · Demleme' };
 
-export default function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ no?: string | string[]; email?: string | string[] }> }) {
+  const q = await searchParams;
+  const one = (v?: string | string[]) => (typeof v === 'string' ? v.slice(0, 120) : '');
   return (
     <main className="page page-wide">
       <p className="eyebrow">Yardım</p>
@@ -12,7 +14,7 @@ export default function Page() {
         <D>Sipariş takibi</D>
       </h1>
       <p className="lead">Üye olmadan verdiğin siparişin durumunu sipariş numarası ve e-posta adresinle öğrenebilirsin. Üyeysen siparişlerini hesabında da görürsün.</p>
-      <TrackView />
+      <TrackView initialNo={one(q.no)} initialEmail={one(q.email)} />
     </main>
   );
 }

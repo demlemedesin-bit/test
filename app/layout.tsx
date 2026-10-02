@@ -1,14 +1,23 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { getSite, text } from '@/lib/site';
+import { rest } from '@/lib/catalog';
 
 // Başlık, açıklama ve paylaşım bilgisi panelden (İçerik → SEO) değiştirilir.
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSite();
   const img = text(s, 'seo_og_image');
+  // Site doğrulama kodları (Yönetim → Entegrasyonlar → Site doğrulama)
+  const vr = (await rest<{ key: string; value: string }[]>('shop_settings?select=key,value&key=in.(verify_google,verify_meta,verify_yandex)')) ?? [];
+  const v = Object.fromEntries(vr.map((r) => [r.key, String(r.value ?? '').trim()]));
   return {
     title: text(s, 'seo_title'),
     description: text(s, 'seo_desc'),
+    verification: {
+      ...(v.verify_google ? { google: v.verify_google } : {}),
+      ...(v.verify_yandex ? { yandex: v.verify_yandex } : {}),
+      ...(v.verify_meta ? { other: { 'facebook-domain-verification': v.verify_meta } } : {}),
+    },
     openGraph: {
       type: 'website',
       siteName: 'Demleme',

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { tl } from '@/lib/shop';
+import { carrierUrl } from '@/lib/carriers';
 
 export const STATUS: Record<string, string> = {
   odeme_bekleniyor: 'Ödeme bekleniyor',
@@ -11,7 +12,7 @@ export const STATUS: Record<string, string> = {
   iptal: 'İptal edildi',
 };
 
-export const PAY: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme' };
+export const PAY: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme', kart: 'Kredi/banka kartı' };
 
 export type OrderItem = { name: string; color_name?: string | null; size?: string | null; qty: number; unit_price: number; line_total: number };
 export type OrderRow = {
@@ -75,6 +76,14 @@ export function OrderBody({ o, extra }: { o: OrderRow; extra?: ReactNode }) {
       {o.tracking_no || o.tracking_carrier ? (
         <p className="small" style={{ margin: '6px 0 0' }}>
           Kargo: <b>{[o.tracking_carrier, o.tracking_no].filter(Boolean).join(' · ')}</b>
+          {carrierUrl(o.tracking_carrier, o.tracking_no) ? (
+            <>
+              {' · '}
+              <a href={carrierUrl(o.tracking_carrier, o.tracking_no)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
+                Kargoyu takip et
+              </a>
+            </>
+          ) : null}
         </p>
       ) : null}
       {extra}
