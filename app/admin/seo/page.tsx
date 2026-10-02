@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ExternalLink, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { ArrowRight, ExternalLink, RefreshCw, Save, Sparkles, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { dt, refreshSite } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
@@ -101,6 +101,45 @@ export default function SeoAdmin() {
     return () => clearTimeout(x);
   }, [load]);
 
+  /** Boş SEO alanlarını sitenin kendi verisinden doldurur (dolu olanlara dokunmaz) ve kaydeder. */
+  async function auto() {
+    if (!f) return;
+    setBusy(true);
+    const [t, pr] = await Promise.all([
+      supabase().from('site_content').select('value').eq('key', 'texts').maybeSingle(),
+      supabase().from('products').select('name,thumb,data').eq('active', true).order('sort').limit(40),
+    ]);
+    const tx = (t.data?.value && typeof t.data.value === 'object' ? t.data.value : {}) as Record<string, unknown>;
+    const ps = (pr.data ?? []) as { name: string; thumb: string; data: { desc?: string } | null }[];
+    const name = f.seo.site_name.trim() || 'Demleme';
+    const host = typeof window !== 'undefined' && !/localhost|127\.0\.0\.1|\.vercel\.app$/.test(window.location.hostname) ? window.location.host : '';
+    const names = ps.slice(0, 4).map((p) => p.name).join(', ');
+    const title = sv(tx.seo_title) || `${name} · Podcast, topluluk ve mağaza`;
+    const desc = (sv(tx.seo_desc) || `${name} podcastı, toplulukla sohbetler ve markaya özel ürünler${names ? `: ${names}` : ''}. Türkiye’nin her yerine hızlı kargo, 14 gün iade.`).slice(0, 160);
+    const o = f.seo.org;
+    const seo: Seo = {
+      ...f.seo,
+      site_name: name,
+      title_template: f.seo.title_template || `%s · ${name}`,
+      default_title: f.seo.default_title || title.slice(0, 60),
+      default_desc: f.seo.default_desc || desc,
+      og_image: f.seo.og_image || ps.find((p) => p.thumb)?.thumb || '',
+      favicon: f.seo.favicon || '/icon.svg',
+      canonical_host: f.seo.canonical_host || host,
+      locale: f.seo.locale || 'tr_TR',
+      noindex_site: host ? false : f.seo.noindex_site,
+      org: { ...o, name: o.name || name, legal_name: o.legal_name || name, logo: o.logo || f.seo.favicon || '/icon.svg', city: o.city || 'Türkiye', email: o.email },
+      sitemap: { ...f.seo.sitemap, include_products: true, include_pages: true, include_blog: true, include_images: true, changefreq: 'weekly', priorities: { home: 1, products: 0.8, blog: 0.5, pages: 0.4 } },
+    };
+    const clean = parseSeo({ ...seo, org: { ...seo.org, social: lines(f.social) }, robots: { ...seo.robots, extra_disallow: lines(f.extra_disallow) }, sitemap: { ...seo.sitemap, exclude: lines(f.exclude) } });
+    const { error } = await supabase().from('site_content').upsert([{ key: 'seo', value: clean, updated_at: new Date().toISOString() }], { onConflict: 'key' });
+    if (error) { setBusy(false); return show('Otomatik doldurulamadı: ' + error.message, true); }
+    await refreshSite();
+    setBusy(false);
+    await load();
+    show('SEO ayarları otomatik dolduruldu ve yayınlandı');
+  }
+
   const up: Up = useCallback((p) => setF((s) => (s ? { ...s, ...p } : s)), []);
 
   async function save() {
@@ -140,6 +179,7 @@ export default function SeoAdmin() {
     <>
       <TopBar title="SEO ve reklam" sub="Arama motoru, paylaşım, izleme kodları ve çerez onayı" onMenu={menu}>
         <a className="btn ghost" href="/" target="_blank" rel="noopener">Siteyi aç</a>
+        {f && <button className="btn ghost" onClick={auto} disabled={busy} title="Boş alanları sitenin verisinden doldurur ve yayınlar"><Sparkles size={15} /> Otomatik doldur</button>}
         {hasSettings && f && (
           <button className="btn" onClick={save} disabled={busy}>
             <Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}
