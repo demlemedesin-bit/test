@@ -24,6 +24,7 @@ export type AdminOrder = OrderRow & {
   tracking_carrier: string | null;
   tracking_no: string | null;
   paid_at: string | null;
+  coupon_code?: string | null;
   shipped_at: string | null;
   updated_at: string;
   created_at: string;
@@ -59,30 +60,62 @@ export type Customer = {
   last_order_at: string | null;
 };
 
-/** Oturum + yönetici yetkisi. admin: null = henüz bilinmiyor. */
+export const PERMS = [
+  { key: 'orders', label: 'Siparişler' },
+  { key: 'products', label: 'Ürünler ve stok' },
+  { key: 'customers', label: 'Müşteriler' },
+  { key: 'campaigns', label: 'Kampanya ve indirim' },
+  { key: 'content', label: 'İçerik (site, blog, sayfalar)' },
+  { key: 'reports', label: 'Raporlar' },
+  { key: 'tracking', label: 'Takip (UTM)' },
+  { key: 'integrations', label: 'Entegrasyonlar' },
+  { key: 'system', label: 'Sistem ve kullanıcılar' },
+] as const;
+export type Perm = (typeof PERMS)[number]['key'];
+
+/** Hazır rol şablonları (Sistem sayfasında seçilir). */
+export const ROLE_TEMPLATES: { key: string; label: string; perms: Perm[] }[] = [
+  { key: 'depo', label: 'Depo', perms: ['orders', 'products'] },
+  { key: 'muhasebe', label: 'Muhasebe', perms: ['orders', 'reports', 'customers'] },
+  { key: 'icerik', label: 'İçerik editörü', perms: ['content'] },
+  { key: 'pazarlama', label: 'Pazarlama', perms: ['campaigns', 'tracking', 'reports', 'content'] },
+  { key: 'musteri', label: 'Müşteri hizmetleri', perms: ['orders', 'customers'] },
+];
+
+/** Oturum + panel yetkileri. perms boşsa panele giremez. */
 export function useAdmin() {
   const { session, user, loading } = useAuth();
-  const [admin, setAdmin] = useState<boolean | null>(null);
+  const [perms, setPerms] = useState<string[] | null>(null);
+  const [full, setFull] = useState(false);
   const uid = user?.id;
 
   useEffect(() => {
     if (loading) return;
     if (!uid) {
-      Promise.resolve().then(() => setAdmin(null));
+      Promise.resolve().then(() => setPerms(null));
       return;
     }
     let off = false;
-    supabase()
-      .rpc('is_admin')
-      .then(({ data, error }) => {
-        if (!off) setAdmin(!error && data === true);
-      });
+    Promise.all([supabase().rpc('my_perms'), supabase().rpc('is_admin')]).then(([p, a]) => {
+      if (off) return;
+      setPerms(!p.error && Array.isArray(p.data) ? (p.data as string[]) : []);
+      setFull(!a.error && a.data === true);
+    });
     return () => {
       off = true;
     };
   }, [loading, uid]);
 
-  return { session, user, loading: loading || (!!uid && admin === null), admin: admin === true };
+  const list = perms ?? [];
+  return {
+    session,
+    user,
+    loading: loading || (!!uid && perms === null),
+    admin: list.length > 0,
+    isAdmin: full,
+    perms: list,
+    can: (p: Perm) => list.includes(p),
+  };
 }
 
 /** Panelde yapılan değişiklik sitede hemen görünsün diye önbelleği yeniler. Başarısız olsa da kayıt bozulmaz (en geç 60 sn). */

@@ -21,6 +21,8 @@ export type OrderRow = {
   items: OrderItem[];
   subtotal: number;
   shipping: number;
+  discount?: number;
+  coupon?: string | null;
   total: number;
   payment_method: string;
   full_name?: string;
@@ -56,6 +58,12 @@ export function OrderBody({ o, extra }: { o: OrderRow; extra?: ReactNode }) {
         <span>Kargo</span>
         <span>{Number(o.shipping) === 0 ? 'Ücretsiz' : tl(Number(o.shipping))}</span>
       </div>
+      {Number(o.discount) > 0 && (
+        <div className="sum-row muted">
+          <span>İndirim{o.coupon ? ` (${o.coupon})` : ''}</span>
+          <span>−{tl(Number(o.discount))}</span>
+        </div>
+      )}
       <div className="sum-row sum-total">
         <span>Toplam</span>
         <span>{tl(Number(o.total))}</span>
