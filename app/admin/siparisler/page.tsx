@@ -145,7 +145,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
             <Printer size={15} /> Yazdır
           </button>
           <a className="btn ghost" href={`/admin/siparisler/fatura?no=${encodeURIComponent(order.order_no)}`} target="_blank" rel="noopener noreferrer">
-            <FileText size={15} /> Fatura / irsaliye yazdır
+            <FileText size={15} /> Fatura / irsaliye / kargo etiketi
           </a>
           <button className="btn" disabled={busy} onClick={() => save(meta, 'Bilgiler kaydedildi')}>
             Notu ve kargo bilgisini kaydet

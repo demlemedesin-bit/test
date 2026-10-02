@@ -203,6 +203,20 @@ export async function notifyOrder(event: OrderEvent, orderNo: string): Promise<N
       }
     }
 
+    // Yönetici bildirimi: yeni siparişte shop_settings.admin_emails adreslerine özet gider
+    if (event === 'order_created') {
+      const admins = String(m.admin_emails ?? '').split(/[,;\s]+/).map((x) => x.trim()).filter((x) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x)).slice(0, 5);
+      if (admins.length) {
+        const lines = ((order.items as { name?: string; qty?: number }[] | null) ?? []).map((i) => `- ${i.qty ?? 1} x ${i.name ?? 'Ürün'}`).join('\n');
+        const subject = `Yeni sipariş ${order.order_no}: ₺${Number(order.total).toLocaleString('tr-TR')}`;
+        const text = `Yeni sipariş geldi.\n\nSipariş: ${order.order_no}\nMüşteri: ${order.full_name ?? ''} (${order.email ?? ''}, ${order.phone ?? ''})\nÖdeme: ${order.payment_method ?? ''}\nToplam: ₺${Number(order.total).toLocaleString('tr-TR')}\n\n${lines}\n\nYönetim paneli: ${siteUrl()}/admin/siparisler`;
+        for (const a of admins) {
+          const r = await sendEmail({ to: a, subject, text });
+          await logMsg(sb, { channel: 'email', to_addr: a, template: 'admin_new_order', subject, status: r.status, error: r.error, order_no: orderNo });
+        }
+      }
+    }
+
     const w = await postWebhook(event, {
       order_no: order.order_no, status: order.status, email: order.email, full_name: order.full_name, phone: order.phone,
       items: order.items, subtotal: order.subtotal, shipping: order.shipping, discount: order.discount ?? 0, coupon_code: order.coupon_code,

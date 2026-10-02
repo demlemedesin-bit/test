@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowDown, ArrowLeft, ArrowUp, Clock, ImagePlus, Package, Pencil, Plus, Power, Save, Trash2, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Clock, ImagePlus, Package, Pencil, Plus, Power, Save, Table2, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { refreshSite, slugify, tl, uploadImage, type AdminProduct, type Color } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { ProductsInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
+import { BulkEditor, notifyRestock } from '@/components/admin/BulkProducts';
 import { PageHero } from '@/components/admin/PageHero';
 import { GalleryInput, ImageSlot } from '@/components/admin/DropZone';
 
@@ -132,8 +133,13 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       return setErrs([error.code === '23505' ? 'Bu adresle (slug) başka bir ürün var.' : 'Kaydedilemedi: ' + error.message]);
     }
     await refreshSite();
+    let extra = '';
+    if (!d.isNew && (init.soon || (init.stock.trim() !== '' && Number(init.stock) <= 0)) && !d.soon && d.active && (stock === null || stock > 0)) {
+      const r = await notifyRestock(slug);
+      if (r && r.sent) extra = `, ${r.sent} kişiye “stokta” e-postası gitti`;
+    }
     setBusy(false);
-    toast(d.isNew ? 'Ürün eklendi, sitede yayında' : 'Kaydedildi, site güncellendi');
+    toast((d.isNew ? 'Ürün eklendi, sitede yayında' : 'Kaydedildi, site güncellendi') + extra);
     onSaved();
     onClose();
   }
@@ -214,7 +220,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       <section className="card pe-sec">
         <div className="card-h"><h2 className="card-t">Katalog bilgisi</h2></div>
         <div className="card-b">
-        {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu (YouTube/MP4 bağlantısı)']] as const).map(([k, l]) => (
+        {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu (YouTube/MP4 bağlantısı)'], ['episode_title', 'Podcast bölümü adı (bu ürünün geçtiği bölüm)'], ['episode_url', 'Podcast bölümü bağlantısı (https://…)']] as const).map(([k, l]) => (
           <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
         ))}
         <Field label="Kritik stok seviyesi" hint="Stok bu sayıya inince panelde uyarı çıkar (varsayılan 5)"><input className="inp" type="number" min={0} value={String((d.data as Record<string, unknown>).crit ?? '')} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, crit: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) } }))} /></Field>
@@ -347,6 +353,7 @@ export default function Products() {
   const [list, setList] = useState<AdminProduct[] | null>(null);
   const [err, setErr] = useState('');
   const [edit, setEdit] = useState<Draft | null>(null);
+  const [bulk, setBulk] = useState(false);
   const { show, node } = useToast();
 
   const load = useCallback(async () => {
@@ -393,11 +400,13 @@ export default function Products() {
 
   const nextSort = (list?.reduce((m, p) => Math.max(m, p.sort), 0) ?? 0) + 10;
 
+  if (bulk && list) return (<><BulkEditor list={list} toast={show} menu={menu} onBack={() => setBulk(false)} onSaved={load} />{node}</>);
   if (edit) return (<><Editor key={edit.slug || 'yeni'} init={edit} toast={show} onClose={() => setEdit(null)} onSaved={load} />{node}</>);
 
   return (
     <>
       <TopBar title="Ürünler" sub={list ? `${list.length} ürün` : ''} onMenu={menu}>
+        {list && list.length > 0 && <button className="btn ghost" onClick={() => setBulk(true)}><Table2 size={15} /> Toplu düzenle / CSV</button>}
         <button className="btn" onClick={() => setEdit(blank(nextSort))}><Plus size={15} /> Yeni ürün</button>
       </TopBar>
       <div className="adm-scroll">

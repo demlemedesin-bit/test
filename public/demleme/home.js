@@ -517,6 +517,10 @@
         bt.onclick=function(){ c.click(); };
         recs.lastChild.appendChild(a);
       });
+      var ff=+(panel.getAttribute('data-free-from')||0), sb=document.getElementById('cartShip');
+      if(!sb){ sb=document.createElement('div'); sb.id='cartShip'; foot.insertBefore(sb, foot.firstChild); }
+      if(ff>0&&items.length){ var left=Math.max(0,ff-sum), pc=Math.min(100,Math.round(sum/ff*100)); sb.hidden=false;
+        sb.innerHTML='<p>'+(left>0?'Ücretsiz kargoya <b>'+fmt(left)+'</b> kaldı':'Tebrikler, <b>kargo ücretsiz</b>!')+'</p><div class="cs-bar"><i style="width:'+pc+'%"></i></div>'; } else { sb.hidden=true; }
       count.textContent=n; count.hidden=!n; empty.hidden=!!n; foot.hidden=!n; subtotal.textContent=fmt(sum);
     };
     var open=function(o){
