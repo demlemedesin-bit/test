@@ -43,7 +43,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p01-cam-kavanoz-uzun-720.webp",
+  "sort": 0
  },
  {
   "slug": "cam-kavanoz-basik",
@@ -89,7 +92,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p02-cam-kavanoz-basik-720.webp",
+  "sort": 10
  },
  {
   "slug": "demleme-sehpasi",
@@ -145,7 +151,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p03-demleme-sehpasi-720.webp",
+  "sort": 20
  },
  {
   "slug": "katli-saklama-kabi",
@@ -196,7 +205,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p04-katli-saklama-kabi-720.webp",
+  "sort": 30
  },
  {
   "slug": "sofra-tepsisi-buyuk",
@@ -242,7 +254,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p05-sofra-tepsisi-buyuk-720.webp",
+  "sort": 40
  },
  {
   "slug": "sofra-tepsisi-kucuk",
@@ -288,7 +303,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p06-sofra-tepsisi-kucuk-720.webp",
+  "sort": 50
  },
  {
   "slug": "demleme-tisort",
@@ -402,7 +420,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "giyim",
+  "thumb": "/demleme/03-shop/products/p07-demleme-tisort-720.webp",
+  "sort": 60
  },
  {
   "slug": "demleme-sapka",
@@ -462,7 +483,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "giyim",
+  "thumb": "/demleme/03-shop/products/p08-demleme-sapka-720.webp",
+  "sort": 70
  },
  {
   "slug": "demleme-bez-canta",
@@ -507,7 +531,10 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "aksesuar",
+  "thumb": "/demleme/03-shop/products/p09-demleme-bez-canta-720.webp",
+  "sort": 80
  },
  {
   "slug": "demleme-cay-bardagi",
@@ -542,6 +569,9 @@
     "Kargo & iade",
     "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
    ]
-  ]
+  ],
+  "shopCat": "sofra",
+  "thumb": "/demleme/03-shop/products/p10-demleme-cay-bardagi-720.webp",
+  "sort": 90
  }
 ]

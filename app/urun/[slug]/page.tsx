@@ -1,30 +1,34 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
-import { productHtml, products } from '@/lib/content';
+import { productHtml } from '@/lib/content';
+import { getProducts } from '@/lib/catalog';
 import './product.css';
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
+// Yeni eklenen ürünler de açılsın; liste veritabanından gelir.
+export const dynamicParams = true;
+export const revalidate = 60;
 
-export function generateStaticParams() {
-  return products().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getProducts()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const p = products().find((x) => x.slug === slug);
+  const p = (await getProducts()).find((x) => x.slug === slug);
   if (!p) return {};
   return { title: `${p.name} · Demleme Mağaza`, description: p.desc };
 }
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  if (!products().some((p) => p.slug === slug)) notFound();
+  const list = await getProducts();
+  if (!list.some((p) => p.slug === slug)) notFound();
   return (
     <>
-      <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: productHtml() }} />
+      <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: await productHtml(list) }} />
       <Script src="/demleme/product.js" strategy="afterInteractive" />
     </>
   );

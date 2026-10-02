@@ -1,23 +1,27 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { D } from '@/components/Display';
-import { docBySlug, docs } from '@/lib/legal';
+import { docSlugs, legalDocs } from '@/lib/legal';
+import { getConfig } from '@/lib/catalog';
 
 type Props = { params: Promise<{ doc: string }> };
 
 export const dynamicParams = false;
+export const revalidate = 60;
 
 export function generateStaticParams() {
-  return docs.map((d) => ({ doc: d.slug }));
+  return docSlugs.map((doc) => ({ doc }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const d = docBySlug((await params).doc);
+  const { doc } = await params;
+  const d = legalDocs(await getConfig()).find((x) => x.slug === doc);
   return d ? { title: `${d.title} · Demleme`, description: d.lead } : {};
 }
 
 export default async function Page({ params }: Props) {
-  const d = docBySlug((await params).doc);
+  const { doc } = await params;
+  const d = legalDocs(await getConfig()).find((x) => x.slug === doc);
   if (!d) notFound();
   return (
     <main className="page page-wide">

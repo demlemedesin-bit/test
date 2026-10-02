@@ -24,6 +24,8 @@ export type OrderRow = {
   total: number;
   payment_method: string;
   full_name?: string;
+  tracking_carrier?: string | null;
+  tracking_no?: string | null;
   address?: { city?: string; district?: string; address?: string; zip?: string; title?: string };
 };
 
@@ -62,6 +64,11 @@ export function OrderBody({ o, extra }: { o: OrderRow; extra?: ReactNode }) {
         Ödeme: {PAY[o.payment_method] ?? o.payment_method}
         {o.address?.city ? ` · Teslimat: ${o.address.district ? o.address.district + ', ' : ''}${o.address.city}` : ''}
       </p>
+      {o.tracking_no || o.tracking_carrier ? (
+        <p className="small" style={{ margin: '6px 0 0' }}>
+          Kargo: <b>{[o.tracking_carrier, o.tracking_no].filter(Boolean).join(' · ')}</b>
+        </p>
+      ) : null}
       {extra}
     </>
   );
