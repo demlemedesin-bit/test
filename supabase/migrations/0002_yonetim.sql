@@ -19,7 +19,7 @@ alter table public.shop_settings alter column value type text using value::text;
 alter table public.shop_settings add column is_public boolean not null default true;
 alter table public.shop_settings add column updated_at timestamptz not null default now();
 insert into public.shop_settings (key, value, is_public) values
-  ('contact_email', 'merhaba@demleme.com', true),
+  ('contact_email', 'garen@demlemedesin.com', true),
   ('seller_name', 'Demleme', true), ('seller_address', '', true), ('seller_tax_office', '', true),
   ('seller_tax_no', '', true), ('seller_mersis', '', true), ('seller_phone', '', true),
   ('bank_holder', '', true), ('bank_name', '', true), ('bank_iban', '', true),
