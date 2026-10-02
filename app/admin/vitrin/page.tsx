@@ -47,7 +47,7 @@ export default function Vitrin() {
           <Sw v={s.related_on} on={(b) => set('related_on', b)} label="“Bunu da beğenebilirsin” bölümü (ürün sayfası)" />
           <Field label="Başlık"><input className="inp" value={s.related_title} onChange={(e) => set('related_title', e.target.value)} /></Field>
           <Field label="Gösterilecek ürün sayısı"><input className="inp" type="number" min={1} max={8} value={s.related_count} onChange={(e) => set('related_count', Math.max(1, Math.min(8, Number(e.target.value) || 1)))} /></Field>
-          <Field label="Seçim"><select className="inp" value={s.related_mode} onChange={(e) => set('related_mode', e.target.value as 'auto' | 'manual')}><option value="auto">Otomatik (diğer ürünler)</option><option value="manual">Elle seçilen (ürün verisindeki related)</option></select></Field>
+          <Field label="Seçim"><select className="inp" value={s.related_mode} onChange={(e) => set('related_mode', e.target.value as 'auto' | 'manual' | 'together')}><option value="together">Birlikte alınanlar (satış verisinden, yetmezse otomatik)</option><option value="auto">Otomatik (diğer ürünler)</option><option value="manual">Elle seçilen (ürün verisindeki related)</option></select></Field>
         </div></section>
         <section className="card" style={{ marginTop: 16 }}><div className="card-h"><h2 className="card-t">Sepet</h2></div><div className="card-b">
           <Sw v={s.upsell_cart_on} on={(b) => set('upsell_cart_on', b)} label="Sepette “Şunları da ekle” çapraz satış" />

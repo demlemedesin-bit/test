@@ -215,6 +215,14 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       </div>
 
       <div className="sec">
+        <p className="sec-t">Katalog bilgisi</p>
+        {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu (YouTube/MP4 bağlantısı)']] as const).map(([k, l]) => (
+          <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
+        ))}
+        <Field label="Kritik stok seviyesi" hint="Stok bu sayıya inince panelde uyarı çıkar (varsayılan 5)"><input className="inp" type="number" min={0} value={String((d.data as Record<string, unknown>).crit ?? '')} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, crit: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) } }))} /></Field>
+      </div>
+
+      <div className="sec">
         <p className="sec-t">SEO</p>
         <Field label="Arama sonucu başlığı" hint={`${d.seoTitle.length}/60 · Boşsa “${d.name.trim() || 'Ürün adı'} · Demleme Mağaza” kullanılır`}>
           <input className="inp" value={d.seoTitle} maxLength={120} onChange={(e) => set('seoTitle', e.target.value)} />
@@ -302,6 +310,14 @@ export default function Products() {
     const t = setTimeout(load, 0);
     return () => clearTimeout(t);
   }, [load]);
+  const [asked, setAsked] = useState(false);
+  useEffect(() => {
+    if (!list || asked) return;
+    setAsked(true);
+    const slug = new URLSearchParams(location.search).get('edit');
+    const p = slug ? list.find((x) => x.slug === slug) : null;
+    if (p) setEdit(toDraft(p));
+  }, [list, asked]);
 
   async function move(i: number, dir: -1 | 1) {
     if (!list) return;

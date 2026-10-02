@@ -88,7 +88,7 @@ export function Upsell({ items }: { items: CartItem[] }) {
           const img = p.thumb || p.colors?.[0]?.img;
           return (
             <div className="px-card px-card-up" key={p.slug}>
-              <a className="px-card-link" href={`/urun/${p.slug}`}>
+              <a className="px-card-link" data-rec="upsell" href={`/urun/${p.slug}`}>
                 <span className="px-th">{img ? <img src={img} alt="" loading="lazy" /> : null}</span>
                 <span className="px-nm">{p.name}</span>
                 <span className="px-pr">{tl(Number(p.price))}</span>

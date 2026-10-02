@@ -16,7 +16,8 @@
 | Google/Meta ürün feed'i, pazaryeri CSV | Var | /feed/* |
 | UTM / kısa link takibi, raporlar | Var | Takip, Raporlar |
 | Roller ve yetkiler, denetim kaydı | Var | Kullanıcılar ve kayıtlar |
-| İndirimli (üstü çizili) fiyat, indirim rozeti | Eksik | Sıradaki: `compare_at_price` |
+| Süreli kampanya fiyatı (üstü çizili, geri sayım), düşük stok uyarısı | Var | Süreli kampanya |
+| Depo, muhasebe, müşteri hizmetleri, iade, analiz, ürün kalitesi, veri kontrolü, banner/betik yönetimi | Var | Yönetim menüsü |
 | Paket / set ürün (bundle) | Eksik | Sepet çapraz satışla kısmen karşılanıyor |
 | Hediye kartı, sadakat puanı | Eksik | |
 | Trendyol/Hepsiburada/N11 API entegrasyonu | Eksik | Şimdilik feed CSV |

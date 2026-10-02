@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { useAdmin, usePendingCounts } from '@/lib/admin';
@@ -18,6 +18,11 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
       { href: '/admin/urunler', label: 'Ürünler', Icon: Package, perm: 'products' },
       { href: '/admin/musteriler', label: 'Müşteriler', Icon: Users, perm: 'customers' },
       { href: '/admin/sepetler', label: 'Terk edilen sepetler', Icon: ShoppingCart, perm: 'customers' },
+      { href: '/admin/kalite', label: 'Ürün kalitesi', Icon: Gauge, perm: 'products' },
+      { href: '/admin/iadeler', label: 'İade ve değişim', Icon: Undo2, perm: 'orders' },
+      { href: '/admin/depo', label: 'Depo', Icon: Boxes, perm: 'warehouse' },
+      { href: '/admin/muhasebe', label: 'Muhasebe', Icon: Calculator, perm: 'accounting' },
+      { href: '/admin/destek', label: 'Müşteri hizmetleri', Icon: Headphones, perm: 'support' },
     ],
   },
   {
@@ -25,7 +30,9 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
     items: [
       { href: '/admin/kampanyalar', label: 'Kampanya ve indirim', Icon: BadgePercent, perm: 'campaigns' },
       { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone, perm: 'tracking' },
+      { href: '/admin/sureli', label: 'Süreli kampanya', Icon: Timer, perm: 'campaigns' },
       { href: '/admin/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'reports' },
+      { href: '/admin/analiz', label: 'Analiz', Icon: Activity, perm: 'reports' },
       { href: '/admin/vitrin', label: 'Vitrin ve popup', Icon: LayoutTemplate, perm: 'content' },
       { href: '/admin/popuplar', label: 'Popuplar', Icon: LayoutTemplate, perm: 'content' },
       { href: '/admin/abonelikler', label: 'Bülten ve stok haberi', Icon: MailPlus, perm: 'customers' },
@@ -38,12 +45,14 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
       { href: '/admin/sayfalar', label: 'Sayfa, blog, yönlendirme', Icon: Newspaper, perm: 'content' },
       { href: '/admin/yorumlar', label: 'Ürün yorumları', Icon: Star, perm: 'content' },
       { href: '/admin/seo', label: 'SEO ve reklam', Icon: Search, perm: 'content' },
+      { href: '/admin/tasarim', label: 'Sayfa tasarımı', Icon: PaintBucket, perm: 'content' },
       { href: '/admin/medya', label: 'Medya', Icon: ImageIcon, perm: 'content' },
     ],
   },
   {
     g: 'Sistem',
     items: [
+      { href: '/admin/veri-kontrol', label: 'Veri kontrolü', Icon: Activity, perm: 'integrations' },
       { href: '/admin/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug, perm: 'integrations' },
       { href: '/admin/sistem', label: 'Kullanıcılar ve kayıtlar', Icon: ShieldCheck, perm: 'system' },
       { href: '/admin/ayarlar', label: 'Ayarlar', Icon: Settings, perm: 'system' },
