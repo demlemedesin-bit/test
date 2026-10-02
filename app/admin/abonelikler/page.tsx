@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { dt } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { Empty, Loading, TopBar } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Sub = { email: string; source: string; created_at: string; unsubscribed: boolean };
 type Alert = { id: string; email: string; product_slug: string; created_at: string; notified_at: string | null };
@@ -39,7 +40,7 @@ export default function Abonelikler() {
       <TopBar title="Bülten ve stok haberi" sub="Abone listesi ve “gelince haber ver” talepleri" onMenu={menu}>
         <button className="btn ghost" onClick={csv}><Download size={15} /> CSV</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="tabs" style={{ marginBottom: 14 }}>
           <button className={`tab${tab === 'b' ? ' on' : ''}`} onClick={() => setTab('b')}>Bülten ({subs?.length ?? 0})</button>
           <button className={`tab${tab === 's' ? ' on' : ''}`} onClick={() => setTab('s')}>Stok haberi ({al.length})</button>

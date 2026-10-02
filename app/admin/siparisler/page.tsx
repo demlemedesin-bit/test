@@ -10,6 +10,7 @@ import { CARRIER_NAMES } from '@/lib/carriers';
 import { useMenu } from '@/components/admin/Shell';
 import { OrdersInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
+import { PageHero } from '@/components/admin/PageHero';
 
 const TABS: [string, string][] = [
   ['hepsi', 'Tümü'],
@@ -373,7 +374,7 @@ function Orders() {
         </button>
       </TopBar>
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
           {orders && orders.length > 0 && <OrdersInsight orders={orders} now={nowTs} />}
           <div className="toolbar">

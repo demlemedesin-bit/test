@@ -7,6 +7,7 @@ import { DAY, startOfDay, type Ev } from '@/lib/analytics';
 import { useMenu } from '@/components/admin/Shell';
 import { Loading, TopBar } from '@/components/admin/ui';
 import { Card, Tbl } from '@/components/admin/Tbl';
+import { PageHero } from '@/components/admin/PageHero';
 
 type Row = { name: string; ok: boolean | null; detail: string; fix?: string };
 
@@ -71,7 +72,7 @@ export default function VeriKontrol() {
   return (
     <>
       <TopBar title="Analytics ve reklam veri kontrolü" sub="Kurulum yetmez: olaylar gerçekten geliyor mu?" onMenu={menu} />
-      <div className="adm-scroll"><div className="adm-inner">
+      <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <Card title="Kontroller" meta="Son 7 günlük ilk-taraf olay verisine göre">
           <Tbl min={760} cols={[['', '30px'], ['Kontrol', 'minmax(0,1fr)'], ['Durum', 'minmax(0,1.6fr)']]}
             rows={rows.map((r) => [<span key="i" style={{ color: r.ok === null ? 'var(--tx3)' : r.ok ? 'var(--green)' : '#c2410c', fontWeight: 700 }}>{r.ok === null ? '•' : r.ok ? '✓' : '✗'}</span>, r.name, <span key="d">{r.detail}{r.ok === false && r.fix ? <em style={{ color: '#c2410c', display: 'block', fontStyle: 'normal', fontSize: 12 }}>→ {r.fix}</em> : null}</span>])} />

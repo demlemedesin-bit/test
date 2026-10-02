@@ -7,6 +7,7 @@ import { refreshSite } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, TopBar, useToast } from '@/components/admin/ui';
 import { STOREFRONT_DEFAULTS, STOREFRONT_KEY, toStorefront, type Storefront } from '@/lib/storefront';
+import { PageHero } from '@/components/admin/PageHero';
 
 const Sw = ({ v, on, label, hint }: { v: boolean; on: (b: boolean) => void; label: string; hint?: string }) => (
   <div className="fld">
@@ -42,7 +43,7 @@ export default function Vitrin() {
         <a className="btn ghost" href="/admin/popuplar">Popuplar</a>
         <button className="btn" onClick={save} disabled={busy}><Save size={15} /> {busy ? 'Kaydediliyor…' : 'Kaydet'}</button>
       </TopBar>
-      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 860 }}>
+      <div className="adm-scroll"><div className="adm-inner" style={{ maxWidth: 860 }}><PageHero />
         <section className="card"><div className="card-h"><h2 className="card-t">Ürün önerileri</h2></div><div className="card-b">
           <Sw v={s.related_on} on={(b) => set('related_on', b)} label="“Bunu da beğenebilirsin” bölümü (ürün sayfası)" />
           <Field label="Başlık"><input className="inp" value={s.related_title} onChange={(e) => set('related_title', e.target.value)} /></Field>

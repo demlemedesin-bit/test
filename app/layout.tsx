@@ -26,6 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(baseUrl(seo, siteUrl())),
     title: { default: title, template: seo.title_template || '%s' },
     description,
+    ...(seo.favicon ? { icons: { icon: seo.favicon, apple: seo.favicon, shortcut: seo.favicon } } : {}),
     ...(seo.noindex_site ? { robots: { index: false, follow: false, googleBot: { index: false, follow: false } } } : {}),
     verification: {
       ...(v.verify_google ? { google: v.verify_google } : {}),

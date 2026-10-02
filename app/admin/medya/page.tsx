@@ -24,6 +24,7 @@ import {
 import { useMenu } from '@/components/admin/Shell';
 import { Confirm, Empty, Field, Kpi, Loading, TopBar, useToast } from '@/components/admin/ui';
 import './medya.css';
+import { PageHero } from '@/components/admin/PageHero';
 
 const PAGE = 100;
 const PLACEHOLDER = '.emptyFolderPlaceholder';
@@ -423,7 +424,7 @@ export default function Media() {
     <>
       <TopBar title="Medya" sub="Görseller, otomatik sıkıştırma ve depolama" onMenu={menu} />
       <div className="adm-scroll">
-        <div className="adm-inner">
+        <div className="adm-inner"><PageHero />
           <div className="kpis">
             <Kpi label="Toplam dosya" value={usage ? (usage.capped ? '≥ ' : '') + usage.files.toLocaleString('tr-TR') : '…'} sub="Tüm klasörlerde" tone="ac" icon={<Images size={17} />} />
             <Kpi label="Depolama kullanımı" value={usage ? fmtBytes(usage.bytes) : '…'} sub={usage?.capped ? 'Klasör sayısı çok; kısmi sonuç' : 'product-images alanı'} tone="blue" icon={<HardDrive size={17} />} />

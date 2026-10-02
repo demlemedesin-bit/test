@@ -174,7 +174,7 @@ function reviewsHtml(reviews: Review[]): string {
 /** Ürün sayfasının Product JSON-LD verisi (script içine güvenle gömülür: "<" kaçışlı). */
 export function productJsonLd(p: SiteProduct, reviews: Review[], origin: string): string {
   const abs = (u: string) => (/^https?:\/\//i.test(u) ? u : `${origin}${u.startsWith('/') ? '' : '/'}${u}`);
-  const images = [...new Set([...p.colors.map((c) => c.img || ''), p.thumb].filter(Boolean))].slice(0, 6).map(abs);
+  const images = [...new Set([...p.colors.map((c) => c.img || ''), p.thumb, ...(p.gallery ?? [])].filter(Boolean))].slice(0, 8).map(abs);
   const ld: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
