@@ -1,14 +1,13 @@
 import type { ReactNode } from 'react';
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
+import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import './shop.css';
 
 export default function ShopLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Header />
+      <SiteHeader />
       {children}
-      <Footer />
+      <SiteFooter />
     </>
   );
 }
