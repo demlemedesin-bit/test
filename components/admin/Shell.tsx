@@ -27,6 +27,7 @@ const NAV: { g: string; items: { href: string; label: string; Icon: typeof Users
       { href: '/admin/takip', label: 'Takip (UTM)', Icon: Megaphone, perm: 'tracking' },
       { href: '/admin/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'reports' },
       { href: '/admin/vitrin', label: 'Vitrin ve popup', Icon: LayoutTemplate, perm: 'content' },
+      { href: '/admin/popuplar', label: 'Popuplar', Icon: LayoutTemplate, perm: 'content' },
       { href: '/admin/abonelikler', label: 'Bülten ve stok haberi', Icon: MailPlus, perm: 'customers' },
     ],
   },

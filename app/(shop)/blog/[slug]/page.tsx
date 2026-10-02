@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation';
 import { D } from '@/components/Display';
 import { getPost, trDate } from '@/lib/cms';
 import { md } from '@/lib/md';
+import { JsonLd } from '@/components/JsonLd';
+import { applyTemplate, articleLd, baseUrl, breadcrumbLd } from '@/lib/seo';
+import { getSeoBundle } from '@/lib/seoServer';
+import { siteUrl } from '@/lib/siteUrl';
 import '../../yazi.css';
 
 type Props = { params: Promise<{ slug: string }> };
@@ -14,17 +18,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = await getPost(slug);
   if (!p) return {};
-  const title = `${p.seo_title.trim() || p.title} · Demleme`;
+  const { seo } = await getSeoBundle();
+  const title = applyTemplate(seo, p.seo_title.trim() || p.title);
   const description = p.seo_desc.trim() || p.excerpt.trim() || undefined;
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: `/blog/${p.slug}` },
     openGraph: {
       type: 'article',
       title,
       description,
-      siteName: 'Demleme',
+      siteName: seo.site_name,
       ...(p.published_at ? { publishedTime: p.published_at } : {}),
       ...(p.cover ? { images: [p.cover] } : {}),
     },
@@ -35,8 +40,16 @@ export default async function BlogPost({ params }: Props) {
   const { slug } = await params;
   const p = await getPost(slug);
   if (!p) notFound();
+  const { seo } = await getSeoBundle();
+  const base = baseUrl(seo, siteUrl());
   return (
     <main className="page yz">
+      <JsonLd
+        data={[
+          articleLd(seo, base, { slug: p.slug, title: p.seo_title.trim() || p.title, description: p.seo_desc.trim() || p.excerpt.trim() || undefined, cover: p.cover, published: p.published_at ?? p.created_at }),
+          breadcrumbLd(base, [{ name: 'Ana sayfa', path: '/' }, { name: 'Blog', path: '/blog' }, { name: p.title, path: `/blog/${p.slug}` }]),
+        ]}
+      />
       <p className="crumb">
         <a href="/blog">Blog</a>
       </p>

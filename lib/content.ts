@@ -1,9 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getConfig, getProducts, type SiteProduct } from './catalog';
+import { getConfig, getProducts, rest, type SiteProduct } from './catalog';
 import { getFooterPages } from './cms';
 import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite } from './site';
 import { DRAWINGS } from './siteDefaults';
+import type { Storefront } from './storefront';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -76,10 +77,134 @@ export async function products(): Promise<SiteProduct[]> {
   return getProducts();
 }
 
-export async function productHtml(list?: SiteProduct[]): Promise<string> {
-  const [all, site] = await Promise.all([list ? Promise.resolve(list) : getProducts(), getSite()]);
-  return fill(read('product.html'), site).replace(
-    '{{PRODUCT_DATA}}',
-    () => `<script type="application/json" id="productData">${safe(all)}</script>`,
+// ── Ürün sayfası: yorumlar, ilgili ürünler, "Yeni" rozeti, JSON-LD ───────────────
+
+/** Onaylı yorum (anon yalnızca bu sütunları görür; e-posta asla gelmez). */
+export type Review = { id: string; name: string; rating: number; title: string; body: string; verified: boolean; reply: string | null; created_at: string };
+
+export async function getReviews(slug: string): Promise<Review[]> {
+  const rows = await rest<Review[]>(
+    `reviews?select=id,name,rating,title,body,verified,reply,created_at&product_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc&limit=200`,
   );
+  return Array.isArray(rows) ? rows.filter((r) => r && typeof r.rating === 'number' && r.rating >= 1 && r.rating <= 5) : [];
+}
+
+type Meta = { created: number; related: string[] };
+
+/** Ürün başına ek bilgiler: eklenme tarihi ("Yeni" rozeti) ve admin'den seçilen ilgili ürünler (data.related). */
+async function productMeta(): Promise<Map<string, Meta>> {
+  const rows = (await rest<{ slug: string; created_at: string | null; related: unknown }[]>('products?select=slug,created_at,related:data->related&active=eq.true')) ?? [];
+  return new Map(
+    rows.map((r) => [
+      r.slug,
+      {
+        created: r.created_at ? Date.parse(r.created_at) : NaN,
+        related: Array.isArray(r.related) ? (r.related as unknown[]).filter((x): x is string => typeof x === 'string') : [],
+      },
+    ]),
+  );
+}
+
+function pickRelated(list: SiteProduct[], cur: SiteProduct, meta: Map<string, Meta>, sf: Storefront): SiteProduct[] {
+  const by = new Map(list.map((p) => [p.slug, p]));
+  const manual: SiteProduct[] = [];
+  for (const s of meta.get(cur.slug)?.related ?? []) {
+    const p = by.get(s);
+    if (p && p.slug !== cur.slug && !manual.includes(p)) manual.push(p);
+  }
+  if (sf.related_mode === 'manual') return manual.slice(0, sf.related_count);
+  // otomatik: önce aynı kategori, sonra diğer satıştaki ürünler; tükenenler sona
+  const rank = (p: SiteProduct) => (p.out ? 4 : 0) + (p.shopCat === cur.shopCat ? 0 : 2) + (p.cat === cur.cat ? 0 : 1);
+  const auto = list
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => p.slug !== cur.slug && !p.soon && !manual.includes(p))
+    .sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i)
+    .map(({ p }) => p);
+  return [...manual, ...auto].slice(0, sf.related_count);
+}
+
+function relatedHtml(items: SiteProduct[], title: string): string {
+  if (!items.length) return '';
+  const cards = items
+    .map((x) => {
+      const img = x.colors[0]?.img || x.thumb;
+      return `<a href="/urun/${esc(x.slug)}"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
+    })
+    .join('');
+  return `<section class="more px-related"><div class="more-h"><h2>${esc(title)}</h2><a href="/#magaza">Tüm ürünler →</a></div><div class="more-row">${cards}</div></section>`;
+}
+
+const stars = (n: number) => `<span class="px-stars" role="img" aria-label="5 üzerinden ${n} yıldız">${'★'.repeat(n)}<i>${'★'.repeat(5 - n)}</i></span>`;
+const avgOf = (r: Review[]) => r.reduce((a, x) => a + x.rating, 0) / r.length;
+const trNum = (n: number) => n.toFixed(1).replace('.', ',');
+const dateTr = (iso: string) => {
+  const t = Date.parse(iso);
+  return isNaN(t) ? '' : new Date(t).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Istanbul' });
+};
+
+function reviewItem(r: Review): string {
+  return `<li class="px-item"><div class="px-item-top">${stars(r.rating)}<span class="px-item-name">${esc(r.name)}</span>${r.verified ? '<span class="px-verified">Doğrulanmış alıcı</span>' : ''}<time class="px-item-date" datetime="${esc(r.created_at)}">${esc(dateTr(r.created_at))}</time></div>${r.title ? `<p class="px-item-title">${esc(r.title)}</p>` : ''}${r.body ? `<p class="px-item-body">${esc(r.body)}</p>` : ''}${r.reply ? `<p class="px-reply"><b>Demleme yanıtı</b><span>${esc(r.reply)}</span></p>` : ''}</li>`;
+}
+
+function reviewsHtml(reviews: Review[]): string {
+  const head = '<div class="px-rev-h"><h2>Yorumlar</h2></div><div id="pxReviewForm"></div>';
+  if (!reviews.length) return `<section class="px-rev" id="yorumlar">${head}<p class="px-rev-empty">Bu ürüne henüz yorum yazılmadı. İlk yorumu sen yaz.</p></section>`;
+  const dist = [5, 4, 3, 2, 1]
+    .map((n) => {
+      const c = reviews.filter((r) => r.rating === n).length;
+      return `<li><span>${n}★</span><span class="px-dist-bar"><span style="width:${Math.round((c / reviews.length) * 100)}%"></span></span><em>${c}</em></li>`;
+    })
+    .join('');
+  const avg = avgOf(reviews);
+  const first = reviews.slice(0, 6).map(reviewItem).join('');
+  const rest = reviews.slice(6);
+  const more = rest.length ? `<details class="px-more-rev"><summary>${rest.length} yorum daha göster</summary><ul class="px-list">${rest.map(reviewItem).join('')}</ul></details>` : '';
+  return `<section class="px-rev" id="yorumlar">${head}<div class="px-rev-grid"><div class="px-sum"><div class="px-sum-avg"><b>${trNum(avg)}</b><span>/ 5 · ${reviews.length} yorum</span></div>${stars(Math.round(avg))}<ul class="px-dist">${dist}</ul></div><div><ul class="px-list">${first}</ul>${more}</div></div></section>`;
+}
+
+/** Ürün sayfasının Product JSON-LD verisi (script içine güvenle gömülür: "<" kaçışlı). */
+export function productJsonLd(p: SiteProduct, reviews: Review[], origin: string): string {
+  const abs = (u: string) => (/^https?:\/\//i.test(u) ? u : `${origin}${u.startsWith('/') ? '' : '/'}${u}`);
+  const images = [...new Set([...p.colors.map((c) => c.img || ''), p.thumb].filter(Boolean))].slice(0, 6).map(abs);
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: p.name,
+    ...(images.length ? { image: images } : {}),
+    description: p.seoDesc || p.desc || p.name,
+    sku: p.slug,
+    brand: { '@type': 'Brand', name: 'Demleme' },
+    offers: {
+      '@type': 'Offer',
+      price: p.priceNum.toFixed(2),
+      priceCurrency: 'TRY',
+      availability: p.out || p.soon ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+      url: `${origin}/urun/${p.slug}`,
+    },
+  };
+  if (reviews.length) {
+    ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: Number(avgOf(reviews).toFixed(1)), reviewCount: reviews.length, bestRating: 5, worstRating: 1 };
+    ld.review = reviews.slice(0, 5).map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.name },
+      datePublished: r.created_at.slice(0, 10),
+      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+      ...(r.body ? { reviewBody: r.body } : {}),
+      ...(r.title ? { name: r.title } : {}),
+    }));
+  }
+  return safe(ld);
+}
+
+export async function productHtml(list: SiteProduct[] | undefined, slug: string, sf: Storefront, reviews: Review[]): Promise<string> {
+  const [base, site, meta] = await Promise.all([list ? Promise.resolve(list) : getProducts(), getSite(), productMeta()]);
+  // "Yeni" rozeti: kendi rozeti olmayan ve son new_days gün içinde eklenen ürünler
+  const since = sf.badges.new_days > 0 ? Date.now() - sf.badges.new_days * 864e5 : Infinity;
+  const all = base.map((p) => ((meta.get(p.slug)?.created ?? NaN) >= since && !p.badge ? { ...p, badge: 'Yeni' } : p));
+  const cur = all.find((p) => p.slug === slug);
+  const related = sf.related_on && cur ? relatedHtml(pickRelated(all, cur, meta, sf), sf.related_title) : '';
+  return fill(read('product.html'), site)
+    .replace('{{REVIEWS}}', () => (sf.reviews_on ? reviewsHtml(reviews) : ''))
+    .replace('{{RELATED}}', () => related)
+    .replace('{{PRODUCT_DATA}}', () => `<script type="application/json" id="productData">${safe(all)}</script>`);
 }

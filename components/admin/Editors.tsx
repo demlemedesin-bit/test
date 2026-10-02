@@ -1,36 +1,75 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, type DragEvent, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ImagePlus, Plus, RotateCcw, Trash2 } from 'lucide-react';
-import { uploadImage } from '@/lib/admin';
+import { uploadImageDetailed } from '@/lib/admin';
+import { checkImageFile, fmtBytes, gainText, getMediaSettings } from '@/lib/media';
+import { Spinner } from './ui';
 
-/** Görsel alanı: önizleme + yükleme (WebP'ye çevrilir) + adres. */
+/** Görsel alanı: önizleme + yükleme (ayarlara göre sıkıştırılır) + sürükle-bırak + adres. */
 export function ImageInput({ value, onChange, onError, folder = 'site', round }: { value: string; onChange: (v: string) => void; onError?: (m: string) => void; folder?: string; round?: boolean }) {
   const [busy, setBusy] = useState(false);
+  const [over, setOver] = useState(false);
+  const [info, setInfo] = useState('');
+  const [err, setErr] = useState('');
   async function pick(f?: File) {
-    if (!f) return;
+    if (!f || busy) return;
+    setErr('');
+    setInfo('');
     setBusy(true);
     try {
-      onChange(await uploadImage(f, folder));
+      const s = await getMediaSettings();
+      checkImageFile(f, s);
+      const r = await uploadImageDetailed(f, folder, s);
+      onChange(r.url);
+      setInfo(r.untouched ? `${fmtBytes(r.after)} (olduğu gibi yüklendi)` : gainText(r.before, r.after));
     } catch (e) {
-      onError?.('Görsel yüklenemedi: ' + (e instanceof Error ? e.message : 'bilinmeyen hata'));
+      const m = e instanceof Error ? e.message : 'bilinmeyen hata';
+      setErr(m);
+      onError?.(m);
     }
     setBusy(false);
   }
+  function drop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setOver(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f) pick(f);
+  }
   return (
-    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-      <label className="up" style={{ flexShrink: 0, borderRadius: round ? '50%' : undefined }} title="Görsel yükle">
-        {value ? (
+    <div
+      style={{ display: 'flex', gap: 12, alignItems: 'center', borderRadius: 14, outline: over ? '2px dashed var(--ac)' : undefined, outlineOffset: 4, background: over ? 'var(--ac3)' : undefined }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={drop}
+    >
+      <label className="up" style={{ flexShrink: 0, borderRadius: round ? '50%' : undefined, opacity: busy ? 0.6 : 1 }} title="Görsel yükle ya da sürükle">
+        {busy ? (
+          <Spinner size={18} />
+        ) : value ? (
            
           <img src={value} alt="" />
         ) : (
           <ImagePlus size={20} />
         )}
-        <input type="file" accept="image/*" onChange={(e) => pick(e.target.files?.[0])} />
+        <input
+          type="file"
+          accept="image/*"
+          disabled={busy}
+          onChange={(e) => {
+            pick(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
       </label>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <input className="inp" value={value} onChange={(e) => onChange(e.target.value)} placeholder="Yükle ya da adres yapıştır" />
-        {busy && <span className="hint">Yükleniyor…</span>}
+        <input className="inp" value={value} onChange={(e) => onChange(e.target.value)} placeholder="Yükle, sürükle ya da adres yapıştır" />
+        {busy && <span className="hint">Sıkıştırılıp yükleniyor…</span>}
+        {!busy && err && <span className="hint" style={{ color: 'var(--red)' }}>{err}</span>}
+        {!busy && !err && info && <span className="hint" style={{ color: 'var(--green)' }}>{info}</span>}
       </div>
     </div>
   );

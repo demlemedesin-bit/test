@@ -1,15 +1,20 @@
 import type { Metadata } from 'next';
 import { D } from '@/components/Display';
 import { getPosts, trDate } from '@/lib/cms';
+import { applyTemplate } from '@/lib/seo';
+import { getSeoBundle } from '@/lib/seoServer';
 import '../yazi.css';
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Blog · Demleme',
-  description: 'Demleme’den yazılar, notlar ve haberler.',
-  alternates: { canonical: '/blog' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getSeoBundle();
+  return {
+    title: { absolute: applyTemplate(seo, 'Blog') },
+    description: `${seo.site_name}’den yazılar, notlar ve haberler.`,
+    alternates: { canonical: '/blog' },
+  };
+}
 
 export default async function BlogIndex() {
   const posts = await getPosts();

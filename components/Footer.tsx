@@ -1,4 +1,5 @@
 import type { FooterLink } from '@/lib/siteDefaults';
+import { NewsletterForm } from './NewsletterForm';
 
 const DEFAULT_LINKS: FooterLink[] = [
   { label: 'Sipariş takibi', href: '/siparis-takip' },
@@ -17,6 +18,13 @@ export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', li
   const all = [...links, ...extra.filter((e) => !links.some((l) => l.href === e.href))];
   return (
     <footer className="pf">
+      <div className="pf-news">
+        <div>
+          <b className="pf-news-t">Bültene katıl</b>
+          <p className="pf-news-p">Yeni ürünlerden ve kampanyalardan ilk sen haberdar ol.</p>
+        </div>
+        <NewsletterForm source="footer" tone="dark" />
+      </div>
       <span>{copy}</span>
       <span className="pf-links">
         <a href="/">Ana sayfa</a>

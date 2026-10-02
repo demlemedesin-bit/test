@@ -5,24 +5,31 @@ import { useCart, lineKey, MAX_QTY } from '@/lib/cart';
 import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
 import { CouponBox } from './CouponBox';
 import { Alert } from './ui';
+import { RecentlyViewed, useStorefront } from './RecentlyViewed';
+import { Upsell } from './Upsell';
+import './ProductExtras.css';
 
 export function CartView() {
   const { items, ready, setQty, remove } = useCart();
   const { priced, error, loading } = usePricedCart(items, ready);
   const [code, setCode] = useCouponCode();
   const { quote, busy } = useQuote(items, code, '', ready && !!priced && !priced.hasProblem);
+  const sf = useStorefront();
 
   if (!ready) return <p className="loading">Sepetin yükleniyor…</p>;
 
   if (!items.length)
     return (
-      <div className="empty">
-        <h2>Sepetin boş</h2>
-        <p>Sofranı kurmak için mağazaya göz atabilirsin.</p>
-        <a className="btn btn--solid" href="/#magaza">
-          Alışverişe başla
-        </a>
-      </div>
+      <>
+        <div className="empty">
+          <h2>Sepetin boş</h2>
+          <p>Sofranı kurmak için mağazaya göz atabilirsin.</p>
+          <a className="btn btn--solid" href="/#magaza">
+            Alışverişe başla
+          </a>
+        </div>
+        <RecentlyViewed />
+      </>
     );
 
   if (loading) return <p className="loading">Fiyatlar yükleniyor…</p>;
@@ -31,6 +38,7 @@ export function CartView() {
   return (
     <div className="shop-grid">
       <div>
+        {sf?.ship_bar_on && priced.subtotal > 0 && <ShipBar subtotal={priced.subtotal} remaining={priced.remainingForFree} />}
         {priced.hasProblem && <Alert kind="err">Sepetinde satın alınamayan ürünler var. Devam etmek için onları kaldır.</Alert>}
         <ul className="lines">
           {priced.lines.map((l) => (
@@ -66,6 +74,8 @@ export function CartView() {
             ← Alışverişe devam et
           </a>
         </p>
+        <Upsell items={items} />
+        <RecentlyViewed exclude={items.map((i) => i.slug)} />
       </div>
 
       <aside className="summary" aria-label="Sipariş özeti">
@@ -85,7 +95,7 @@ export function CartView() {
           <span>{priced.subtotal === 0 ? '—' : (quote ? quote.shipping : priced.shipping) === 0 ? 'Ücretsiz' : tl(quote ? quote.shipping : priced.shipping)}</span>
         </div>
         <CouponBox code={code} setCode={setCode} quote={quote} busy={busy} />
-        {priced.remainingForFree > 0 && <p className="free-note">{tl(priced.remainingForFree)} daha ekle, kargo ücretsiz olsun.</p>}
+        {sf && !sf.ship_bar_on && priced.remainingForFree > 0 && <p className="free-note">{tl(priced.remainingForFree)} daha ekle, kargo ücretsiz olsun.</p>}
         <div className="sum-row sum-total">
           <span>Toplam</span>
           <span>{tl(quote ? quote.total : priced.total)}</span>
@@ -103,6 +113,19 @@ export function CartView() {
           </Link>
         )}
       </aside>
+    </div>
+  );
+}
+
+/** Ücretsiz kargoya ne kadar kaldığını gösteren ilerleme çubuğu. */
+function ShipBar({ subtotal, remaining }: { subtotal: number; remaining: number }) {
+  const pct = remaining > 0 ? Math.min(100, Math.floor((subtotal / (subtotal + remaining)) * 100)) : 100;
+  return (
+    <div className="px px-ship" role="status">
+      <p className="px-ship-t">{remaining > 0 ? `${tl(remaining)} daha ekle, kargo ücretsiz olsun.` : 'Tebrikler, kargo ücretsiz!'}</p>
+      <div className="px-ship-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label="Ücretsiz kargo ilerlemesi">
+        <span style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
