@@ -55,3 +55,9 @@ npm run build
 - Site ↔ veritabanı: ürünler ve ayarlar Supabase'ten okunur (`lib/catalog.ts`, 60 sn önbellek). Panelde kaydedince `/api/revalidate` (yalnızca yönetici jetonuyla) siteyi anında yeniler. Veritabanına ulaşılamazsa `content/` altındaki dosyalar devreye girer.
 - Stok: `products.stock` boşsa sınırsız; sipariş stoktan düşer, iptalde geri eklenir.
 - Şema: `supabase/migrations/0002_yonetim.sql` (0001'den sonra uygulanır).
+
+## İçerik yönetimi ve takip (faz 2)
+
+- **/admin/icerik**: ana sayfadaki tüm metinler, görseller, bağlantılar, istatistikler, SSS, konuklar/reels, ayın demleyenleri, footer, SEO, bölüm aç/kapa ve animasyon ayarları. Veri `site_content` tablosunda; kaydedilmeyen alanlar `lib/siteDefaults.ts` varsayılanıdır (yeni alan eklemek için `FIELDS`'a ekleyip `content/home.html`'e `{{t:alan_id}}` yaz).
+- **/admin/takip**: UTM’li kısa linkler (`/t/<kod>`), kaynak/kampanya raporu (ziyaretçi, sepet, sipariş, ciro). Olaylar `track_events` tablosuna `/api/track` üzerinden yazılır (`public/demleme/track.js`). Google Analytics 4 ve Meta Pixel kodları İçerik → Takip kodları’ndan girilir.
+- Veritabanı: `supabase/migrations/0003_icerik_takip.sql`.

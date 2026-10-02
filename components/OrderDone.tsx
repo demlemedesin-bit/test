@@ -39,6 +39,20 @@ export function OrderDone() {
     }
   }, [raw]);
 
+  // Satışı kaynağa (UTM / kısa link) bağlamak için bir kez bildir
+  const ono = order?.order_no;
+  const total = order?.total;
+  useEffect(() => {
+    if (!ono) return;
+    try {
+      if (sessionStorage.getItem('dm-tracked-' + ono)) return;
+      sessionStorage.setItem('dm-tracked-' + ono, '1');
+    } catch {
+      /* sorun değil */
+    }
+    (window as unknown as { dmTrack?: (t: string, e: object) => void }).dmTrack?.('order', { order_no: ono, value: Number(total) });
+  }, [ono, total]);
+
   if (order === undefined) return <p className="loading">Yükleniyor…</p>;
   if (!order)
     return (

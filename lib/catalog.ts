@@ -51,7 +51,7 @@ const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const tlStr = (n: number) => '₺' + n.toLocaleString('tr-TR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
 
-async function rest<T>(query: string): Promise<T | null> {
+export async function rest<T>(query: string): Promise<T | null> {
   if (!SUPABASE_URL || !SUPABASE_KEY) return null;
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
