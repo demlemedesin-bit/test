@@ -93,7 +93,7 @@
 
   // Turkish glyphs for Strenuous (see CSS): wrap Ş ş Ğ ğ İ ı and every lowercase i in display text
   (function(){
-    var SEL='.title, h2, h3, h4, .card-title, .product-name, .faq-q, .footer-logo, .nav-logo, .cart-head h3, .rl-name, .shop-cats button, .nav-mobile a, .cart-item-name, .kc, .kb-list button span';   // only the Strenuous roles need the rebuilt Turkish glyphs
+    var SEL='.title, h2, h3, h4, .card-title, .product-name, .faq-q, .footer-logo, .nav-logo, .cart-head h3, .rl-name, .shop-cats button, .nav-mobile a, .kc, .kb-list button span';   // only the Strenuous roles need the rebuilt Turkish glyphs
     var MAP={'Ş':['S','tg-ced'],'ş':['s','tg-ced'],'Ğ':['G','tg-brv'],'ğ':['g','tg-brv'],'İ':['I','tg-dot'],'i':['I','tg-dot'],'ı':['I','']};   // every i/ı is the full-height I of this unicase face; only i and İ get the dot  // unicase face: lowercase i needs its dot too; capital I stays bare (= Turkish I)
     var walk=function(node){
       if(node.nodeType===3){
@@ -479,17 +479,43 @@
     var render=function(){
       list.innerHTML='';
       var n=0, sum=0;
+      var cards=[].slice.call(document.querySelectorAll('.add-to-cart[data-slug]'));
+      var cardOf=function(slug){ return cards.filter(function(c){ return c.getAttribute('data-slug')===slug; })[0]; };
       items.forEach(function(it, i){
         n+=it.qty; sum+=price(it.price)*it.qty;
-        var li=document.createElement('li');
-        li.innerHTML='<span class="cart-item-name"></span><span class="meta"></span>'+
-          '<span class="cart-qty"><button type="button" aria-label="Azalt">–</button><span></span><button type="button" aria-label="Arttır">+</button></span>'+
+        var c=cardOf(it.slug), img=it.img||(c&&c.getAttribute('data-img'))||'';
+        var pr=/₺/.test(String(it.price)) ? String(it.price) : (price(it.price) ? fmt(price(it.price)) : '');
+        var li=document.createElement('li'); li.className='cart-li';
+        li.innerHTML='<a class="cart-th" href="/urun/'+encodeURIComponent(it.slug)+'" tabindex="-1" aria-hidden="true"></a>'+
+          '<div class="cart-info"><span class="cart-item-name"></span><span class="meta"></span>'+
+          '<span class="cart-qty"><button type="button" aria-label="Azalt">–</button><span></span><button type="button" aria-label="Arttır">+</button></span></div>'+
           '<button type="button" class="cart-remove">Kaldır</button>';
-        li.children[0].textContent=it.name; li.children[1].textContent=it.price; li.children[2].children[1].textContent=it.qty;
-        li.children[2].children[0].onclick=function(){ if(it.qty>1){ it.qty--; } else { items.splice(i,1); } save(); render(); };
-        li.children[2].children[2].onclick=function(){ if(it.qty<MAXQ){ it.qty++; save(); render(); } };
-        li.children[3].onclick=function(){ items.splice(i,1); save(); render(); };
+        if(img){ var im=document.createElement('img'); im.src=img; im.alt=''; im.loading='lazy'; li.children[0].appendChild(im); }
+        var info=li.children[1];
+        info.children[0].textContent=it.name; info.children[1].textContent=pr;
+        info.children[2].children[1].textContent=it.qty;
+        info.children[2].children[0].onclick=function(){ if(it.qty>1){ it.qty--; } else { items.splice(i,1); } save(); render(); };
+        info.children[2].children[2].onclick=function(){ if(it.qty<MAXQ){ it.qty++; save(); render(); } };
+        li.children[2].onclick=function(){ items.splice(i,1); save(); render(); };
         list.appendChild(li);
+      });
+      // Sepet önerileri: sepette olmayan, stokta ve seçim gerektirmeyen ürünler
+      var recs=document.getElementById('cartRecs');
+      if(!recs){ recs=document.createElement('div'); recs.id='cartRecs'; list.parentNode.insertBefore(recs, foot); }
+      var inCart={}; items.forEach(function(x){ inCart[x.slug]=1; });
+      var seen={}, pick=cards.filter(function(c){ var sl=c.getAttribute('data-slug'); if(inCart[sl]||seen[sl]) return false; seen[sl]=1; return true; }).slice(0,3);
+      recs.hidden=!items.length||!pick.length;
+      recs.innerHTML=pick.length?'<p class="cart-recs-t">Sepetine yakışır</p><div class="cart-recs-g"></div>':'';
+      pick.forEach(function(c){
+        var a=document.createElement('div'); a.className='cart-rec';
+        var sl=c.getAttribute('data-slug'), choose=c.hasAttribute('data-choose');
+        a.innerHTML='<a class="cart-rec-i" href="/urun/'+encodeURIComponent(sl)+'"><img alt="" loading="lazy"></a><span class="cart-rec-n"></span><span class="cart-rec-p"></span><button type="button" class="cart-rec-b"></button>';
+        a.querySelector('img').src=c.getAttribute('data-img')||'';
+        a.querySelector('.cart-rec-n').textContent=c.getAttribute('data-name')||'';
+        a.querySelector('.cart-rec-p').textContent=c.getAttribute('data-price')||'';
+        var bt=a.querySelector('button'); bt.textContent=choose?'Seç':'Ekle';
+        bt.onclick=function(){ c.click(); };
+        recs.lastChild.appendChild(a);
       });
       count.textContent=n; count.hidden=!n; empty.hidden=!!n; foot.hidden=!n; subtotal.textContent=fmt(sum);
     };
