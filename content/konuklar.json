@@ -1,0 +1,357 @@
+{
+ "_note": "Konuklar table: guests in seat order (seat 1 starts in the middle; → brings seat 2, 3 … in from the left). drawing = file in assets/04-konuklar/guests (+ stand-sit clips of the same name). Edit names / links / reels here, then run build.py.",
+ "teas": {
+  "_note": "the tea glasses drawn on the table: one steam each; [centre x, top y, width of the tea] as fractions of the table drawing",
+  "steam": [
+   [
+    0.1265,
+    0.4544,
+    0.029
+   ],
+   [
+    0.2688,
+    0.6584,
+    0.0272
+   ],
+   [
+    0.4076,
+    0.3044,
+    0.0279
+   ],
+   [
+    0.7215,
+    0.6466,
+    0.0286
+   ],
+   [
+    0.8051,
+    0.4045,
+    0.0305
+   ]
+  ]
+ },
+ "guests": [
+  {
+   "seat": 1,
+   "name": "Selin B.",
+   "url": "/konuklar/selin-b",
+   "drawing": "g01_f",
+   "reels": [
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    },
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    }
+   ]
+  },
+  {
+   "seat": 2,
+   "name": "Emre K.",
+   "url": "/konuklar/emre-k",
+   "drawing": "g06_m",
+   "reels": [
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    },
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    }
+   ]
+  },
+  {
+   "seat": 3,
+   "name": "Aslı D.",
+   "url": "/konuklar/asli-d",
+   "drawing": "g02_f",
+   "reels": [
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    },
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    },
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    }
+   ]
+  },
+  {
+   "seat": 4,
+   "name": "Mert Y.",
+   "url": "/konuklar/mert-y",
+   "drawing": "g07_m",
+   "reels": [
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    },
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    },
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    }
+   ]
+  },
+  {
+   "seat": 5,
+   "name": "Deniz A.",
+   "url": "/konuklar/deniz-a",
+   "drawing": "g16_f",
+   "reels": [
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    },
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    },
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    }
+   ]
+  },
+  {
+   "seat": 6,
+   "name": "Can T.",
+   "url": "/konuklar/can-t",
+   "drawing": "g08_m",
+   "reels": [
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    },
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    },
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    }
+   ]
+  },
+  {
+   "seat": 7,
+   "name": "Elif S.",
+   "url": "/konuklar/elif-s",
+   "drawing": "g15_f",
+   "reels": [
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    },
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    }
+   ]
+  },
+  {
+   "seat": 8,
+   "name": "Burak Ö.",
+   "url": "/konuklar/burak-o",
+   "drawing": "g09_m",
+   "reels": [
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    },
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    }
+   ]
+  },
+  {
+   "seat": 9,
+   "name": "Zeynep K.",
+   "url": "/konuklar/zeynep-k",
+   "drawing": "g05_f",
+   "reels": [
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    },
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    },
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    }
+   ]
+  },
+  {
+   "seat": 10,
+   "name": "Kerem T.",
+   "url": "/konuklar/kerem-t",
+   "drawing": "g10_m",
+   "reels": [
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 8
+    },
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    },
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    }
+   ]
+  },
+  {
+   "seat": 11,
+   "name": "Ece N.",
+   "url": "/konuklar/ece-n",
+   "drawing": "g11_f",
+   "reels": [
+    {
+     "cover": "reel05-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 60
+    },
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    },
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    }
+   ]
+  },
+  {
+   "seat": 12,
+   "name": "Haluk Ç.",
+   "url": "/konuklar/haluk-c",
+   "drawing": "g13_m",
+   "reels": [
+    {
+     "cover": "reel06-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 25
+    },
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    },
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    }
+   ]
+  },
+  {
+   "seat": 13,
+   "name": "Nazlı Y.",
+   "url": "/konuklar/nazli-y",
+   "drawing": "g12_f",
+   "reels": [
+    {
+     "cover": "reel01-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 12
+    },
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    }
+   ]
+  },
+  {
+   "seat": 14,
+   "name": "Onur S.",
+   "url": "/konuklar/onur-s",
+   "drawing": "g14_m",
+   "reels": [
+    {
+     "cover": "reel02-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 34
+    },
+    {
+     "cover": "reel03-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 18
+    },
+    {
+     "cover": "reel04-640x800.webp",
+     "url": "https://instagram.com",
+     "progress": 42
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,547 @@
+[
+ {
+  "slug": "cam-kavanoz-uzun",
+  "name": "Cam Kavanoz · Uzun",
+  "cat": "Ev & Sofra",
+  "price": "₺420",
+  "desc": "Şekerin, çayın, kurabiyenin yeri. Bambu kapaklı, üstünde çayını yudumlayan Demleme adamı.",
+  "colors": [
+   {
+    "key": "tek",
+    "name": "Şeffaf / bambu",
+    "hex": "#E7E2D6",
+    "img": "/demleme/06-urun/images/kavanoz-uzun.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Boyut",
+   "items": [
+    [
+     "Uzun",
+     "cam-kavanoz-uzun"
+    ],
+    [
+     "Basık",
+     "cam-kavanoz-basik"
+    ]
+   ]
+  },
+  "details": [
+   [
+    "Ölçüler",
+    "Ø 11 cm × 18 cm · 1,2 litre"
+   ],
+   [
+    "Malzeme",
+    "Borosilikat cam, bambu kapak, silikon conta. Baskı gıdaya uygun seramik boya."
+   ],
+   [
+    "Bakım",
+    "Cam bulaşık makinesinde yıkanabilir; bambu kapağı elde yıkayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "cam-kavanoz-basik",
+  "name": "Cam Kavanoz · Basık",
+  "cat": "Ev & Sofra",
+  "price": "₺390",
+  "desc": "Kuru çay, kahve, lokum… Tezgâhta durduğu yerde güzel, bambu kapaklı, baskılı.",
+  "colors": [
+   {
+    "key": "tek",
+    "name": "Şeffaf / bambu",
+    "hex": "#E7E2D6",
+    "img": "/demleme/06-urun/images/kavanoz-basik.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Boyut",
+   "items": [
+    [
+     "Uzun",
+     "cam-kavanoz-uzun"
+    ],
+    [
+     "Basık",
+     "cam-kavanoz-basik"
+    ]
+   ]
+  },
+  "details": [
+   [
+    "Ölçüler",
+    "Ø 11 cm × 12 cm · 0,8 litre"
+   ],
+   [
+    "Malzeme",
+    "Borosilikat cam, bambu kapak, silikon conta. Baskı gıdaya uygun seramik boya."
+   ],
+   [
+    "Bakım",
+    "Cam bulaşık makinesinde yıkanabilir; bambu kapağı elde yıkayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "demleme-sehpasi",
+  "name": "Demleme Sehpası",
+  "cat": "Ev & Sofra",
+  "price": "₺2.400",
+  "badge": "Atölyede üretilir",
+  "desc": "İstanbul'daki atölyemizde, üç kuşaktır metal işleyen ailemin elinden. Üstteki tepsi çıkıyor: çayı getirir, götürürsün. Altı saklama alanı.",
+  "colors": [
+   {
+    "key": "kirmizi",
+    "name": "Kırmızı",
+    "hex": "#9E1F24",
+    "img": "/demleme/06-urun/images/sehpa-kirmizi.webp"
+   },
+   {
+    "key": "antrasit",
+    "name": "Antrasit",
+    "hex": "#4E4A46",
+    "img": "/demleme/06-urun/images/sehpa-antrasit.webp"
+   },
+   {
+    "key": "adacayi",
+    "name": "Adaçayı",
+    "hex": "#A0B096",
+    "img": "/demleme/06-urun/images/sehpa-adacayi.webp"
+   },
+   {
+    "key": "hardal",
+    "name": "Hardal",
+    "hex": "#A8803A",
+    "img": "/demleme/06-urun/images/sehpa-hardal.webp"
+   }
+  ],
+  "details": [
+   [
+    "Ölçüler",
+    "Yükseklik 52 cm · tepsi Ø 45 cm · saklama gövdesi Ø 34 × 26 cm · 4,8 kg"
+   ],
+   [
+    "Malzeme",
+    "Elektrostatik toz boyalı çelik gövde, krem emaye çıkarılabilir tepsi."
+   ],
+   [
+    "Bakım",
+    "Nemli bezle silin, aşındırıcı temizleyici kullanmayın."
+   ],
+   [
+    "Üretim",
+    "Her sehpa siparişle üretilir: 7–10 iş gününde kargoda."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "katli-saklama-kabi",
+  "name": "Katlı Saklama Kabı",
+  "cat": "Ev & Sofra",
+  "price": "₺1.150",
+  "desc": "Üç katlı sefer tası: öğle yemeği, piknik, komşuya giden dolma. Kilitli, sapından taşınır.",
+  "colors": [
+   {
+    "key": "krem",
+    "name": "Krem",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/saklama-krem.webp"
+   },
+   {
+    "key": "adacayi",
+    "name": "Adaçayı",
+    "hex": "#A0B096",
+    "img": "/demleme/06-urun/images/saklama-adacayi.webp"
+   },
+   {
+    "key": "hardal",
+    "name": "Hardal",
+    "hex": "#C9A04A",
+    "img": "/demleme/06-urun/images/saklama-hardal.webp"
+   },
+   {
+    "key": "kiremit",
+    "name": "Kiremit",
+    "hex": "#C45C3E",
+    "img": "/demleme/06-urun/images/saklama-kiremit.webp"
+   }
+  ],
+  "details": [
+   [
+    "Ölçüler",
+    "3 kat · Ø 16 cm × 30 cm · her kat 1,1 litre"
+   ],
+   [
+    "Malzeme",
+    "Emaye çelik kaplar, paslanmaz çelik kilit ve sap."
+   ],
+   [
+    "Bakım",
+    "Elde yıkayın; ocakta ya da mikrodalgada ısıtmayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "sofra-tepsisi-buyuk",
+  "name": "Sofra Tepsisi · Büyük",
+  "cat": "Ev & Sofra",
+  "price": "₺980",
+  "desc": "Kalabalık sofraların tepsisi. Kenarı siyah, ortası Demleme'nin masası.",
+  "colors": [
+   {
+    "key": "tek",
+    "name": "Krem / siyah kenar",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/tepsi-buyuk.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Boyut",
+   "items": [
+    [
+     "Büyük · Ø 40",
+     "sofra-tepsisi-buyuk"
+    ],
+    [
+     "Küçük · Ø 28",
+     "sofra-tepsisi-kucuk"
+    ]
+   ]
+  },
+  "details": [
+   [
+    "Ölçüler",
+    "Ø 40 cm · kenar yüksekliği 2 cm"
+   ],
+   [
+    "Malzeme",
+    "Emaye çelik, elde boyanmış kenar."
+   ],
+   [
+    "Bakım",
+    "Elde yıkayın, bulaşık makinesine koymayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "sofra-tepsisi-kucuk",
+  "name": "Sofra Tepsisi · Küçük",
+  "cat": "Ev & Sofra",
+  "price": "₺690",
+  "desc": "İki kişilik çayın tepsisi. Bardaklar, şekerlik, bir tabak kurabiye.",
+  "colors": [
+   {
+    "key": "tek",
+    "name": "Krem / siyah kenar",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/tepsi-kucuk.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Boyut",
+   "items": [
+    [
+     "Büyük · Ø 40",
+     "sofra-tepsisi-buyuk"
+    ],
+    [
+     "Küçük · Ø 28",
+     "sofra-tepsisi-kucuk"
+    ]
+   ]
+  },
+  "details": [
+   [
+    "Ölçüler",
+    "Ø 28 cm · kenar yüksekliği 1,8 cm"
+   ],
+   [
+    "Malzeme",
+    "Emaye çelik, elde boyanmış kenar."
+   ],
+   [
+    "Bakım",
+    "Elde yıkayın, bulaşık makinesine koymayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "demleme-tisort",
+  "name": "Demleme Tişört",
+  "cat": "Giyim",
+  "price": "₺650",
+  "desc": "Rahat kesim, kalın pamuk. Göğsünde çayını yudumlayan Demleme adamı.",
+  "colors": [
+   {
+    "key": "krem",
+    "name": "Krem",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/tisort-krem.webp"
+   },
+   {
+    "key": "adacayi",
+    "name": "Adaçayı",
+    "hex": "#A0B096",
+    "img": "/demleme/06-urun/images/tisort-adacayi.webp"
+   },
+   {
+    "key": "hardal",
+    "name": "Hardal",
+    "hex": "#C9A04A",
+    "img": "/demleme/06-urun/images/tisort-hardal.webp"
+   },
+   {
+    "key": "kiremit",
+    "name": "Kiremit",
+    "hex": "#C45C3E",
+    "img": "/demleme/06-urun/images/tisort-kiremit.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Beden",
+   "items": [
+    [
+     "S",
+     ""
+    ],
+    [
+     "M",
+     ""
+    ],
+    [
+     "L",
+     ""
+    ],
+    [
+     "XL",
+     ""
+    ],
+    [
+     "XXL",
+     ""
+    ]
+   ],
+   "pick": true
+  },
+  "chart": {
+   "head": [
+    "Beden",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL"
+   ],
+   "rows": [
+    [
+     "Göğüs genişliği",
+     "50",
+     "53",
+     "56",
+     "59",
+     "62"
+    ],
+    [
+     "Boy",
+     "69",
+     "72",
+     "74",
+     "76",
+     "78"
+    ],
+    [
+     "Omuz",
+     "45",
+     "47",
+     "49",
+     "51",
+     "53"
+    ]
+   ],
+   "note": "Ölçüler cm, düz zeminde yatırılmış ürün üzerinden. Model 1,80 m, L giyiyor."
+  },
+  "details": [
+   [
+    "Kalıp",
+    "Rahat (relaxed) kesim; tam beden almanı öneririz."
+   ],
+   [
+    "Malzeme",
+    "%100 organik pamuk, 200 g/m², ön baskı."
+   ],
+   [
+    "Bakım",
+    "30 °C'de ters yıkayın, baskının üzerine ütü yapmayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "demleme-sapka",
+  "name": "Demleme Şapka",
+  "cat": "Giyim",
+  "price": "₺520",
+  "desc": "Yumuşak, yıkanmış pamuk şapka. Önünde nakış Demleme adamı.",
+  "colors": [
+   {
+    "key": "krem",
+    "name": "Krem",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/sapka-krem.webp"
+   },
+   {
+    "key": "adacayi",
+    "name": "Adaçayı",
+    "hex": "#A0B096",
+    "img": "/demleme/06-urun/images/sapka-adacayi.webp"
+   },
+   {
+    "key": "hardal",
+    "name": "Hardal",
+    "hex": "#C9A04A",
+    "img": "/demleme/06-urun/images/sapka-hardal.webp"
+   },
+   {
+    "key": "kiremit",
+    "name": "Kiremit",
+    "hex": "#C45C3E",
+    "img": "/demleme/06-urun/images/sapka-kiremit.webp"
+   }
+  ],
+  "sizes": {
+   "label": "Beden",
+   "items": [
+    [
+     "Tek beden · 55–60 cm",
+     ""
+    ]
+   ]
+  },
+  "details": [
+   [
+    "Beden",
+    "Tek beden, arkadan metal tokayla ayarlanır (55–60 cm)."
+   ],
+   [
+    "Malzeme",
+    "%100 pamuk twill, nakış."
+   ],
+   [
+    "Bakım",
+    "Elde, soğuk suda yıkayın; kurutucuya koymayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "demleme-bez-canta",
+  "name": "Demleme Bez Çanta",
+  "cat": "Aksesuar",
+  "price": "₺380",
+  "desc": "Pazara, kütüphaneye, sahile. Kalın kanvas, uzun sap, omuzda taşınır.",
+  "colors": [
+   {
+    "key": "krem",
+    "name": "Krem",
+    "hex": "#EDE6D6",
+    "img": "/demleme/06-urun/images/canta-krem.webp"
+   },
+   {
+    "key": "adacayi",
+    "name": "Adaçayı",
+    "hex": "#A0B096",
+    "img": "/demleme/06-urun/images/canta-adacayi.webp"
+   },
+   {
+    "key": "kiremit",
+    "name": "Kiremit",
+    "hex": "#C45C3E",
+    "img": "/demleme/06-urun/images/canta-kiremit.webp"
+   }
+  ],
+  "details": [
+   [
+    "Ölçüler",
+    "38 × 42 cm · sap 65 cm · 10 kg'a kadar taşır"
+   ],
+   [
+    "Malzeme",
+    "340 g/m² pamuk kanvas, ön baskı."
+   ],
+   [
+    "Bakım",
+    "30 °C'de ters yıkayın."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ },
+ {
+  "slug": "demleme-cay-bardagi",
+  "name": "Demleme Çay Bardağı",
+  "cat": "Ev & Sofra",
+  "price": "₺240",
+  "badge": "Yakında",
+  "soon": true,
+  "desc": "İnce belli, tabaklı çay bardağı; üstünde Demleme adamı. Çok yakında sofralarda.",
+  "colors": [
+   {
+    "key": "tek",
+    "name": "Şeffaf / beyaz tabak",
+    "hex": "#F4F1EA",
+    "img": "/demleme/06-urun/images/bardak.webp"
+   }
+  ],
+  "details": [
+   [
+    "Ölçüler",
+    "100 ml · 7 × 9,5 cm · tabak Ø 11 cm"
+   ],
+   [
+    "Malzeme",
+    "Temperli cam, porselen tabak."
+   ],
+   [
+    "Bakım",
+    "Bulaşık makinesinde yıkanabilir."
+   ],
+   [
+    "Kargo & iade",
+    "Siparişin 2–4 iş gününde kargoda. Türkiye içi 750 ₺ üzeri kargo bedava. 14 gün içinde koşulsuz iade."
+   ]
+  ]
+ }
+]
