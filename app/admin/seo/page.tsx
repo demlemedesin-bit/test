@@ -124,11 +124,11 @@ export default function SeoAdmin() {
       default_title: f.seo.default_title || title.slice(0, 60),
       default_desc: f.seo.default_desc || desc,
       og_image: f.seo.og_image || ps.find((p) => p.thumb)?.thumb || '',
-      favicon: f.seo.favicon || '/icon.svg',
+      favicon: f.seo.favicon || '/icon.png',
       canonical_host: f.seo.canonical_host || host,
       locale: f.seo.locale || 'tr_TR',
       noindex_site: host ? false : f.seo.noindex_site,
-      org: { ...o, name: o.name || name, legal_name: o.legal_name || name, logo: o.logo || f.seo.favicon || '/icon.svg', city: o.city || 'Türkiye', email: o.email },
+      org: { ...o, name: o.name || name, legal_name: o.legal_name || name, logo: o.logo || f.seo.favicon || '/icon.png', city: o.city || 'Türkiye', email: o.email },
       sitemap: { ...f.seo.sitemap, include_products: true, include_pages: true, include_blog: true, include_images: true, changefreq: 'weekly', priorities: { home: 1, products: 0.8, blog: 0.5, pages: 0.4 } },
     };
     const clean = parseSeo({ ...seo, org: { ...seo.org, social: lines(f.social) }, robots: { ...seo.robots, extra_disallow: lines(f.extra_disallow) }, sitemap: { ...seo.sitemap, exclude: lines(f.exclude) } });

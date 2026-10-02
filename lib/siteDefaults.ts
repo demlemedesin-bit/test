@@ -731,7 +731,8 @@ export const DEFAULT_FOOTER: FooterData = {
   {
    "label": "Gizlilik politikası",
    "href": "/gizlilik-politikasi"
-  }
+  },
+  {"label": "Çerez politikası", "href": "/cerez-politikasi"}
  ]
 };
 export const DEFAULT_DM: Demleyen = {

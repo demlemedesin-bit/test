@@ -8,6 +8,8 @@ import { siteUrl } from '@/lib/siteUrl';
 import { Popups } from '@/components/Popups';
 import { CustomScripts } from '@/components/CustomScripts';
 import { parseScripts } from '@/lib/design';
+import { Welcome } from '@/components/Welcome';
+import { Motion } from '@/components/Motion';
 import { AdsLoader, ConsentBanner } from '@/components/Consent';
 
 // Başlık, açıklama ve paylaşım bilgisi panelden (İçerik → SEO) değiştirilir.
@@ -75,6 +77,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Reklam / izleme betikleri yalnızca geçerli kimlik varsa ve (gerekiyorsa) çerez onayından sonra yüklenir */}
         <AdsLoader ads={ads} />
         <ConsentBanner cfg={consent} />
+        <Welcome />
+        <Motion />
         <Popups />
         <CustomScripts cfg={sc} />
         <Script src="/demleme/track.js" strategy="afterInteractive" />

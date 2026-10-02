@@ -63,6 +63,38 @@
         hit=items.filter(function(x){ return x.slug===cur.slug && x.color===cl && (x.size||'')===sz; })[0];
     if(hit){ hit.qty=Math.min(9, hit.qty+q); } else { items.push({slug:cur.slug, color:cl, size:sz, name:nm, price:cur.price, qty:q, img:cur.colors[col].img}); }
     saveCart(); countCart(); m.classList.remove('warn'); if(window.dmTrack) dmTrack('add_to_cart');
-    m.textContent=q+' × '+cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+') sepete eklendi.'; });
+    m.textContent=''; added(cur.colors[col].img, cur.name, cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : ''), q, cur.price); });
+
+  // Add-to-cart feedback: the product photo flies into the cart, the counter pops and a card slides in
+  var toastT=0;
+  var added=function(img, name, variant, qty, price){
+    var reduce=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var btn=$('ppAdd'); btn.classList.remove('done'); void btn.offsetWidth; btn.classList.add('done'); setTimeout(function(){ btn.classList.remove('done'); }, 1600);
+    var src=$('ppImg'), cart=document.querySelector('.pn-cart img'), cc=$('cartCount');
+    if(!reduce && src && cart && src.getBoundingClientRect){
+      var a=src.getBoundingClientRect(), b=cart.getBoundingClientRect(), s=Math.min(120, a.width*0.35);
+      var f=document.createElement('img'); f.src=src.currentSrc||src.src; f.alt=''; f.className='fly-img';
+      f.style.cssText='left:'+(a.left+a.width/2-s/2)+'px;top:'+(a.top+a.height/2-s/2)+'px;width:'+s+'px;height:'+s+'px';
+      document.body.appendChild(f);
+      var dx=b.left+b.width/2-(a.left+a.width/2), dy=b.top+b.height/2-(a.top+a.height/2);
+      var an=f.animate([{transform:'translate(0,0) scale(1) rotate(0)',opacity:1},{transform:'translate('+dx*0.6+'px,'+(dy*0.6-80)+'px) scale(.7) rotate(-8deg)',opacity:1,offset:.55},{transform:'translate('+dx+'px,'+dy+'px) scale(.12) rotate(10deg)',opacity:.2}],{duration:760,easing:'cubic-bezier(.5,.05,.4,1)'});
+      an.onfinish=function(){ f.remove(); bump(); };
+    } else bump();
+    function bump(){ var c=document.querySelector('.pn-cart'); if(!c) return; c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
+    var old=document.querySelector('.add-toast'); if(old) old.remove(); clearTimeout(toastT);
+    var n=0, total=0; items.forEach(function(it){ n+=it.qty; total+=it.qty*(parseFloat(String(it.price).replace(/[^\d,]/g,'').replace(',','.'))||0); });
+    var t=document.createElement('div'); t.className='add-toast'; t.setAttribute('role','status');
+    var esc=function(x){ var d=document.createElement('div'); d.textContent=x; return d.innerHTML; };
+    t.innerHTML='<div class="at-row"><span class="at-img"><img src="'+esc(img)+'" alt=""><i class="at-ok"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i></span>'
+      +'<span class="at-txt"><b>Sepete eklendi</b><span>'+qty+' × '+esc(name)+'</span><small>'+esc(variant)+'</small></span>'
+      +'<button type="button" class="at-x" aria-label="Kapat">×</button></div>'
+      +'<div class="at-sum">Sepetinde <b>'+n+' ürün</b> · '+(Math.round(total)).toLocaleString('tr-TR')+' ₺</div>'
+      +'<div class="at-btns"><a class="at-go" href="/sepet">Sepeti gör</a><button type="button" class="at-more">Alışverişe devam</button></div><i class="at-bar"></i>';
+    document.body.appendChild(t);
+    var close=function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); }, 260); };
+    t.querySelector('.at-x').addEventListener('click', close); t.querySelector('.at-more').addEventListener('click', close);
+    requestAnimationFrame(function(){ t.classList.add('in'); });
+    toastT=setTimeout(close, 6500);
+  };
   render(); countCart();
 })();
