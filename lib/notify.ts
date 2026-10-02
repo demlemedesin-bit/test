@@ -41,7 +41,7 @@ export async function sendEmail(p: { to: string; subject: string; text: string }
   const from = process.env.MAIL_FROM;
   if (!key || !from) return { status: 'skipped', error: !key ? 'SMTP2GO_API_KEY tanımsız' : 'MAIL_FROM tanımsız' };
   try {
-    const r = await fetch('https://api.smtp2go.com/v3/email/send', {
+    const r = await fetch('https://eu-api.smtp2go.com/v3/email/send', {
       method: 'POST',
       headers: { 'X-Smtp2go-Api-Key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text }),
