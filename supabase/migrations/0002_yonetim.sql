@@ -23,7 +23,7 @@ insert into public.shop_settings (key, value, is_public) values
   ('seller_name', 'Demleme', true), ('seller_address', '', true), ('seller_tax_office', '', true),
   ('seller_tax_no', '', true), ('seller_mersis', '', true), ('seller_phone', '', true),
   ('bank_holder', '', true), ('bank_name', '', true), ('bank_iban', '', true),
-  ('admin_emails', 'milgosutyonetim@gmail.com', false)
+  ('admin_emails', 'garen@demlemedesin.com', false)
 on conflict (key) do nothing;
 drop policy "ayarlar herkese açık" on public.shop_settings;
 create policy "açık ayarlar herkese açık" on public.shop_settings for select using (is_public);
