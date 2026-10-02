@@ -348,6 +348,34 @@ export const FIELDS: Field[] = [
   "def": "Demleme izlerken çektiğin fotoğrafı bizimle paylaş, sen de ayın demleyenleri arasında yerini al."
  },
  {
+  "id": "dm_sehpa",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Sehpa görseli",
+  "kind": "image",
+  "def": "/demleme/05-demleyenler/sehpa/sehpa-1100.webp"
+ },
+ {
+  "id": "dm_note1",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Not: çıkarılabilir tepsi (görsel)",
+  "kind": "image",
+  "def": "/demleme/05-demleyenler/svg/note-cikarilabilir-tepsi.svg"
+ },
+ {
+  "id": "dm_note2",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Not: her pazar yenilenir (görsel)",
+  "kind": "image",
+  "def": "/demleme/05-demleyenler/svg/note-her-pazar-yenilenir.svg"
+ },
+ {
+  "id": "dm_note3",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Not: saklama alanı (görsel)",
+  "kind": "image",
+  "def": "/demleme/05-demleyenler/svg/note-saklama-alani.svg"
+ },
+ {
   "id": "dm_url",
   "group": "Ana sayfa · Ayın demleyenleri",
   "label": "Katıl düğmesi bağlantısı",
