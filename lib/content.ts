@@ -140,7 +140,7 @@ function relatedHtml(items: SiteProduct[], title: string): string {
       return `<a href="/urun/${esc(x.slug)}" data-rec="related"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${x.was && !x.out ? `<s style="opacity:.55">${esc(x.was)}</s> ` : ''}${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
     })
     .join('');
-  return `<section class="more px-related"><div class="more-h"><h2>${esc(title)}</h2><a href="/#magaza">Tüm ürünler →</a></div><div class="more-row">${cards}</div></section>`;
+  return `<section class="more px-related"><div class="more-h"><h2>${esc(title)}</h2><a href="/urunler">Tüm ürünler →</a></div><div class="more-row">${cards}</div></section>`;
 }
 
 const stars = (n: number) => `<span class="px-stars" role="img" aria-label="5 üzerinden ${n} yıldız">${'★'.repeat(n)}<i>${'★'.repeat(5 - n)}</i></span>`;
