@@ -94,3 +94,5 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pf{ background:var(--brown); color:var(--on-brown-2); padding:var(--s-48) var(--pad); font-size:var(--t-14); display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; } .pf a{ color:var(--on-brown); }
 @media (max-width: 900px){ .pp{ grid-template-columns:1fr; } .more-row{ grid-template-columns:repeat(2, minmax(0,1fr)); } .pn-links{ display:none; } }
 @media (max-width: 480px){ .pp-thumbs button{ width:64px; } .pp-add img{ height:56px; } }
+
+.pn-acc{ margin-left:auto; margin-right:20px; font-size:15px; color:var(--ink-2); } .pn-acc:hover{ color:var(--ink); }

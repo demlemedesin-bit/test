@@ -463,11 +463,12 @@
   // Cart: localStorage, opens from the nav drawing
   (function(){
     var KEY='demleme-cart', items=[];
-    try{ items = JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ items=[]; }
+    try{ items = (JSON.parse(localStorage.getItem(KEY)) || []).filter(function(x){ return x && x.slug; }); }catch(e){ items=[]; }
     var panel=document.getElementById('cartPanel'), backdrop=document.getElementById('cartBackdrop'),
         btn=document.getElementById('cartBtn'), list=document.getElementById('cartList'),
         empty=document.getElementById('cartEmpty'), foot=document.getElementById('cartFoot'),
         count=document.getElementById('cartCount'), subtotal=document.getElementById('cartSubtotal');
+    var MAXQ=9;
     var price=function(p){ var m=String(p).replace(/\./g,'').match(/\d+/); return m ? +m[0] : 0; };
     var fmt=function(n){ return '₺' + n.toLocaleString('tr-TR'); };
     var save=function(){ try{ localStorage.setItem(KEY, JSON.stringify(items)); }catch(e){} };
@@ -482,7 +483,7 @@
           '<button type="button" class="cart-remove">Kaldır</button>';
         li.children[0].textContent=it.name; li.children[1].textContent=it.price; li.children[2].children[1].textContent=it.qty;
         li.children[2].children[0].onclick=function(){ if(it.qty>1){ it.qty--; } else { items.splice(i,1); } save(); render(); };
-        li.children[2].children[2].onclick=function(){ it.qty++; save(); render(); };
+        li.children[2].children[2].onclick=function(){ if(it.qty<MAXQ){ it.qty++; save(); render(); } };
         li.children[3].onclick=function(){ items.splice(i,1); save(); render(); };
         list.appendChild(li);
       });
@@ -500,14 +501,16 @@
     [].forEach.call(document.querySelectorAll('[data-cart-close]'), function(a){ a.addEventListener('click', function(){ open(false); }); });
     [].forEach.call(document.querySelectorAll('.add-to-cart'), function(b){
       b.addEventListener('click', function(){
-        var name=b.getAttribute('data-name'), pr=b.getAttribute('data-price');
-        var hit=items.filter(function(x){ return x.name===name; })[0];
-        if(hit){ hit.qty++; } else { items.push({name:name, price:pr, qty:1}); }
+        var slug=b.getAttribute('data-slug');
+        if(!slug) return;
+        // Renk / beden seçilmesi gereken ürünler ve yakında gelenler ürün sayfasına gider
+        if(b.hasAttribute('data-choose')){ location.href='/urun/'+slug; return; }
+        var color=b.getAttribute('data-color')||'', name=b.getAttribute('data-name'), pr=b.getAttribute('data-price');
+        var hit=items.filter(function(x){ return x.slug===slug && x.color===color && !x.size; })[0];
+        if(hit){ hit.qty=Math.min(MAXQ, hit.qty+1); }
+        else { items.push({slug:slug, color:color, size:'', name:name, price:pr, qty:1, img:b.getAttribute('data-img')||''}); }
         save(); render(); open(true);
       });
-    });
-    document.getElementById('cartCheckout').addEventListener('click', function(){
-      document.getElementById('cartNote').textContent='Teşekkürler — siparişini merhaba@demleme.com adresine yazarak tamamlayabilirsin. Ödeme sayfası yakında.';
     });
     render();
     if(/[?&]sepet=1/.test(location.search)) open(true);

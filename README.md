@@ -39,3 +39,11 @@ npm install
 npm run dev      # http://localhost:3000
 npm run build
 ```
+
+## E-ticaret (üye, sepet, ödeme)
+
+- Sayfalar: `/giris`, `/kayit`, `/sifremi-unuttum`, `/sifre-sifirla`, `/hesabim`, `/sepet`, `/odeme`, `/siparis-tamamlandi`, `/siparis-takip`, yasal metinler (`/kvkk`, `/kargo-ve-iade`, `/mesafeli-satis-sozlesmesi`, `/gizlilik-politikasi`, `/kullanim-sartlari`).
+- Veritabanı: Supabase. Şema `supabase/migrations/0001_eticaret.sql`. Fiyatlar ve kargo hesabı sunucuda (`create_order`) yapılır, tarayıcıdan gelen fiyat dikkate alınmaz.
+- Ortam değişkenleri: `.env.example` (yalnızca anon anahtar; `service_role` asla koda/repoya girmez).
+- Satıcı/banka bilgileri: `content/shop-config.json` (boşsa yasal metinlerde ve havale ekranında yer tutucu gösterilir).
+- Ödeme: havale/EFT ve kapıda ödeme aktif; kart ödemesi için sanal pos (iyzico/PayTR) bilgileri gerekir.
