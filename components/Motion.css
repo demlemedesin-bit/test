@@ -23,3 +23,9 @@ img[loading="lazy"][data-ld]{ opacity:1; }
   img[loading="lazy"]:not([data-ld]){ opacity:1; transform:none; }
   .mo-bar{ display:none; }
 }
+
+/* Strenuous'ta olmayan Türkçe harfler (bkz. Motion.tsx fixGlyphs) */
+.tg{ position:relative; display:inline-block; }
+.tg-ced::after{ content:","; position:absolute; left:50%; top:0; transform:translate(-50%,.11em); line-height:inherit; }
+.tg-dot::after{ content:""; position:absolute; left:50%; top:-.04em; width:.13em; height:.13em; margin-left:-.065em; border-radius:50%; background:currentColor; }
+.tg-brv::after{ content:""; position:absolute; left:50%; top:-.19em; width:.42em; height:.15em; margin-left:-.21em; border:.09em solid currentColor; border-top:0; border-radius:0 0 .22em .22em / 0 0 .15em .15em; }
