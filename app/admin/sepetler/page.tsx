@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bell, Download, Search, ShoppingCart, Trash2, Wallet, Mail } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { dt, tl } from '@/lib/admin';
@@ -58,13 +58,16 @@ export default function Carts() {
   const [open, setOpen] = useState<Cart | null>(null);
   const [del, setDel] = useState<Cart | null>(null);
   const [busy, setBusy] = useState(false);
+  const first = useRef(false);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase().from('abandoned_carts').select('*').order('updated_at', { ascending: false });
     if (error) return setErr('Sepetler yüklenemedi. Sayfayı yenile.');
     setErr('');
     setNow(Date.now());
-    setList((data ?? []) as Cart[]);
+    const rows = (data ?? []) as Cart[];
+    setList(rows);
+    if (!first.current) { first.current = true; if (rows.length && !rows.some((c) => Date.now() - new Date(c.updated_at).getTime() > HOUR)) setTab('hepsi'); }
   }, []);
   useEffect(() => {
     const t = setTimeout(load, 0);
@@ -96,8 +99,9 @@ export default function Carts() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ event: 'cart_reminder', email: c.email }),
       });
-      const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; skipped?: boolean };
       if (!res.ok || !j.ok) throw new Error(j.error || 'Hatırlatma gönderilemedi.');
+      if (j.skipped) throw new Error(`E-posta gönderilmedi${j.error ? ': ' + j.error : ' (bildirim kapalı ya da e-posta servisi bağlı değil)'}. Vercel’de RESEND_API_KEY ve MAIL_FROM tanımlı olmalı.`);
       const at = new Date().toISOString();
       const { error } = await supabase().from('abandoned_carts').update({ reminded_at: at, remind_count: c.remind_count + 1 }).eq('email', c.email);
       if (error) show('Gönderildi ama kayıt güncellenemedi.', true);
@@ -178,7 +182,7 @@ export default function Carts() {
             {!list ? (
               <Loading />
             ) : shown.length === 0 ? (
-              <Empty title={list.length ? 'Eşleşen sepet yok' : 'Terk edilen sepet yok'} text="E-postasını bırakıp siparişi tamamlamayanların sepetleri burada listelenir." icon={<ShoppingCart size={30} strokeWidth={1.5} />} />
+              <Empty title={list.length ? 'Eşleşen sepet yok' : 'Terk edilen sepet yok'} text="Ödeme sayfasında e-postasını yazıp siparişi tamamlamayanların sepetleri burada listelenir. Sepet 1 saat işlemsiz kalırsa “terk edilen” sayılır; yeni sepetler “Aktif sepet” sekmesindedir." icon={<ShoppingCart size={30} strokeWidth={1.5} />} />
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <div className="tbl">
