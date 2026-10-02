@@ -21,6 +21,7 @@ import {
   type Guest,
 } from '@/lib/siteDefaults';
 
+import './icerik.css';
 const TABS = ['Metin ve görseller', 'Sıkça sorulan sorular', 'Konuklar', 'Ayın demleyenleri', 'Menü ve footer'] as const;
 const GROUPS = [...new Set(FIELDS.map((f) => f.group))];
 const COVER = '/demleme/04-konuklar/reel-covers/';
@@ -31,6 +32,7 @@ export default function Content() {
   const { show, node } = useToast();
   const [tab, setTab] = useState<(typeof TABS)[number]>(TABS[0]);
   const [group, setGroup] = useState(GROUPS[0]);
+  const [q, setQ] = useState('');
   const [t, setT] = useState<Record<string, string> | null>(null);
   const [faq, setFaq] = useState<Faq[]>(DEFAULT_FAQ);
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS);
@@ -56,7 +58,10 @@ export default function Content() {
     return () => clearTimeout(x);
   }, [load]);
 
-  const fields = useMemo(() => FIELDS.filter((f) => f.group === group), [group]);
+  const fields = useMemo(() => {
+    const k = q.trim().toLowerCase();
+    return k ? FIELDS.filter((f) => (f.label + ' ' + (f.hint ?? '') + ' ' + f.group).toLowerCase().includes(k)) : FIELDS.filter((f) => f.group === group);
+  }, [group, q]);
 
   async function save() {
     if (!t) return;
@@ -104,22 +109,35 @@ export default function Content() {
       </TopBar>
       <div className="adm-scroll">
         <div className="adm-inner" style={{ maxWidth: 940 }}>
-          <div className="tabs" style={{ marginBottom: 18 }}>
+          <div className="ic-top">
             {TABS.map((x) => (
-              <button key={x} type="button" className={`tab${tab === x ? ' on' : ''}`} onClick={() => setTab(x)}>{x}</button>
+              <button key={x} type="button" className={tab === x ? 'on' : ''} onClick={() => setTab(x)}>{x}</button>
             ))}
           </div>
 
           {tab === TABS[0] && (
             <>
-              <div className="tabs" style={{ marginBottom: 16 }}>
-                {GROUPS.map((g) => (
-                  <button key={g} type="button" className={`tab${group === g ? ' on' : ''}`} onClick={() => setGroup(g)} style={{ fontSize: 12.5 }}>{g}</button>
-                ))}
-              </div>
+              <div className="ic-grid">
+              <aside className="ic-side">
+                <input className="ic-search" placeholder="Alan ara…" value={q} onChange={(e) => setQ(e.target.value)} />
+                {GROUPS.map((g) => {
+                  const all = FIELDS.filter((f) => f.group === g);
+                  const mod = all.filter((f) => t[f.id] != null).length;
+                  const hit = q.trim() ? all.filter((f) => (f.label + ' ' + (f.hint ?? '')).toLowerCase().includes(q.trim().toLowerCase())).length : all.length;
+                  if (!hit) return null;
+                  return (
+                    <button key={g} type="button" className={!q.trim() && group === g ? 'on' : ''} onClick={() => { setGroup(g); setQ(''); }}>
+                      <span>{g}</span>
+                      <span className={`ic-n${mod ? ' mod' : ''}`} title={mod ? `${mod} alan değiştirildi` : `${all.length} alan`}>{mod || all.length}</span>
+                    </button>
+                  );
+                })}
+              </aside>
+              <div>
               <section className="card">
-                <div className="card-h"><h2 className="card-t">{group}</h2><span className="card-m">Değiştirdiğin alanlar kaydedilince sitede yayına girer</span></div>
+                <div className="card-h"><h2 className="card-t">{q.trim() ? `“${q.trim()}” sonuçları` : group}</h2><span className="card-m">Değiştirdiğin alanlar kaydedilince sitede yayına girer</span></div>
                 <div className="card-b">
+                  {fields.length === 0 && <div className="ic-empty">Eşleşen alan yok.</div>}
                   {fields.map((f) => {
                     const v = t[f.id] ?? f.def;
                     const changed = t[f.id] != null;
@@ -158,6 +176,8 @@ export default function Content() {
                   })}
                 </div>
               </section>
+              </div>
+              </div>
             </>
           )}
 

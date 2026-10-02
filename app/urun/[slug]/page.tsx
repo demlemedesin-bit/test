@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
-import { productHtml } from '@/lib/content';
+import { getReviews, productHtml, productJsonLd } from '@/lib/content';
+import { getStorefront } from '@/lib/storefront';
+import { siteUrl } from '@/lib/siteUrl';
+import { ProductExtras } from '@/components/ProductExtras';
 import { getProducts } from '@/lib/catalog';
 import './product.css';
 
@@ -26,11 +29,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const list = await getProducts();
-  if (!list.some((p) => p.slug === slug)) notFound();
+  const [list, sf] = await Promise.all([getProducts(), getStorefront()]);
+  const p = list.find((x) => x.slug === slug);
+  if (!p) notFound();
+  const reviews = sf.reviews_on ? await getReviews(slug) : [];
+  const html = await productHtml(list, slug, sf, reviews);
   return (
     <>
-      <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: await productHtml(list) }} />
+      <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: productJsonLd(p, reviews, siteUrl()) }} />
+      <ProductExtras slug={slug} name={p.name} unavailable={p.out || p.soon} reviewsOn={sf.reviews_on} wishlistOn={sf.wishlist_on} stockAlertOn={sf.stock_alert_on} recentOn={sf.recent_on} />
       <Script src="/demleme/product.js" strategy="afterInteractive" />
     </>
   );

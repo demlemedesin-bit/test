@@ -1,10 +1,12 @@
 import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import { D } from '@/components/Display';
+import { NotFoundLog } from '@/components/NotFoundLog';
 import './(shop)/shop.css';
 
 export default function NotFound() {
   return (
     <>
+      <NotFoundLog />
       <SiteHeader />
       <main className="err-page">
         <h1>

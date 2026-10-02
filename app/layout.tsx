@@ -2,17 +2,29 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { getSite, text } from '@/lib/site';
 import { rest } from '@/lib/catalog';
+import { getSeoBundle } from '@/lib/seoServer';
+import { baseUrl } from '@/lib/seo';
+import { siteUrl } from '@/lib/siteUrl';
+import { Popups } from '@/components/Popups';
+import { AdsLoader, ConsentBanner } from '@/components/Consent';
 
 // Başlık, açıklama ve paylaşım bilgisi panelden (İçerik → SEO) değiştirilir.
 export async function generateMetadata(): Promise<Metadata> {
-  const s = await getSite();
-  const img = text(s, 'seo_og_image');
+  const [s, { seo }] = await Promise.all([getSite(), getSeoBundle()]);
+  // Önce SEO ayarı (Yönetim → SEO ve reklam), yoksa eski İçerik → SEO alanları
+  const title = seo.default_title || text(s, 'seo_title');
+  const description = seo.default_desc || text(s, 'seo_desc');
+  const ogTitle = seo.default_title || text(s, 'seo_og_title');
+  const ogDesc = seo.default_desc || text(s, 'seo_og_desc');
+  const img = seo.og_image || text(s, 'seo_og_image');
   // Site doğrulama kodları (Yönetim → Entegrasyonlar → Site doğrulama)
   const vr = (await rest<{ key: string; value: string }[]>('shop_settings?select=key,value&key=in.(verify_google,verify_meta,verify_yandex)')) ?? [];
   const v = Object.fromEntries(vr.map((r) => [r.key, String(r.value ?? '').trim()]));
   return {
-    title: text(s, 'seo_title'),
-    description: text(s, 'seo_desc'),
+    metadataBase: new URL(baseUrl(seo, siteUrl())),
+    title: { default: title, template: seo.title_template || '%s' },
+    description,
+    ...(seo.noindex_site ? { robots: { index: false, follow: false, googleBot: { index: false, follow: false } } } : {}),
     verification: {
       ...(v.verify_google ? { google: v.verify_google } : {}),
       ...(v.verify_yandex ? { yandex: v.verify_yandex } : {}),
@@ -20,9 +32,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       type: 'website',
-      siteName: 'Demleme',
-      title: text(s, 'seo_og_title'),
-      description: text(s, 'seo_og_desc'),
+      siteName: seo.site_name,
+      locale: seo.locale,
+      title: ogTitle,
+      description: ogDesc,
+      ...(img ? { images: [img] } : {}),
+    },
+    twitter: {
+      card: img ? 'summary_large_image' : 'summary',
+      title: ogTitle,
+      description: ogDesc,
+      ...(seo.twitter ? { site: '@' + seo.twitter, creator: '@' + seo.twitter } : {}),
       ...(img ? { images: [img] } : {}),
     },
   };
@@ -31,11 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = { themeColor: '#F8F4EA' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const s = await getSite();
-  const ga = text(s, 'ga_id').trim();
-  const px = text(s, 'pixel_id').trim();
-  const gaOk = /^G-[A-Z0-9]{4,20}$/.test(ga);
-  const pxOk = /^\d{5,20}$/.test(px);
+  const { ads, consent } = await getSeoBundle();
   return (
     <html lang="tr">
       <head>
@@ -52,15 +68,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         {children}
-        {gaOk && (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga}`} strategy="afterInteractive" />
-            <Script id="ga-init" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${ga}');`}</Script>
-          </>
-        )}
-        {pxOk && (
-          <Script id="fb-pixel" strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${px}');fbq('track','PageView');`}</Script>
-        )}
+        {/* Reklam / izleme betikleri yalnızca geçerli kimlik varsa ve (gerekiyorsa) çerez onayından sonra yüklenir */}
+        <AdsLoader ads={ads} />
+        <ConsentBanner cfg={consent} />
+        <Popups />
         <Script src="/demleme/track.js" strategy="afterInteractive" />
       </body>
     </html>
