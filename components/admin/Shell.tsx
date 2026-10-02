@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { SelectSeg } from './SelectSeg';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
@@ -241,6 +242,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <MenuCtx.Provider value={() => setOpen(true)}>
+        <SelectSeg />
         <div className="adm-main">
           {blocked ? (
             <div className="empty" style={{ margin: 'auto' }}>

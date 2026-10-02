@@ -256,3 +256,19 @@
 .bg-sw .bg-cream i { background: #f8f4ea; } .bg-sw .bg-ink i { background: #17130f; } .bg-sw .bg-accent i { background: #dd262c; }
 .bg-sw button.on { border-color: var(--ac); color: var(--tx); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ac) 30%, transparent); }
 @media (max-width: 960px) { .pu-grid { grid-template-columns: 1fr; } .pu-prev { position: static; order: -1; } .pu-new-p { position: fixed; left: 12px; right: 12px; top: auto; bottom: 76px; width: auto; max-height: 70vh; overflow: auto; } }
+
+/* Otomatik buton grubu ve özel açılır liste */
+.seg.seg-auto { margin: 0; }
+.adm select.inp { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; border-radius: 12px; transition: border-color 0.15s, box-shadow 0.15s; }
+.adm select.inp:hover { border-color: var(--ac); }
+.adm select.inp:focus { outline: none; border-color: var(--ac); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac) 22%, transparent); }
+.seg button:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Premium boş durum */
+.empty { padding: 48px 20px; }
+.empty-ic { position: relative; width: 76px; height: 76px; margin: 0 auto 14px; display: grid; place-items: center; }
+.empty-ic i { position: absolute; inset: 0; border-radius: 26px; background: linear-gradient(140deg, color-mix(in srgb, var(--ac) 30%, transparent), color-mix(in srgb, var(--blue) 18%, transparent)); transform: rotate(8deg); filter: blur(0.3px); animation: heroFloat 7s ease-in-out infinite; }
+.empty-ic span { position: relative; width: 58px; height: 58px; border-radius: 20px; display: grid; place-items: center; color: #fff; background: linear-gradient(140deg, color-mix(in srgb, var(--ac) 70%, #fff), var(--ac)); box-shadow: 0 12px 28px color-mix(in srgb, var(--ac) 40%, transparent); }
+.empty-ic span svg { opacity: 1; }
+.empty b { font-size: 16px; }
+.empty-t { display: block; max-width: 440px; margin: 4px auto 0; color: var(--tx3); font-size: 13px; line-height: 1.5; }
+.empty-a { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
