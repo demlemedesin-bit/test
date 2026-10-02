@@ -1,0 +1,16 @@
+{
+  "contactEmail": "merhaba@demleme.com",
+  "seller": {
+    "name": "Demleme",
+    "address": "",
+    "taxOffice": "",
+    "taxNo": "",
+    "mersis": "",
+    "phone": ""
+  },
+  "bank": {
+    "holder": "",
+    "bankName": "",
+    "iban": ""
+  }
+}

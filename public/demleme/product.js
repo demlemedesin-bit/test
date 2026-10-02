@@ -1,7 +1,7 @@
 (function(){
   var P=JSON.parse(document.getElementById('productData').textContent), $=function(id){ return document.getElementById(id); };
   var cur=null, col=0, size=-1, q=1, KEY='demleme-cart', items=[];
-  try{ items=JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ items=[]; }
+  try{ items=(JSON.parse(localStorage.getItem(KEY))||[]).filter(function(x){ return x && x.slug; }); }catch(e){ items=[]; }
   var saveCart=function(){ try{ localStorage.setItem(KEY, JSON.stringify(items)); }catch(e){} };
   var countCart=function(){ var n=0; items.forEach(function(it){ n+=it.qty; }); var cc=$('cartCount'); cc.textContent=n; cc.classList.toggle('on', n>0); };
   var esc=function(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
@@ -55,8 +55,9 @@
   $('qPlus').addEventListener('click', function(){ q=Math.min(9,q+1); $('qN').textContent=q; });
   $('ppAdd').addEventListener('click', function(){ var m=$('ppMsg');
     if(cur.sizes && cur.sizes.pick && size<0){ m.textContent='Önce bedenini seç.'; m.classList.add('warn'); return; }
-    var nm=cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+')', hit=items.filter(function(x){ return x.name===nm; })[0];
-    if(hit){ hit.qty+=q; } else { items.push({name:nm, price:cur.price, qty:q}); }
+    var nm=cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+')', sz=size>=0 ? cur.sizes.items[size][0] : '', cl=cur.colors[col].key,
+        hit=items.filter(function(x){ return x.slug===cur.slug && x.color===cl && (x.size||'')===sz; })[0];
+    if(hit){ hit.qty=Math.min(9, hit.qty+q); } else { items.push({slug:cur.slug, color:cl, size:sz, name:nm, price:cur.price, qty:q, img:cur.colors[col].img}); }
     saveCart(); countCart(); m.classList.remove('warn');
     m.textContent=q+' × '+cur.name+' ('+cur.colors[col].name+(size>=0 ? ', '+cur.sizes.items[size][0] : '')+') sepete eklendi.'; });
   render(); countCart();
