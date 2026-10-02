@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { saleOf } from '@/lib/sale';
 import { tl } from '@/lib/shop';
 import { fetchStorefront, readRecent, type Storefront } from '@/lib/storefront';
 import './ProductExtras.css';
@@ -21,7 +22,7 @@ export function useStorefront(): Storefront | null {
   return sf;
 }
 
-type Mini = { slug: string; name: string; price: number; thumb: string | null; colors: { img?: string }[] | null };
+type Mini = { slug: string; name: string; price: number; thumb: string | null; colors: { img?: string }[] | null; data?: { sale?: unknown } | null };
 
 /** Son baktığın ürünler. enabled verilmezse vitrin ayarındaki recent_on okunur (sepet sayfası böyle kullanır). */
 export function RecentlyViewed({ exclude = [], enabled, limit = 4, title = 'Son baktıkların' }: { exclude?: string[]; enabled?: boolean; limit?: number; title?: string }) {
@@ -38,7 +39,7 @@ export function RecentlyViewed({ exclude = [], enabled, limit = 4, title = 'Son 
       const slugs = readRecent().filter((s) => !ex.has(s)).slice(0, limit);
       if (!slugs.length) return;
       try {
-        const { data, error } = await supabase().from('products').select('slug,name,price,thumb,colors').in('slug', slugs).eq('active', true);
+        const { data, error } = await supabase().from('products').select('slug,name,price,thumb,colors,data').in('slug', slugs).eq('active', true);
         if (off || error || !data) return;
         const by = new Map((data as Mini[]).map((p) => [p.slug, p]));
         setList(slugs.map((s) => by.get(s)).filter((p): p is Mini => !!p));
@@ -61,7 +62,7 @@ export function RecentlyViewed({ exclude = [], enabled, limit = 4, title = 'Son 
           <a className="px-card" data-rec="recent" href={`/urun/${p.slug}`} key={p.slug}>
             <span className="px-th">{p.thumb || p.colors?.[0]?.img ? <img src={p.thumb || p.colors?.[0]?.img} alt="" loading="lazy" /> : null}</span>
             <span className="px-nm">{p.name}</span>
-            <span className="px-pr">{tl(Number(p.price))}</span>
+            <span className="px-pr">{(() => { const s = saleOf(Number(p.price), p.data); return <>{s.on && <s style={{ opacity: 0.5, marginRight: 6 }}>{tl(s.base)}</s>}{tl(s.price)}</>; })()}</span>
           </a>
         ))}
       </div>

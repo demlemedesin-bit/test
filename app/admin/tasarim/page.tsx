@@ -8,9 +8,10 @@ import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, TopBar, useToast } from '@/components/admin/ui';
 import { ImageInput } from '@/components/admin/Editors';
 import { Tabs } from '@/components/admin/Tbl';
+import { BannerPreview, PlacementMap, bannerState } from '@/components/admin/Preview';
 import { emptyBanner, parseBanners, parseScripts, toIso, toLocalInput, type Banner, type Scripts } from '@/lib/design';
 
-const TABS = [['banner', 'Ana sayfa banner'], ['script', 'Özel betikler']] as const;
+const TABS = [['banner', 'Ana sayfa banner'], ['script', 'Özel betikler'], ['harita', 'Sitede nerede görünür?']] as const;
 
 export default function Tasarim() {
   const menu = useMenu();
@@ -20,6 +21,7 @@ export default function Tasarim() {
   const [sc, setSc] = useState<Scripts | null>(null);
   const [sel, setSel] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
     supabase().from('site_content').select('key, value').in('key', ['banners', 'scripts']).then(({ data }) => {
@@ -55,7 +57,7 @@ export default function Tasarim() {
             <aside className="card"><div className="card-b" style={{ padding: 10 }}>
               {bn.map((x, i) => (
                 <button key={x.id} type="button" onClick={() => setSel(i)} style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 8, border: 0, background: i === sel ? 'var(--ac2)' : 'none', color: i === sel ? 'var(--ac)' : 'var(--tx2)', fontSize: 13, cursor: 'pointer' }}>
-                  <span>{x.name || 'Adsız'}</span><span className={`badge plain${x.on ? ' b-ac' : ''}`}>{x.on ? 'açık' : 'kapalı'}</span>
+                  <span>{x.name || 'Adsız'}</span><span className={`badge plain ${bannerState(x, now).tone}`}>{bannerState(x, now).label}</span>
                 </button>
               ))}
               <button className="btn ghost" style={{ width: '100%', marginTop: 8 }} onClick={() => { setBn((l) => [...(l ?? []), emptyBanner()]); setSel(bn.length); }}><Plus size={14} /> Yeni banner</button>
@@ -67,6 +69,7 @@ export default function Tasarim() {
                   <button className="btn ghost" onClick={() => { setBn((l) => (l ?? []).filter((_, i) => i !== sel)); setSel(0); }}><Trash2 size={14} /> Sil</button>
                 </div></div>
                 <div className="card-b">
+                  <div className={`alert ${bannerState(b, now).tone === 'b-green' ? 'ok' : 'warn'}`} style={{ marginBottom: 14 }}>{bannerState(b, now).label}: {bannerState(b, now).why}</div>
                   <label className="chk"><input type="checkbox" checked={b.on} onChange={(e) => up({ on: e.target.checked })} /> Yayında</label>
                   <Field label="İç ad"><input className="inp" value={b.name} onChange={(e) => up({ name: e.target.value })} /></Field>
                   <Field label="Masaüstü görseli" hint="Önerilen 1600×500"><ImageInput value={b.image} onChange={(v) => up({ image: v })} onError={(m) => show(m, true)} folder="banner" /></Field>
@@ -80,8 +83,10 @@ export default function Tasarim() {
                   <Field label="Yayın bitişi" hint="Süre dolunca banner kendiliğinden kalkar"><input className="inp" type="datetime-local" value={toLocalInput(b.ends_at)} onChange={(e) => up({ ends_at: toIso(e.target.value) })} /></Field>
                 </div></section>
             )}
+            {b && <section className="card" style={{ gridColumn: '1 / -1' }}><div className="card-h"><h2 className="card-t">Canlı önizleme</h2><span className="card-m">Kaydetmeden önce görünümü kontrol et</span></div><div className="card-b"><BannerPreview banner={b} /></div></section>}
           </div>
         )}
+        {tab === 'harita' && <PlacementMap />}
         {tab === 'script' && (
           <section className="card"><div className="card-h"><h2 className="card-t">Özel betikler</h2><span className="card-m">Canlı sohbet, ısı haritası, doğrulama vb.</span></div><div className="card-b">
             <label className="chk"><input type="checkbox" checked={sc.need_consent} onChange={(e) => setSc({ ...sc, need_consent: e.target.checked })} /> Pazarlama çerezi onayından sonra yükle (önerilir)</label>

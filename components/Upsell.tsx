@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { readCart, writeCart, type CartItem } from '@/lib/cart';
 import { tl } from '@/lib/shop';
 import { useStorefront } from './RecentlyViewed';
+import { saleOf } from '@/lib/sale';
 import './ProductExtras.css';
 
 type P = {
@@ -20,7 +21,7 @@ type P = {
   stock: number | null;
   thumb: string | null;
   sort: number | null;
-  data: { related?: unknown } | null;
+  data: { related?: unknown; sale?: unknown } | null;
 };
 
 const relatedOf = (p: P): string[] => (Array.isArray(p.data?.related) ? (p.data.related as unknown[]).filter((x): x is string => typeof x === 'string') : []);
@@ -72,7 +73,7 @@ export function Upsell({ items }: { items: CartItem[] }) {
       color: c?.key ?? '',
       size: '',
       name: c ? `${p.name} (${c.name})` : p.name,
-      price: tl(Number(p.price)),
+      price: tl(saleOf(Number(p.price), p.data).price),
       qty: 1,
       img: c?.img || p.thumb || undefined,
     };
@@ -91,7 +92,7 @@ export function Upsell({ items }: { items: CartItem[] }) {
               <a className="px-card-link" data-rec="upsell" href={`/urun/${p.slug}`}>
                 <span className="px-th">{img ? <img src={img} alt="" loading="lazy" /> : null}</span>
                 <span className="px-nm">{p.name}</span>
-                <span className="px-pr">{tl(Number(p.price))}</span>
+                <span className="px-pr">{(() => { const s = saleOf(Number(p.price), p.data); return <>{s.on && <s style={{ opacity: 0.5, marginRight: 6 }}>{tl(s.base)}</s>}{tl(s.price)}</>; })()}</span>
               </a>
               {needsChoice(p) ? (
                 <a className="px-btn px-btn-sm" href={`/urun/${p.slug}`}>
