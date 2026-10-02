@@ -74,9 +74,9 @@ export async function products(): Promise<SiteProduct[]> {
 }
 
 export async function productHtml(list?: SiteProduct[]): Promise<string> {
-  const all = list ?? (await getProducts());
-  return read('product.html').replace(
+  const [all, site] = await Promise.all([list ? Promise.resolve(list) : getProducts(), getSite()]);
+  return fill(read('product.html'), site).replace(
     '{{PRODUCT_DATA}}',
-    `<script type="application/json" id="productData">${safe(all)}</script>`,
+    () => `<script type="application/json" id="productData">${safe(all)}</script>`,
   );
 }
