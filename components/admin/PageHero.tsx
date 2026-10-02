@@ -20,6 +20,7 @@ const META: Record<string, Meta> = {
   '/admin/destek': { tone: 'blue', desc: 'Müşteri talepleri ve müşteri 360 görünümü tek ekranda.', chips: ['Talepler', 'Customer 360', 'Sipariş geçmişi'] },
   '/admin/kampanyalar': { tone: 'ac', desc: 'Kupon ve otomatik indirimler. Sepette ve ödemede anında geçerli olur.', chips: ['Yüzde / tutar', 'Kullanım limiti', 'Ürüne özel'], site: ['/sepet', 'Sepet sayfası'] },
   '/admin/takip': { tone: 'blue', desc: 'UTM bağlantıları, kaynak ve kampanya performansı.', chips: ['Kısa link (/t/kod)', 'Kaynak raporu', 'Dönüşüm'] },
+  '/admin/puan': { tone: 'ac', desc: 'Alışveriş ve yorumdan puan kazandır; üyeler puanını hediye çekine çevirsin.', chips: ['Kazanma kuralları', 'Ödül çekleri', 'Üye bakiyeleri'], site: ['/hesabim', 'Hesabım sayfası'] },
   '/admin/sureli': { tone: 'amber', desc: 'Zamanlı indirimli fiyat; başlangıç ve bitişte kendiliğinden devreye girer, çıkar.', chips: ['Kartta çizili fiyat', 'Geri sayım', 'Sepette geçerli'], site: ['/#magaza', 'Vitrinde gör'] },
   '/admin/raporlar': { tone: 'green', desc: 'Satış, ürün, şehir ve ödeme raporları; dönem karşılaştırması.', chips: ['Önceki dönem', 'CSV indir', 'Kupon etkisi'] },
   '/admin/analiz': { tone: 'ac', desc: 'Ürün, marka, stok, müşteri ve kampanya analizi; öneri performansı.', chips: ['Funnel', 'Marka', 'Stok devir'] },

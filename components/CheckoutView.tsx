@@ -1,5 +1,6 @@
 'use client';
 
+import { LoyaltyHint } from './Loyalty';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -314,6 +315,7 @@ export function CheckoutView() {
           <span>Toplam</span>
           <span>{tl(quote ? quote.total : priced.total)}</span>
         </div>
+        <LoyaltyHint kind="order" amount={Math.max(priced.subtotal - (quote ? quote.discount : 0), 0)} />
         <button className="btn btn--red btn--block" type="submit" disabled={busy || priced.hasProblem} style={{ marginTop: 20 }}>
           {busy ? 'Siparişin oluşturuluyor…' : payment === 'kart' ? 'Ödemeye geç' : 'Siparişi tamamla'}
         </button>
