@@ -700,3 +700,33 @@ em{ font-style:normal; font-weight:400; }
 .rl-m-ig{ display:block; text-align:center; padding:10px; font-size:14px; color:#17130F; background:#F8F4EA; border-top:1px solid rgba(23,19,15,.15); text-decoration:none; }
 /* Konuklar: the buttons row sits at the top of the table area, beside the guests (no empty band above/below) */
 @media (min-width: 769px){ .kr{ position:relative; margin-bottom:var(--s-24); } .kr-controls{ position:absolute; top:var(--s-8, 8px); left:0; right:0; margin:0 var(--pad); z-index:60; } }
+
+/* Ayın demleyenleri: başlık yukarıda, altında küçük katıl satırı ve anket kartı */
+.dm-top--sehpa{ align-items:start; }
+.dm-top--sehpa .dm-copy{ align-self:start; padding-top:clamp(0px, 2vw, 28px); }
+.dm-copy--c .dm-sub{ margin-top:var(--s-12, 12px); margin-bottom:var(--s-16); font-size:clamp(15px, 1.15vw, 18px); }
+.dm-copy--c .dm-actions--c{ flex-direction:row; flex-wrap:wrap; justify-content:center; gap:var(--s-12, 12px) var(--s-24); }
+.dm-copy--c .dm-join img{ height:clamp(44px, 3.4vw, 54px); }
+.dm-copy--c .dm-weekly{ display:block; flex-basis:100%; width:100%; text-align:center; }
+.dm-poll{ margin:var(--s-24) auto 0; max-width:480px; padding:clamp(16px,1.6vw,24px); text-align:left; background:#FFFDF8; border:2px solid #17130F; border-radius:18px 14px 20px 12px / 14px 20px 12px 18px; box-shadow:5px 6px 0 rgba(23,19,15,.9); }
+.dm-poll[hidden]{ display:none; }
+.dm-poll-h{ margin:0 0 var(--s-12, 12px); font-family:var(--display, inherit); font-size:clamp(20px,1.8vw,26px); text-align:center; line-height:1.1; }
+.dm-poll-opts{ display:grid; gap:6px; }
+.dm-po{ position:relative; display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:12px; cursor:pointer; font-size:clamp(14px,1.1vw,16px); transition:background .15s; }
+label.dm-po:hover{ background:rgba(221,38,44,.07); }
+.dm-po input{ position:absolute; opacity:0; pointer-events:none; }
+.dm-po-dot{ flex:none; width:20px; height:20px; border-radius:50%; border:2px solid #17130F; background:#fff; box-shadow:inset 0 0 0 3px #fff; transition:background .15s; }
+.dm-po input:checked + .dm-po-dot{ background:#DD262C; }
+.dm-po input:focus-visible + .dm-po-dot{ outline:2px solid #17130F; outline-offset:2px; }
+.dm-po-t{ flex:1; min-width:0; }
+.dm-po.is-res{ cursor:default; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 10px; }
+.dm-po-bar{ grid-column:1 / 2; grid-row:2; height:8px; border-radius:99px; background:rgba(23,19,15,.1); overflow:hidden; }
+.dm-po-bar i{ display:block; height:100%; background:#17130F; border-radius:99px; transition:width .6s cubic-bezier(.2,.8,.2,1); }
+.dm-po.is-mine .dm-po-bar i{ background:#DD262C; } .dm-po.is-mine .dm-po-t{ font-weight:600; }
+.dm-po-n{ grid-column:2; grid-row:1 / 3; align-self:center; font-size:14px; min-width:2.6em; text-align:right; }
+.dm-poll-btn{ display:block; width:100%; margin-top:var(--s-12, 12px); padding:13px 18px 11px; border:2px solid #17130F; border-radius:14px 10px 16px 10px / 10px 16px 10px 14px; background:#DD262C; color:#fff; font:inherit; font-size:clamp(15px,1.2vw,17px); letter-spacing:.06em; text-transform:uppercase; cursor:pointer; transition:transform .15s, box-shadow .15s; box-shadow:0 3px 0 #17130F; }
+.dm-poll-btn:hover{ transform:translateY(-1px); box-shadow:0 4px 0 #17130F; } .dm-poll-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 #17130F; } .dm-poll-btn:disabled{ opacity:.6; cursor:wait; }
+.dm-poll-btn[hidden]{ display:none; }
+.dm-poll-msg{ margin:var(--s-8, 8px) 0 0; min-height:1.2em; font-size:14px; color:var(--ink-2); text-align:center; }
+.dm-poll-chg{ background:none; border:0; padding:0; font:inherit; color:#DD262C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.dm-poll-tot{ display:block; margin-top:2px; font-size:13px; opacity:.7; }
