@@ -172,55 +172,29 @@
       var ra=function(){ rp.disabled=rt.scrollLeft<4; rn.disabled=rt.scrollLeft+rt.clientWidth>rt.scrollWidth-4; }; rt.addEventListener('scroll', ra, {passive:true}); ra(); }
   })();
 
-  // Reels: a card with an Instagram reel/post link plays it in a popup (Instagram's own embed, so plays count on Instagram)
+  // Reels: video kartın üzerine gelince (fare) sessiz oynar, çıkınca durur; tıklayınca/dokunınca sesli oynatıcı açılır.
+  // Video yoksa ve bağlantı bir Instagram reel'i ise gömülü oynatıcı, başka bağlantı normal açılır; Instagram'a yönlendirme yok.
   (function(){
     var rt=document.getElementById('reelTrack'); if(!rt) return;
     var RX=/instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i, box=null;
-    var close=function(){ if(!box) return; box.remove(); box=null; document.documentElement.style.overflow=''; };
+    var close=function(){ if(!box) return; var v=box.querySelector('video'); if(v){ try{ v.pause(); }catch(e){} } box.remove(); box=null; document.documentElement.style.overflow=''; };
+    var open=function(inner){ close(); box=document.createElement('div'); box.className='rl-modal'; box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button>'+inner+'</div>';
+      box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); }); document.body.appendChild(box); document.documentElement.style.overflow='hidden'; };
+    var hv=function(card,on){ var v=card.querySelector('.rl-vid'); if(!v) return;
+      if(on){ if(!v.getAttribute('src')) v.src=v.getAttribute('data-src'); var pr=v.play(); if(pr && pr.catch) pr.catch(function(){}); card.classList.add('is-playing'); }
+      else { try{ v.pause(); v.currentTime=0; }catch(e){} card.classList.remove('is-playing'); } };
+    rt.addEventListener('mouseover', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,true); });
+    rt.addEventListener('mouseout', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,false); });
     rt.addEventListener('click', function(e){
-      var a=e.target.closest('a.rl-card'); if(!a) return; var hr=a.getAttribute('href')||''; var m=RX.exec(hr);
+      var a=e.target.closest('a.rl-card'); if(!a) return; var vs=a.getAttribute('data-v'), hr=a.getAttribute('href')||'';
+      if(vs){ e.preventDefault(); hv(a,false); open('<video class="rl-m-v" src="'+vs+'" controls autoplay playsinline loop></video>'); return; }
+      if(hr==='#'){ e.preventDefault(); return; }
+      var m=RX.exec(hr);
       if(!m){ if(/instagram\.com/i.test(hr)) e.preventDefault(); return; }   // Instagram'a yönlendirme yok: oynatılamayan bağlantı hiçbir yere gitmez
-      e.preventDefault(); close();
-      var type=m[1].toLowerCase()==='p'?'p':(m[1].toLowerCase()==='tv'?'tv':'reel');
-      var src='https://www.instagram.com/'+type+'/'+m[2]+'/embed/';
-      box=document.createElement('div'); box.className='rl-modal';
-      box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button><iframe src="'+src+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" title="Instagram"></iframe></div>';
-      box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); });
-      document.body.appendChild(box); document.documentElement.style.overflow='hidden';
+      e.preventDefault(); var type=m[1].toLowerCase()==='p'?'p':(m[1].toLowerCase()==='tv'?'tv':'reel');
+      open('<iframe src="https://www.instagram.com/'+type+'/'+m[2]+'/embed/" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" title="Instagram"></iframe>');
     });
     addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
-  })();
-
-  // Ayın demleyenleri anketi: favori fotoğrafa oy (tarayıcı başına 1 oy, sonra değiştirilebilir); sonuçlar /api/anket
-  (function(){
-    var form=document.getElementById('dmPoll'), dataEl=document.getElementById('demleyenData'); if(!form || !dataEl) return;
-    var D; try{ D=JSON.parse(dataEl.textContent); }catch(e){ return; }
-    var P=(D.photos||[]).filter(function(p){ return p && p.name; }); if(!P.length) return;
-    var month=String(D.month||document.getElementById('dmMonth').textContent||'').trim(); if(!month) return;
-    var opts=document.getElementById('dmPollOpts'), btn=document.getElementById('dmPollBtn'), msg=document.getElementById('dmPollMsg');
-    var ls=function(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
-    var voter=ls('dm-voter'); if(!voter){ voter=Math.random().toString(36).slice(2,12)+Date.now().toString(36)+Math.random().toString(36).slice(2,8); ls('dm-voter',voter); }
-    var VK='dm-vote:'+month, mine=ls(VK), results=null, editing=false;
-    var key=function(p){ return (p.name+' / '+(p.city||'')).slice(0,80); };
-    var esc=function(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var draw=function(){
-      var voted=mine && !editing, total=0; if(results){ P.forEach(function(p){ total+=results[key(p)]||0; }); }
-      form.classList.toggle('is-voted', !!voted);
-      opts.innerHTML=P.map(function(p,i){ var k=key(p), n=results?(results[k]||0):0, pc=total?Math.round(n*100/total):0, on=(mine===k);
-        if(voted) return '<div class="dm-po is-res'+(on?' is-mine':'')+'"><span class="dm-po-t">'+esc(k)+(on?' \u2713':'')+'</span><span class="dm-po-bar"><i style="width:'+pc+'%"></i></span><span class="dm-po-n">%'+pc+'</span></div>';
-        return '<label class="dm-po"><input type="radio" name="dmv" value="'+i+'"'+(on?' checked':'')+'><span class="dm-po-dot"></span><span class="dm-po-t">'+esc(k)+'</span></label>'; }).join('');
-      btn.hidden=!!voted; msg.innerHTML=voted?('Te\u015fekk\u00fcrler, oyun kaydedildi. <button type="button" class="dm-poll-chg">Oyumu de\u011fi\u015ftir</button>'+(total?' <span class="dm-poll-tot">'+total+' oy</span>':'')):'';
-    };
-    form.hidden=false; draw();
-    fetch('/api/anket?month='+encodeURIComponent(month),{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(r){ results=r; draw(); }).catch(function(){});
-    msg.addEventListener('click', function(e){ if(e.target.closest('.dm-poll-chg')){ editing=true; draw(); } });
-    form.addEventListener('submit', function(e){ e.preventDefault();
-      var c=form.querySelector('input[name=dmv]:checked'); if(!c){ msg.textContent='L\u00fctfen bir foto\u011fraf se\u00e7.'; return; }
-      var k=key(P[+c.value]); btn.disabled=true; msg.textContent='';
-      fetch('/api/anket',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({month:month,voter:voter,photo:k})}).then(function(r){ return r.json().then(function(j){ return {ok:r.ok&&j.ok, j:j}; }); })
-        .then(function(x){ btn.disabled=false; if(!x.ok){ msg.textContent='Oy kaydedilemedi, biraz sonra tekrar dene.'; return; } mine=k; editing=false; ls(VK,k); results=x.j.results||{}; draw(); })
-        .catch(function(){ btn.disabled=false; msg.textContent='Oy kaydedilemedi, biraz sonra tekrar dene.'; });
-    });
   })();
 
   // Shop: categories filter the rail (the red circle moves), arrows scroll it by one card
@@ -358,7 +332,12 @@
     // reels under the table follow the guest in the middle
     var track=document.getElementById('reelTrack'), rname=document.getElementById('krReelName'), shown=-1;
     var reels=function(){ var mid=((Math.round(rot)%N)+N)%N; if(mid===shown || !track) return; var first=shown<0; shown=mid; var g=G[mid];
-      var fill=function(){ rname.textContent=g.name; track.innerHTML=(g.reels||[]).map(function(r){ return '<a class="rl-card" href="'+r.url+'" target="_blank" rel="noopener"><img class="rl-cover" src="'+COV[r.c]+'" alt="" loading="lazy"><img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt=""><span class="rl-name">'+g.name+'</span><span class="rl-bar"><i style="width:'+r.p+'%"></i></span></a>'; }).join(''); track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
+      var fill=function(){ rname.textContent=g.name; track.innerHTML=(g.reels||[]).map(function(r){
+        var cov=(r.c>=0 && COV[r.c]) ? '<img class="rl-cover" src="'+COV[r.c]+'" alt="" loading="lazy">' : (r.v ? '<video class="rl-cover rl-still" src="'+r.v+'#t=0.1" preload="metadata" muted playsinline aria-hidden="true"></video>' : '');
+        var inner=cov+(r.v?'<video class="rl-vid" data-src="'+r.v+'" muted loop playsinline preload="none" aria-hidden="true"></video>':'')+'<img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt=""><span class="rl-name">'+g.name+'</span><span class="rl-bar"><i style="width:'+r.p+'%"></i></span>';
+        if(r.v) return '<a class="rl-card has-v" href="#" role="button" data-v="'+r.v+'" aria-label="'+g.name+' reels videosunu oynat">'+inner+'</a>';
+        if(!r.url) return '<a class="rl-card" href="#" role="button" aria-label="'+g.name+'">'+inner+'</a>';
+        return '<a class="rl-card" href="'+r.url+'" target="_blank" rel="noopener">'+inner+'</a>'; }).join(''); track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
       if(first){ fill(); return; } track.classList.add('is-swap'); setTimeout(function(){ fill(); track.classList.remove('is-swap'); }, 260); };
     layout(); reels(); addEventListener('resize', layout);
     // idle only while the table is on screen

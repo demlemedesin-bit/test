@@ -47,7 +47,7 @@ export async function homeHtml(): Promise<string> {
       steam: steam[g.drawing] ?? null,
       stand: `${KONUK}stand-sit/${g.drawing}-stand.mp4`,
       sit: `${KONUK}stand-sit/${g.drawing}-sit.mp4`,
-      reels: (g.reels ?? []).filter((r) => r.cover).map((r) => ({ c: covers.indexOf(r.cover), url: r.url, p: Number(r.progress) || 0 })),
+      reels: (g.reels ?? []).filter((r) => r.cover || r.video).map((r) => ({ c: r.cover ? covers.indexOf(r.cover) : -1, url: r.url, p: Number(r.progress) || 0, v: r.video || '' })),
     })),
     covers: covers.map((f) => (isUrl(f) ? f : `${KONUK}reel-covers/${f}`)),
     teas: tea,
