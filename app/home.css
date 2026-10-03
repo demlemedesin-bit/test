@@ -752,5 +752,5 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 .rl-card.is-playing .rl-cover{ transform:none; }
 .rl-card .rl-vid ~ .rl-play, .rl-card .rl-vid ~ .rl-name, .rl-card .rl-vid ~ .rl-bar{ z-index:1; }
 .rl-m-v{ flex:1; width:100%; min-height:0; background:#000; object-fit:contain; }
-/* Konuklar: düğme satırı kayarken menünün (logo) üstüne binmesin */
-@media (min-width: 769px){ .kr{ z-index:0; } }
+/* Konuklar: düğme satırı kayarken menünün (logo) üstüne binmesin (menü z-index 50; .kr'ye z-index VERME: videoların multiply karışımını bozar, beyaz kutu çıkar) */
+@media (min-width: 769px){ .kr-controls{ z-index:49; } }
