@@ -173,6 +173,12 @@
         <a class="dm-site" href="{{t:dm_url}}" target="_blank" rel="noopener"><img src="/demleme/07-shared-ui/svg/burst-left.svg" alt="">demlemedesin.com<img src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></a>
         <span class="dm-weekly">{{t:dm_weekly}}</span>
       </div>
+      <form class="dm-poll" id="dmPoll" novalidate hidden>
+        <p class="dm-poll-h">Favori fotoğrafına oy ver</p>
+        <div class="dm-poll-opts" id="dmPollOpts"></div>
+        <button class="dm-poll-btn" type="submit" id="dmPollBtn">Oyunu gönder</button>
+        <p class="dm-poll-msg" id="dmPollMsg" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </div>
   <script type="application/json" id="demleyenData">{{DM_DATA}}</script>
