@@ -242,12 +242,28 @@ export default function Content() {
                             } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
                           }} />
                         </label>
-                        <input className="inp" placeholder="Reel bağlantısı" value={r.url} onChange={(e) => setGuests((a) => setAt(a, gi, { reels: setAt(g.reels, ri, { url: e.target.value }) }))} />
+                        <label className={`btn ghost sm${r.video ? ' on' : ''}`} style={{ position: 'relative' }} title={r.video ? 'Video yüklü: ' + r.video : 'MP4 / WebM / MOV, en çok 50 MB'}>
+                          {r.video ? 'Video ✓ değiştir' : 'Video yükle'}
+                          <input type="file" accept="video/mp4,video/webm,video/quicktime" style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={async (e) => {
+                            const f = e.target.files?.[0];
+                            e.target.value = '';
+                            if (!f) return;
+                            try {
+                              show('Video yükleniyor…');
+                              const { uploadReelVideo } = await import('@/lib/admin');
+                              const url = await uploadReelVideo(f);
+                              setGuests((a) => setAt(a, gi, { reels: setAt(g.reels, ri, { video: url }) }));
+                              show('Video yüklendi. Kaydetmeyi unutma.');
+                            } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
+                          }} />
+                        </label>
+                        {r.video && <button type="button" className="btn ghost sm" onClick={() => setGuests((a) => setAt(a, gi, { reels: setAt(g.reels, ri, { video: '' }) }))}>Videoyu kaldır</button>}
+                        <input className="inp" placeholder="Bağlantı (isteğe bağlı)" value={r.url} onChange={(e) => setGuests((a) => setAt(a, gi, { reels: setAt(g.reels, ri, { url: e.target.value }) }))} />
                         <input className="inp" type="number" min={0} max={100} style={{ width: 74 }} title="İlerleme çubuğu %" value={r.progress} onChange={(e) => setGuests((a) => setAt(a, gi, { reels: setAt(g.reels, ri, { progress: Number(e.target.value) }) }))} />
                         <RowTools i={ri} n={g.reels.length} move={(d) => setGuests((a) => setAt(a, gi, { reels: moved(g.reels, ri, d) }))} remove={() => setGuests((a) => setAt(a, gi, { reels: without(g.reels, ri) }))} />
                       </div>
                     ))}
-                    <AddBtn onClick={() => setGuests((a) => setAt(a, gi, { reels: [...g.reels, { cover: REEL_COVERS[0], url: 'https://instagram.com', progress: 20 }] }))}>Reel ekle</AddBtn>
+                    <AddBtn onClick={() => setGuests((a) => setAt(a, gi, { reels: [...g.reels, { cover: REEL_COVERS[0], url: '', progress: 20, video: '' }] }))}>Reel ekle</AddBtn>
                   </div>
                 </section>
               ))}

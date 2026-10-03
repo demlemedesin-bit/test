@@ -189,4 +189,15 @@ export async function uploadImage(file: File, folder: string): Promise<string> {
   return (await uploadImageDetailed(file, folder)).url;
 }
 
+/** Reels videosu yükler (reels-videos bucket'ı, en çok 50 MB, mp4/webm/mov). */
+export async function uploadReelVideo(file: File): Promise<string> {
+  if (!/^video\/(mp4|webm|quicktime)$/.test(file.type)) throw new Error('Yalnızca MP4, WebM veya MOV video yüklenebilir.');
+  if (file.size > 50 * 1024 * 1024) throw new Error('Video 50 MB sınırını aşıyor. Önce küçült (örn. 720p, 15-30 sn).');
+  const ext = file.type === 'video/webm' ? 'webm' : file.type === 'video/quicktime' ? 'mov' : 'mp4';
+  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const up = await supabase().storage.from('reels-videos').upload(name, file, { contentType: file.type, upsert: false, cacheControl: '31536000' });
+  if (up.error) throw new Error(up.error.message);
+  return supabase().storage.from('reels-videos').getPublicUrl(name).data.publicUrl;
+}
+
 export { uploadImageDetailed };
