@@ -732,7 +732,7 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 .dm-poll-tot{ display:block; margin-top:2px; font-size:13px; opacity:.7; }
 
 /* Garen'in fotoğrafı üstündeki çay buharı küçültüldü (bardağın üzerinde aynı noktadan yükselir) */
-.steam{ transform:scale(.62); transform-origin:50% 100%; }
+.steam{ transform:translateX(18%) scale(.62); transform-origin:50% 100%; }   /* küçültülmüş buhar bardağın ağzının tam üstünde dursun */
 /* Konuklar: isim kartları küçük, ad üstte soyad altta */
 .kr-stage .kc{ height:auto; display:block; text-align:center; line-height:1.08; padding:.5em 1em .3em; font-size:clamp(10px, .95vw, 16px); letter-spacing:.04em; min-width:5.2em; }
 @media (max-width: 768px){ .kr-stage .kc{ height:auto; padding:.4em .7em .25em; font-size:8.5px; letter-spacing:.02em; min-width:4.6em; } }
