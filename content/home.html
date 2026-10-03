@@ -28,7 +28,6 @@
     </nav>
     <div class="nav-right">
       <a class="nav-draw nav-draw--yt" href="{{t:url_youtube}}" target="_blank" rel="noopener" aria-label="YouTube"><img src="/demleme/01-brand/icons/youtube.png" alt=""></a>
-      <a class="nav-draw nav-draw--ig" href="{{t:url_instagram}}" target="_blank" rel="noopener" aria-label="Instagram"><img src="/demleme/01-brand/icons/instagram.png" alt=""></a>
       <button class="nav-cart" id="cartBtn" type="button" aria-label="Sepet" aria-expanded="false" aria-controls="cartPanel">
         <img src="/demleme/01-brand/icons/cart.png" alt="">
         <span class="nav-cart-count" id="cartCount" hidden>0</span>
@@ -105,7 +104,6 @@
         <li><button type="button" data-cat="aksesuar">{{t:cat_aksesuar}}<img class="shop-circle" src="/demleme/03-shop/svg/scribble-circle-red.svg" alt=""></button></li>
       </ul>
       <a class="shop-btn" href="/urunler"><span class="dbtn"><img src="/demleme/03-shop/svg/btn-tum-urunleri-gor-drawn-base.svg" alt="Tüm ürünleri gör"><img class="dbtn-arr" src="/demleme/03-shop/svg/btn-tum-urunleri-gor-drawn-arrow.svg" alt=""></span></a>
-      <img class="shop-cat" src="{{t:shop_cat_img}}" alt="">
     </div>
     <div class="shop-art">
       <img class="shop-hero" src="{{t:shop_hero}}" alt="{{t:shop_hero_alt}}">
@@ -168,11 +166,12 @@
     <div class="dm-copy dm-copy--c">
       <h2 class="dm-title"><span class="dm-l1"><img class="bl" src="/demleme/07-shared-ui/svg/burst-left.svg" alt="">Demlemede <span id="dmMonth">{{DM_MONTH}}</span> ayının<img class="br" src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></span><br>demleyenleri</h2>
       <p class="dm-sub">{{t:dm_sub}}</p>
-      <div class="dm-actions dm-actions--c">
-        <span class="dm-join-row"><img src="/demleme/07-shared-ui/svg/burst-left.svg" alt=""><a class="dm-join" href="{{t:dm_url}}" target="_blank" rel="noopener"><span class="dbtn"><img src="/demleme/05-demleyenler/svg/btn-demleyenlere-katil-base.svg" alt="Demleyenlere katıl"><img class="dbtn-arr" src="/demleme/05-demleyenler/svg/btn-demleyenlere-katil-arrow.svg" alt=""></span></a><img src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></span>
-        <a class="dm-site" href="{{t:dm_url}}" target="_blank" rel="noopener"><img src="/demleme/07-shared-ui/svg/burst-left.svg" alt="">demlemedesin.com<img src="/demleme/07-shared-ui/svg/burst-right.svg" alt=""></a>
-        <span class="dm-weekly">{{t:dm_weekly}}</span>
-      </div>
+      <p class="dm-rule">{{t:dm_rule}}</p>
+      <ul class="dm-rules">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg><span>{{t:dm_b1}}</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke-dasharray="3.2 2.6"/><circle cx="12" cy="12" r="4.2"/></svg><span>{{t:dm_b2}}</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6.5L20.5 7"/></svg><span>Fotoğraflar <a href="mailto:{{t:dm_mail}}">{{t:dm_mail}}</a> adresine gönderilmeli.</span></li>
+      </ul>
       <form class="dm-poll" id="dmPoll" novalidate hidden>
         <p class="dm-poll-h">Favori fotoğrafına oy ver</p>
         <div class="dm-poll-opts" id="dmPollOpts"></div>
@@ -260,7 +259,6 @@
         <p>{{t:footer_tagline}}</p>
         <div class="footer-social">
           <a class="footer-draw footer-draw--yt" href="{{t:url_youtube}}" target="_blank" rel="noopener" aria-label="YouTube"><img src="/demleme/01-brand/icons/youtube-on-dark.png" alt=""></a>
-          <a class="footer-draw footer-draw--ig" href="{{t:url_instagram}}" target="_blank" rel="noopener" aria-label="Instagram"><img src="/demleme/01-brand/icons/instagram-on-dark.png" alt=""></a>
           <a class="footer-draw footer-draw--mail" href="mailto:{{contactEmail}}" aria-label="E-posta"><img src="/demleme/01-brand/icons/mail-on-dark.png" alt=""></a>
         </div>
       </div>

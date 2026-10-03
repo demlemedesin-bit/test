@@ -178,12 +178,13 @@
     var RX=/instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i, box=null;
     var close=function(){ if(!box) return; box.remove(); box=null; document.documentElement.style.overflow=''; };
     rt.addEventListener('click', function(e){
-      var a=e.target.closest('a.rl-card'); if(!a) return; var m=RX.exec(a.getAttribute('href')||''); if(!m) return;
+      var a=e.target.closest('a.rl-card'); if(!a) return; var hr=a.getAttribute('href')||''; var m=RX.exec(hr);
+      if(!m){ if(/instagram\.com/i.test(hr)) e.preventDefault(); return; }   // Instagram'a yönlendirme yok: oynatılamayan bağlantı hiçbir yere gitmez
       e.preventDefault(); close();
       var type=m[1].toLowerCase()==='p'?'p':(m[1].toLowerCase()==='tv'?'tv':'reel');
       var src='https://www.instagram.com/'+type+'/'+m[2]+'/embed/';
       box=document.createElement('div'); box.className='rl-modal';
-      box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button><iframe src="'+src+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" title="Instagram"></iframe><a class="rl-m-ig" href="'+a.href+'" target="_blank" rel="noopener">Instagram\u2019da a\u00e7</a></div>';
+      box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button><iframe src="'+src+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen scrolling="no" frameborder="0" title="Instagram"></iframe></div>';
       box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); });
       document.body.appendChild(box); document.documentElement.style.overflow='hidden';
     });
@@ -295,9 +296,9 @@
       var h='<img src="'+g.img+'" alt="" draggable="false">';
       if(g.steam) h+='<svg class="kr-steam" viewBox="0 0 100 160" aria-hidden="true" style="left:'+((g.steam[0]-g.steam[2]*1.1)*100).toFixed(2)+'%;top:'+((g.steam[1]*100)-(g.steam[2]*1.8*100/g.ar)).toFixed(2)+'%;width:'+(g.steam[2]*2.2*100).toFixed(2)+'%"><path class="w1" d="M58 150 C44 128 70 112 54 90 C40 70 60 56 46 34"/><path class="w2" d="M42 152 C30 132 50 118 36 98 C24 80 40 66 28 46" style="animation-delay:'+(1.2+(i*.29)%1.2).toFixed(2)+'s"/></svg>';
       a.innerHTML=h; host.appendChild(a);
-      var c=document.createElement('a'); c.className='kc'; c.href=g.url; c.textContent=g.name; host.appendChild(c); var v=document.createElement('video'); v.className='kr-v'; v.muted=true; v.playsInline=true; v.preload='auto'; v.setAttribute('aria-hidden','true'); host.appendChild(v);
+      var c=document.createElement('a'); c.className='kc'; c.href=g.url; c.textContent=String(g.name).trim().replace(/\s+(?=\S+$)/,'\n'); /* ad üstte, soyad altta */ host.appendChild(c); var v=document.createElement('video'); v.className='kr-v'; v.muted=true; v.playsInline=true; v.preload='auto'; v.setAttribute('aria-hidden','true'); host.appendChild(v);
       return {g:a, c:c, v:v, i:i, vid:false, ar:+g.ar||1.1}; });
-    var rot=0, from=0, target=0, t0=0, DUR=an('tableMs',1000), raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
+    var rot=0, from=0, target=0, t0=0, DUR=an('tableMs',620), raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
     var layout=function(){ var m=mob(); VIS=m?1:2; A=m?.69:.486;
       var calc=function(W){ var th=W/TAR, need=0; for(var k=-VIS;k<=VIS;k++){ var x=.5-A*Math.sin(k*STEP), e=edge(x), sc=.9+(e-edge(.5))/(edge(0)-edge(.5))*.22, gw=W*(m?.27:.165)*sc;
           need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.2); if(Math.abs(k)===VIS) need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.3*1.343*.86); }   // room for a guest standing up at the edge seats
