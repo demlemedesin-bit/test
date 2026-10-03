@@ -346,7 +346,7 @@ export const FIELDS: Field[] = [
   "group": "Ana sayfa · Ayın demleyenleri",
   "label": "Açıklama",
   "kind": "text",
-  "def": "Demleme izlerken çektiğin fotoğrafı bizimle paylaş, sen de ayın demleyenleri arasında yerini al."
+  "def": "Demleme izlerken çektiğin fotoğrafı paylaş. Hepimiz oynayalım!"
  },
  {
   "id": "konuk_table",
@@ -403,6 +403,34 @@ export const FIELDS: Field[] = [
   "label": "Not: saklama alanı (görsel)",
   "kind": "image",
   "def": "/demleme/05-demleyenler/svg/note-saklama-alani.svg"
+ },
+ {
+  "id": "dm_rule",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Kırmızı vurgu cümlesi",
+  "kind": "text",
+  "def": "En çok beğenilen fotoğraf sehpayı kazanıyor."
+ },
+ {
+  "id": "dm_b1",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Kural 1",
+  "kind": "text",
+  "def": "Fotoğraflar dikey çekilmeli."
+ },
+ {
+  "id": "dm_b2",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Kural 2",
+  "kind": "text",
+  "def": "Değerlendirmeye alınması için story’de paylaşılmalı."
+ },
+ {
+  "id": "dm_mail",
+  "group": "Ana sayfa · Ayın demleyenleri",
+  "label": "Fotoğraf gönderme e-postası",
+  "kind": "text",
+  "def": "garen@demlemedesin.com"
  },
  {
   "id": "dm_url",
@@ -558,7 +586,7 @@ export const FIELDS: Field[] = [
   "group": "Animasyonlar",
   "label": "Konuk masası dönüş süresi (ms)",
   "kind": "number",
-  "def": "1000"
+  "def": "620"
  },
  {
   "id": "anim_pourPin",

@@ -32,6 +32,7 @@ export default function Tracking() {
   const [days, setDays] = useState<number>(30);
   const [rep, setRep] = useState<Report | null>(null);
   const [links, setLinks] = useState<TLink[] | null>(null);
+  const [yt, setYt] = useState<{ total: number; visitors: number; where: [string, number][] }>({ total: 0, visitors: 0, where: [] });
   const [err, setErr] = useState('');
   const [edit, setEdit] = useState<(typeof EMPTY & { id?: string }) | null>(null);
   const [del, setDel] = useState<TLink | null>(null);
@@ -47,6 +48,11 @@ export default function Tracking() {
     setErr('');
     setRep(r.data as Report);
     setLinks((l.data ?? []) as TLink[]);
+    const y = await supabase().from('track_events').select('content,sid').eq('type', 'youtube_click').gte('created_at', from).limit(20000);
+    const rows = (y.data ?? []) as { content: string | null; sid: string }[];
+    const by = new Map<string, number>();
+    rows.forEach((x) => by.set(x.content || 'diğer', (by.get(x.content || 'diğer') ?? 0) + 1));
+    setYt({ total: rows.length, visitors: new Set(rows.map((x) => x.sid)).size, where: [...by].sort((a, b) => b[1] - a[1]) });
   }, [days]);
   useEffect(() => {
     const x = setTimeout(load, 0);
@@ -128,6 +134,17 @@ export default function Tracking() {
                 <Kpi label="Sipariş" value={String(tot.orders)} sub={`dönüşüm ${pct(tot.orders, tot.visitors)}`} tone="green" icon={<Check size={17} />} />
                 <Kpi label="Ciro" value={tl(tot.revenue)} sub="takip edilen siparişler" tone="ac" icon={<Copy size={17} />} />
               </div>
+
+              <section className="card" style={{ marginBottom: 18 }}>
+                <div className="card-h"><h2 className="card-t">YouTube yönlendirmeleri</h2><span className="card-m">siteden YouTube&apos;a tıklama</span></div>
+                <div className="card-b">
+                  <div className="kpis" style={{ marginBottom: yt.where.length ? 12 : 0 }}>
+                    <Kpi label="Tıklama" value={String(yt.total)} sub={`${yt.visitors} farklı ziyaretçi`} tone="red" icon={<Link2 size={17} />} />
+                    {yt.where.slice(0, 3).map(([w, n]) => <Kpi key={w} label={w} value={String(n)} sub="tıklama" tone="blue" icon={<Link2 size={17} />} />)}
+                  </div>
+                  {yt.total === 0 && <Empty title="Henüz tıklama yok" text="Menüdeki, hero'daki ve alt bilgideki YouTube bağlantıları burada sayılır." />}
+                </div>
+              </section>
 
               <section className="card" style={{ marginBottom: 18 }}>
                 <div className="card-h"><h2 className="card-t">Günlük ziyaret</h2></div>

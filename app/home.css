@@ -438,8 +438,8 @@ em{ font-style:normal; font-weight:400; }
 .hero-links--left{ justify-content:flex-start; margin-top:clamp(56px, 7vh, 96px); gap:clamp(64px, 7vw, 120px); }
 .hero--d .stats{ margin-top:var(--s-48); grid-template-columns:repeat(4, 1fr); column-gap:clamp(24px, 3vw, 56px); text-align:center; border-top:1px solid var(--line); padding-top:var(--s-32); }   /* full-width strip under the about copy AND Garen's photo (JS pushes it below the photo) */
 .hero--d .stat{ text-align:center; padding:0; }   /* numbers + labels centred in their column */
-.hero--d .stat b{ font-size:clamp(48px, 5.2vw, 88px); }
-.hero--d .stat span{ font-size:var(--t-14); }
+.hero--d .stat b{ font-size:clamp(64px, 7.2vw, 120px); line-height:1; }
+.hero--d .stat span{ font-size:clamp(14px, 1.15vw, 18px); }
 .hero-about{ margin-top:clamp(96px, 14vh, 160px); max-width:min(46vw, 720px); }
 .hero-about h2{ font-size:clamp(36px, 3.8vw, 62px); margin-bottom:var(--s-24); }
 .hero-about p{ font-size:clamp(18px, 1.5vw, 24px); line-height:1.5; margin-bottom:var(--s-24); }
@@ -471,7 +471,7 @@ em{ font-style:normal; font-weight:400; }
   .hero-links--left{ margin-top:var(--s-32); gap:var(--s-40); } .hero-link img{ height:64px; }
   .hero-about{ max-width:none; }
   .hero--d .stats{ grid-template-columns:1fr 1fr; row-gap:var(--s-32); column-gap:var(--s-16); margin-top:var(--s-48); border-top:0; padding-top:0; }
-  .hero--d .stat b{ font-size:44px; margin-bottom:6px; } .hero--d .stat span{ font-size:13px; }
+  .hero--d .stat b{ font-size:58px; margin-bottom:6px; } .hero--d .stat span{ font-size:14px; }
   .hero-b-art{ position:relative; right:auto; top:auto; width:100%; margin-top:var(--s-32); padding-bottom:calc(var(--land-w) * var(--land-ar) * (1 - var(--gy)) + 24px); }
   .hero-about{ margin-top:var(--s-48); }
 }
@@ -730,3 +730,17 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 .dm-poll-msg{ margin:var(--s-8, 8px) 0 0; min-height:1.2em; font-size:14px; color:var(--ink-2); text-align:center; }
 .dm-poll-chg{ background:none; border:0; padding:0; font:inherit; color:#DD262C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
 .dm-poll-tot{ display:block; margin-top:2px; font-size:13px; opacity:.7; }
+
+/* Garen'in fotoğrafı üstündeki çay buharı küçültüldü (bardağın üzerinde aynı noktadan yükselir) */
+.steam{ transform:scale(.62); transform-origin:50% 100%; }
+/* Konuklar: isim kartları küçük, ad üstte soyad altta */
+.kr-stage .kc{ height:auto; display:block; text-align:center; line-height:1.08; padding:.5em 1em .3em; font-size:clamp(10px, .95vw, 16px); letter-spacing:.04em; min-width:5.2em; }
+@media (max-width: 768px){ .kr-stage .kc{ height:auto; padding:.4em .7em .25em; font-size:8.5px; letter-spacing:.02em; min-width:4.6em; } }
+
+/* Ayın demleyenleri: katılım kuralları */
+.dm-copy--c .dm-sub{ font-size:clamp(17px, 1.5vw, 22px); color:var(--ink); max-width:560px; }
+.dm-rule{ margin:0 0 var(--s-16); font-size:clamp(17px, 1.5vw, 22px); font-weight:700; color:#DD262C; }
+.dm-rules{ list-style:none; margin:0 auto var(--s-8, 8px); padding:0; max-width:520px; display:grid; gap:12px; text-align:left; }
+.dm-rules li{ display:flex; align-items:center; gap:14px; font-size:clamp(14px, 1.15vw, 17px); color:var(--ink-2); }
+.dm-rules svg{ flex:none; width:28px; height:28px; fill:none; stroke:#17130F; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.dm-rules a{ color:var(--ink); text-decoration:underline; text-underline-offset:3px; word-break:break-all; }
