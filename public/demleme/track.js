@@ -27,6 +27,13 @@
   var price=function(v){ if(typeof v==='number') return isFinite(v)?v:0; var t=String(v==null?'':v).replace(/[^\d.,]/g,''); if(!t) return 0;
     if(t.indexOf(',')>-1) t=t.replace(/\./g,'').replace(',','.'); else if(!/^\d+\.\d{1,2}$/.test(t)) t=t.replace(/\./g,'');
     var n=parseFloat(t); return isFinite(n)?n:0; };
+  // YouTube'a giden bağlantı tıklamaları (menü, hero, alt bilgi); gitmeden önce sendBeacon ile gönderilir
+  document.addEventListener('click', function(e){
+    var l=e.target.closest && e.target.closest('a[href]'); if(!l) return;
+    var h=l.getAttribute('href')||''; if(!/^https?:\/\/([\w-]+\.)*(youtube\.com|youtu\.be)(\/|$|\?)/i.test(h)) return;
+    var where=l.closest('footer')?'alt bilgi':l.closest('.hero-link, .hero-links')?'hero':l.closest('nav, .nav-right, header')?'menü':'diğer';
+    send('youtube_click',{content:where});
+  }, true);
   var pending=[];
   var dispatch=function(name, d){
     var f=window.dmAds; if(!f) return false;
