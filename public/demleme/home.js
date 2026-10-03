@@ -190,6 +190,38 @@
     addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
   })();
 
+  // Ayın demleyenleri anketi: favori fotoğrafa oy (tarayıcı başına 1 oy, sonra değiştirilebilir); sonuçlar /api/anket
+  (function(){
+    var form=document.getElementById('dmPoll'), dataEl=document.getElementById('demleyenData'); if(!form || !dataEl) return;
+    var D; try{ D=JSON.parse(dataEl.textContent); }catch(e){ return; }
+    var P=(D.photos||[]).filter(function(p){ return p && p.name; }); if(!P.length) return;
+    var month=String(D.month||document.getElementById('dmMonth').textContent||'').trim(); if(!month) return;
+    var opts=document.getElementById('dmPollOpts'), btn=document.getElementById('dmPollBtn'), msg=document.getElementById('dmPollMsg');
+    var ls=function(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
+    var voter=ls('dm-voter'); if(!voter){ voter=Math.random().toString(36).slice(2,12)+Date.now().toString(36)+Math.random().toString(36).slice(2,8); ls('dm-voter',voter); }
+    var VK='dm-vote:'+month, mine=ls(VK), results=null, editing=false;
+    var key=function(p){ return (p.name+' / '+(p.city||'')).slice(0,80); };
+    var esc=function(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var draw=function(){
+      var voted=mine && !editing, total=0; if(results){ P.forEach(function(p){ total+=results[key(p)]||0; }); }
+      form.classList.toggle('is-voted', !!voted);
+      opts.innerHTML=P.map(function(p,i){ var k=key(p), n=results?(results[k]||0):0, pc=total?Math.round(n*100/total):0, on=(mine===k);
+        if(voted) return '<div class="dm-po is-res'+(on?' is-mine':'')+'"><span class="dm-po-t">'+esc(k)+(on?' \u2713':'')+'</span><span class="dm-po-bar"><i style="width:'+pc+'%"></i></span><span class="dm-po-n">%'+pc+'</span></div>';
+        return '<label class="dm-po"><input type="radio" name="dmv" value="'+i+'"'+(on?' checked':'')+'><span class="dm-po-dot"></span><span class="dm-po-t">'+esc(k)+'</span></label>'; }).join('');
+      btn.hidden=!!voted; msg.innerHTML=voted?('Te\u015fekk\u00fcrler, oyun kaydedildi. <button type="button" class="dm-poll-chg">Oyumu de\u011fi\u015ftir</button>'+(total?' <span class="dm-poll-tot">'+total+' oy</span>':'')):'';
+    };
+    form.hidden=false; draw();
+    fetch('/api/anket?month='+encodeURIComponent(month),{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(r){ results=r; draw(); }).catch(function(){});
+    msg.addEventListener('click', function(e){ if(e.target.closest('.dm-poll-chg')){ editing=true; draw(); } });
+    form.addEventListener('submit', function(e){ e.preventDefault();
+      var c=form.querySelector('input[name=dmv]:checked'); if(!c){ msg.textContent='L\u00fctfen bir foto\u011fraf se\u00e7.'; return; }
+      var k=key(P[+c.value]); btn.disabled=true; msg.textContent='';
+      fetch('/api/anket',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({month:month,voter:voter,photo:k})}).then(function(r){ return r.json().then(function(j){ return {ok:r.ok&&j.ok, j:j}; }); })
+        .then(function(x){ btn.disabled=false; if(!x.ok){ msg.textContent='Oy kaydedilemedi, biraz sonra tekrar dene.'; return; } mine=k; editing=false; ls(VK,k); results=x.j.results||{}; draw(); })
+        .catch(function(){ btn.disabled=false; msg.textContent='Oy kaydedilemedi, biraz sonra tekrar dene.'; });
+    });
+  })();
+
   // Shop: categories filter the rail (the red circle moves), arrows scroll it by one card
   (function(){
     var cats=document.getElementById('shopCats'), track=document.getElementById('shopTrack'); if(!cats || !track) return;
