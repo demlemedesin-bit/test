@@ -698,5 +698,5 @@ em{ font-style:normal; font-weight:400; }
 .rl-m-in iframe{ flex:1; width:100%; border:0; background:#fff; }
 .rl-m-x{ position:absolute; top:8px; right:8px; z-index:2; width:34px; height:34px; border-radius:50%; border:2px solid #17130F; background:#F8F4EA; font-size:22px; line-height:1; cursor:pointer; }
 .rl-m-ig{ display:block; text-align:center; padding:10px; font-size:14px; color:#17130F; background:#F8F4EA; border-top:1px solid rgba(23,19,15,.15); text-decoration:none; }
-/* Konuklar: the buttons row sits at the table's lower edge (no empty band under the table) */
-@media (min-width: 769px){ .kr-controls{ margin-top:calc(-1 * clamp(40px, 3.6vw, 56px)); z-index:60; } }
+/* Konuklar: the buttons row sits at the top of the table area, beside the guests (no empty band above/below) */
+@media (min-width: 769px){ .kr{ position:relative; margin-bottom:var(--s-24); } .kr-controls{ position:absolute; top:var(--s-8, 8px); left:0; right:0; margin:0 var(--pad); z-index:60; } }
