@@ -23,7 +23,7 @@ const roleLabel = (k: string) => ROLE_TEMPLATES.find((r) => r.key === k)?.label 
 
 /* ═══ 1. Ekip ═══ */
 type Staff = { id: string; email: string; name: string; role: string; perms: string[] };
-type EditState = { id?: string; email: string; role: string; perms: string[] };
+type EditState = { id?: string; email: string; role: string; perms: string[]; password?: string };
 
 function Team({ toast }: { toast: (t: string, err?: boolean) => void }) {
   const [list, setList] = useState<Staff[] | null>(null);
@@ -49,7 +49,17 @@ function Team({ toast }: { toast: (t: string, err?: boolean) => void }) {
     if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Geçerli bir e-posta yaz.', true);
     if (edit.perms.length === 0) return toast('En az bir yetki seç.', true);
     setBusy(true);
-    const { error } = await supabase().rpc('admin_set_staff', { p_email: email, p_role: edit.role, p_perms: edit.perms });
+    let error: { message: string } | null = null;
+    if (!edit.id && (edit.password ?? '') !== '') {
+      // Şifre yazıldıysa: hesabı doğrudan oluştur (kayıt/e-posta onayı gerekmez)
+      if ((edit.password ?? '').length < 8) { setBusy(false); return toast('Şifre en az 8 karakter olmalı.', true); }
+      const { data: ses } = await supabase().auth.getSession();
+      const r = await fetch('/api/ekip', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${ses.session?.access_token ?? ''}` }, body: JSON.stringify({ email, password: edit.password, role: edit.role, perms: edit.perms }) });
+      const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!r.ok || !j.ok) error = { message: j.error || 'Hesap oluşturulamadı.' };
+    } else {
+      ({ error } = await supabase().rpc('admin_set_staff', { p_email: email, p_role: edit.role, p_perms: edit.perms }));
+    }
     setBusy(false);
     if (error) return toast(error.message, true);
     setEdit(null);
@@ -115,9 +125,14 @@ function Team({ toast }: { toast: (t: string, err?: boolean) => void }) {
           onClose={() => setEdit(null)}
           footer={<><button type="button" className="btn ghost" onClick={() => setEdit(null)}>Vazgeç</button><button type="button" className="btn" onClick={save} disabled={busy}>{busy ? 'Kaydediliyor…' : 'Kaydet'}</button></>}
         >
-          <Field label="E-posta" hint="Kişi sitede bu e-postayla kayıt olmuş olmalı.">
+          <Field label="E-posta" hint={edit.id ? 'Kayıtlı e-posta değiştirilemez.' : 'Aşağıya şifre yazarsan hesap hemen oluşturulur; kişinin ayrıca kayıt olmasına gerek yok.'}>
             <input className="inp" type="email" value={edit.email} disabled={!!edit.id} onChange={(e) => setEdit({ ...edit, email: e.target.value })} placeholder="ornek@eposta.com" />
           </Field>
+          {!edit.id && (
+            <Field label="Şifre (en az 8 karakter)" hint="Boş bırakırsan kişi sitede bu e-postayla kayıt olmuş olmalı. E-posta zaten kayıtlıysa şifresi bununla değişir.">
+              <input className="inp" type="text" autoComplete="new-password" value={edit.password ?? ''} onChange={(e) => setEdit({ ...edit, password: e.target.value })} placeholder="Örn. Demleme2026!" />
+            </Field>
+          )}
           <div className="sec">
             <div className="sec-t">Hazır şablon</div>
             <div className="tabs">
