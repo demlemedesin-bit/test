@@ -313,3 +313,9 @@
 
 /* Bildirim paneli içerik katmanının altında kalmasın */
 .topbar { position: relative; z-index: 60; }
+
+/* Üst çubuk: süre seçici (Son 7/30/90 gün) tek satırda kalsın, başlık gerekirse kısalsın */
+.topbar .tb-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }
+.topbar .tb-right { flex-shrink: 0; }
+.topbar .seg { flex-wrap: nowrap; flex-shrink: 0; gap: 4px; }
+.topbar .seg button { padding: 6px 12px; font-size: 12.5px; white-space: nowrap; }
