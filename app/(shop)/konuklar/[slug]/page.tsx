@@ -48,6 +48,16 @@ export default async function Konuk({ params }: Props) {
           <p key={k}>{t}</p>
         ))}
       </div>
+      {p.videos.length > 0 && (
+        <section className="kp-videos">
+          <h2>Videolar</h2>
+          {p.videos.map((id) => (
+            <div className="kp-video" key={id}>
+              <iframe src={`https://www.youtube-nocookie.com/embed/${id}`} title={`${p.name} videosu`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
+            </div>
+          ))}
+        </section>
+      )}
       {p.photos.length > 0 && (
         <div className="kp-photos">
           {p.photos.map((u) => (

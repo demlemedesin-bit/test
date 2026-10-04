@@ -3,8 +3,9 @@ import { join } from 'node:path';
 import { getSite } from './site';
 import { DRAWINGS } from './siteDefaults';
 import { guestSlug } from './guestSlug';
+import { parseVideo } from './catalog';
 
-export type Profile = { name: string; slug: string; bio: string[]; img: string | null; photos: string[] };
+export type Profile = { name: string; slug: string; bio: string[]; img: string | null; photos: string[]; videos: string[] };
 
 const KONUK = '/demleme/04-konuklar/';
 type Bio = { name: string; slug: string; bio: string[] };
@@ -24,9 +25,9 @@ export async function getProfiles(): Promise<Profile[]> {
     const bio = g.bio?.trim() ? paras(g.bio) : def?.bio ?? [];
     if (!bio.length) continue;
     seen.add(slug);
-    out.push({ name: g.name.trim(), slug, bio, img: DRAWINGS.includes(g.drawing) ? `${KONUK}guests/${g.drawing}-720.webp` : null, photos: (g.photos ?? []).filter(Boolean) });
+    out.push({ name: g.name.trim(), slug, bio, img: DRAWINGS.includes(g.drawing) ? `${KONUK}guests/${g.drawing}-720.webp` : null, photos: (g.photos ?? []).filter(Boolean), videos: [...new Set((g.videos ?? '').split(/\s+/).map((u) => parseVideo(u)?.yt).filter((x): x is string => !!x))] });
   }
-  for (const b of BIOS) if (!seen.has(b.slug)) out.push({ name: b.name, slug: b.slug, bio: b.bio, img: null, photos: [] });
+  for (const b of BIOS) if (!seen.has(b.slug)) out.push({ name: b.name, slug: b.slug, bio: b.bio, img: null, photos: [], videos: [] });
   return out;
 }
 
