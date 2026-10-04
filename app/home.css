@@ -391,7 +391,7 @@ em{ font-style:normal; font-weight:400; }
 .hero-link{ display:flex; flex-direction:column; align-items:center; gap:var(--s-12); text-align:center; transition:opacity var(--dur) var(--ease); }
 .hero-link:hover{ opacity:.7; }
 .hero-link img{ height:clamp(80px, 8.6vw, 124px); width:auto; display:block; }
-.hero-link span{ font-size:clamp(14px, 1.15vw, 16px); margin-top:var(--s-4); font-weight:500; color:var(--ink-2); max-width:16ch; line-height:1.3; }
+.hero-link span{ font-size:var(--t-18); margin-top:var(--s-4); font-weight:500; color:var(--ink-2); max-width:16ch; line-height:1.3; }
 
 /* Title: each line is a flex row of words. Two slots (before "sohbet" and
    before "demlenir") open in relay, driven by script: one opens, its scenes play
