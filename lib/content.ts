@@ -1,3 +1,4 @@
+import { profileHref } from './guestProfiles';
 import fs from 'node:fs';
 import path from 'node:path';
 import { getConfig, getProducts, rest, type SiteProduct } from './catalog';
@@ -41,7 +42,7 @@ export async function homeHtml(): Promise<string> {
   const data = {
     guests: guests.map((g) => ({
       name: g.name,
-      url: g.url,
+      url: profileHref(g.name, !!g.bio?.trim()),
       img: `${KONUK}guests/${g.drawing}-720.webp`,
       ar: aspect[g.drawing.slice(0, 3).toUpperCase()],
       steam: steam[g.drawing] ?? null,

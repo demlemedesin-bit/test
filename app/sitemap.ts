@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getProducts, rest } from '@/lib/catalog';
 import { getPages, getPosts } from '@/lib/cms';
+import { getProfiles } from '@/lib/guestProfiles';
 import { docSlugs } from '@/lib/legal';
 import { siteUrl } from '@/lib/siteUrl';
 import { baseUrl } from '@/lib/seo';
@@ -64,5 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   }
+  out.push({ url: `${base}/konuklar`, changeFrequency: 'monthly', priority: 0.6 });
+  for (const g of await getProfiles()) out.push({ url: `${base}/konuklar/${g.slug}`, changeFrequency: 'monthly', priority: 0.5 });
   return out.filter((e) => !excluded(c.exclude, e.url.slice(base.length) || '/'));
 }

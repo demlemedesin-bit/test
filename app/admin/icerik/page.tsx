@@ -21,6 +21,8 @@ import {
   type Guest,
 } from '@/lib/siteDefaults';
 
+import PROFILES from '@/content/konuk-profilleri.json';
+import { guestSlug } from '@/lib/guestSlug';
 import './icerik.css';
 import { PageHero } from '@/components/admin/PageHero';
 const TABS = ['Metin ve görseller', 'Sıkça sorulan sorular', 'Konuklar', 'Ayın demleyenleri', 'Menü ve footer'] as const;
@@ -214,12 +216,40 @@ export default function Content() {
                   <div className="card-b">
                     <div className="row3">
                       <Field label="Ad"><input className="inp" value={g.name} onChange={(e) => setGuests((a) => setAt(a, gi, { name: e.target.value }))} /></Field>
-                      <Field label="Bağlantı"><input className="inp" value={g.url} onChange={(e) => setGuests((a) => setAt(a, gi, { url: e.target.value }))} /></Field>
                       <Field label="Çizim">
                         <select className="inp" value={g.drawing} onChange={(e) => setGuests((a) => setAt(a, gi, { drawing: e.target.value }))}>
                           {DRAWINGS.map((d) => <option key={d} value={d}>{d}</option>)}
                         </select>
                       </Field>
+                    </div>
+                    <span className="lbl">Profil sayfası <a href={`/konuklar/${guestSlug(g.name)}`} target="_blank" rel="noopener" style={{ fontWeight: 400, marginLeft: 8 }}>/konuklar/{guestSlug(g.name)}</a></span>
+                    <Field label="Konuk hakkında yazı (paragraflar arasına boş satır bırak)">
+                      <textarea className="inp" rows={9} value={g.bio ?? (PROFILES as { slug: string; bio: string[] }[]).find((b) => b.slug === guestSlug(g.name))?.bio.join('\n\n') ?? ''} onChange={(e) => setGuests((a) => setAt(a, gi, { bio: e.target.value }))} />
+                    </Field>
+                    <span className="lbl">Profil fotoğrafları</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+                      {(g.photos ?? []).map((u, pi) => (
+                        <div key={pi} style={{ position: 'relative' }}>
+                          { }
+                          <img src={u} alt="" style={{ width: 84, height: 105, objectFit: 'cover', borderRadius: 6, background: 'var(--s3)', display: 'block' }} />
+                          <button type="button" className="btn ghost sm" style={{ position: 'absolute', top: 2, right: 2, padding: '0 6px' }} onClick={() => setGuests((a) => setAt(a, gi, { photos: without(g.photos ?? [], pi) }))}>×</button>
+                        </div>
+                      ))}
+                      <label className="btn ghost sm" style={{ position: 'relative', alignSelf: 'center' }}>
+                        Fotoğraf ekle
+                        <input type="file" accept="image/*" multiple style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={async (e) => {
+                          const fs = Array.from(e.target.files ?? []);
+                          e.target.value = '';
+                          if (!fs.length) return;
+                          try {
+                            const { uploadImage } = await import('@/lib/admin');
+                            const urls: string[] = [];
+                            for (const f of fs) urls.push(await uploadImage(f, 'konuklar'));
+                            setGuests((a) => setAt(a, gi, { photos: [...(g.photos ?? []), ...urls] }));
+                            show('Fotoğraf yüklendi. Kaydetmeyi unutma.');
+                          } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
+                        }} />
+                      </label>
                     </div>
                     <span className="lbl">Reels&apos;ler</span>
                     {g.reels.map((r, ri) => (
