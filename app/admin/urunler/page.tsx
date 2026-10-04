@@ -225,9 +225,23 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu — YouTube bağlantısı (Liste dışı olabilir) veya .mp4; ürün sayfasında gösterilir'], ['episode_title', 'Podcast bölümü adı (bu ürünün geçtiği bölüm)'], ['episode_url', 'Podcast bölümü bağlantısı (https://…)']] as const).map(([k, l]) => (
           <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
         ))}
-        <Field label="Diğer podcast bölümleri" hint="Ürün birden fazla bölümde geçtiyse her satıra bir bölüm yaz: Bölüm adı | https://bağlantı">
-          <textarea className="inp" rows={3} placeholder={'Alara bölümü | https://youtube.com/watch?v=...\nBaşka bölüm | https://youtube.com/watch?v=...'} value={((d.data as Record<string, unknown>).episodes_extra as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, episodes_extra: e.target.value } }))} />
-        </Field>
+        {(() => {
+          const raw = ((d.data as Record<string, unknown>).episodes_extra as string) ?? '';
+          const rows = raw === '' ? [] : raw.split('\n').map((l) => { const k = l.lastIndexOf('|'); return k < 0 ? ['', l] : [l.slice(0, k).replace(/\s$/, ''), l.slice(k + 1).replace(/^\s/, '')]; });
+          const save = (r: string[][]) => setD((x) => ({ ...x, data: { ...x.data, episodes_extra: r.map((a) => `${a[0]} | ${a[1]}`).join('\n') || undefined } }));
+          return (
+            <Field label="Diğer podcast bölümleri" hint="Ürün birden fazla bölümde geçtiyse her biri için ayrı satır ekle.">
+              {rows.map((r, n) => (
+                <div key={n} style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                  <input className="inp" style={{ flex: '1 1 180px' }} placeholder="Bölüm adı" value={r[0]} onChange={(e) => save(rows.map((a, m) => (m === n ? [e.target.value, a[1]] : a)))} />
+                  <input className="inp" style={{ flex: '2 1 260px' }} placeholder="https://…" value={r[1]} onChange={(e) => save(rows.map((a, m) => (m === n ? [a[0], e.target.value] : a)))} />
+                  <button type="button" className="btn" onClick={() => save(rows.filter((_, m) => m !== n))}>Kaldır</button>
+                </div>
+              ))}
+              <button type="button" className="btn" onClick={() => save([...rows, ['', '']])}>+ Bölüm ekle</button>
+            </Field>
+          );
+        })()}
         <Field label="Video kapak görseli" hint="İsteğe bağlı. Boş bırakırsan YouTube'un kendi kapağı kullanılır. Yatay (16:9) görsel önerilir.">
           {(() => { const cov = ((d.data as Record<string, unknown>).video_cover as string) || ''; return (
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
