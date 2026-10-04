@@ -30,17 +30,17 @@
 .reels{ margin:var(--s-32) var(--pad) 0; }
 .reels-head{ display:flex; align-items:center; gap:var(--s-16); margin-bottom:var(--s-16); }
 .reels-head .label{ margin:0; } .reels-line{ flex:1; height:1px; background:var(--line); }
-.reels-track{ display:grid; grid-auto-flow:column; grid-auto-columns:calc((100% - 4 * var(--s-16)) / 5); gap:var(--s-16); overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-behavior:smooth; }
+.reels-track{ display:grid; grid-auto-flow:column; grid-auto-columns:calc((100% - 2 * var(--s-16)) / 3); gap:var(--s-16); overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-behavior:smooth; }
 .reels-track::-webkit-scrollbar{ display:none; }
-.rl-card{ position:relative; display:block; scroll-snap-align:start; border:2px solid var(--ink); border-radius:12px; overflow:hidden; background:#F8F4EA; aspect-ratio:4/5; }
+.rl-card{ position:relative; display:block; scroll-snap-align:start; border:2px solid var(--ink); border-radius:12px; overflow:hidden; background:#F8F4EA; aspect-ratio:16/9; }
 .rl-cover{ width:100%; height:100%; object-fit:cover; display:block; transition:transform 400ms var(--ease); }
 .rl-card:hover .rl-cover{ transform:scale(1.03); }
 .rl-play{ position:absolute; top:10px; right:10px; width:36px; height:36px; }
 .rl-card::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:38%; background:linear-gradient(to top, rgba(23,19,15,.62), rgba(23,19,15,0)); pointer-events:none; }   /* reels keep their own photo covers: a soft dark fade keeps the name readable */
 .rl-name{ position:absolute; z-index:1; left:14px; bottom:24px; font-family:var(--font-display); font-size:var(--t-14); letter-spacing:.04em; text-transform:uppercase; color:#F8F4EA; }
 .rl-bar{ position:absolute; z-index:1; left:14px; right:14px; bottom:14px; height:3px; background:rgba(248,244,234,.35); border-radius:2px; overflow:hidden; } .rl-bar i{ display:block; height:100%; background:#F8F4EA; }
-@media (max-width: 1024px){ .reels-track{ grid-auto-columns:calc((100% - 2 * var(--s-16)) / 3); } }
-@media (max-width: 768px){ .konuk{ min-height:0; } .konuk-stage{ aspect-ratio:21 / 9; width:100%; } .kc{ height:18px; padding:.15em .7em 0; font-size:8px; letter-spacing:.02em; } .reels-track{ grid-auto-columns:46%; } .konuk-controls{ position:static; margin:var(--s-16) var(--pad) 0; } }
+@media (max-width: 1024px){ .reels-track{ grid-auto-columns:calc((100% - var(--s-16)) / 2); } }
+@media (max-width: 768px){ .konuk{ min-height:0; } .konuk-stage{ aspect-ratio:21 / 9; width:100%; } .kc{ height:18px; padding:.15em .7em 0; font-size:8px; letter-spacing:.02em; } .reels-track{ grid-auto-columns:82%; } .konuk-controls{ position:static; margin:var(--s-16) var(--pad) 0; } }
 /* ---------- Demleme Shop (mockup) ---------- */
 /* ---------- v15 Konuklar: the turning table ---------- */
 .kr{ margin-top:var(--s-24); }

@@ -181,8 +181,10 @@
     var open=function(inner){ close(); box=document.createElement('div'); box.className='rl-modal'; box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button>'+inner+'</div>';
       box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); }); document.body.appendChild(box); document.documentElement.style.overflow='hidden'; };
     var hv=function(card,on){ var v=card.querySelector('.rl-vid'); if(!v) return;
-      if(on){ if(!v.getAttribute('src')) v.src=v.getAttribute('data-src'); var pr=v.play(); if(pr && pr.catch) pr.catch(function(){}); card.classList.add('is-playing'); }
-      else { try{ v.pause(); v.currentTime=0; }catch(e){} card.classList.remove('is-playing'); } };
+      if(on){ card._h=true; if(!v.getAttribute('src')) v.src=v.getAttribute('data-src'); v.muted=true; v.preload='auto';
+        var show=function(){ if(card._h) card.classList.add('is-playing'); }; v.onplaying=show;   // kapak, video gerçekten oynamaya başlayana kadar görünür kalır
+        var pr=v.play(); if(pr && pr.then) pr.then(show, function(){}); }
+      else { card._h=false; v.onplaying=null; try{ v.pause(); v.currentTime=0; }catch(e){} card.classList.remove('is-playing'); } };
     rt.addEventListener('mouseover', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,true); });
     rt.addEventListener('mouseout', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,false); });
     rt.addEventListener('click', function(e){
@@ -361,19 +363,19 @@
           }); }, ok[0] ? 850 : 0); }); };
     var turn=function(dir){ queue.push(dir); if(!busy) step(); };
     var pressFx=function(b){ b.classList.remove('is-press'); void b.offsetWidth; b.classList.add('is-press'); stage.classList.remove('is-nudge'); void stage.offsetWidth; stage.classList.add('is-nudge'); };
-    document.getElementById('krNext').addEventListener('click', function(){ pressFx(this); turn(1); });
-    document.getElementById('krPrev').addEventListener('click', function(){ pressFx(this); turn(-1); });
+    document.getElementById('krNext').addEventListener('click', function(){ pressFx(this); turn(-1); });   // sağ ok: sağdaki konuk öne gelir
+    document.getElementById('krPrev').addEventListener('click', function(){ pressFx(this); turn(1); });    // sol ok: soldaki konuk öne gelir
     // masayı sürükleyerek / kaydırarak da çevir (fare ve dokunma): sola sürükle = bir sonraki konuk
     (function(){ var sx=null, sy=0, id=null, moved=false;
       stage.style.touchAction='pan-y'; stage.classList.add('is-drag');
       stage.addEventListener('pointerdown', function(e){ if(e.pointerType==='mouse' && e.button!==0) return; sx=e.clientX; sy=e.clientY; id=e.pointerId; moved=false; });
       stage.addEventListener('pointermove', function(e){ if(sx===null || e.pointerId!==id) return; var dx=e.clientX-sx; if(Math.abs(dx)>8) moved=true; stage.style.setProperty('--drag', Math.max(-1,Math.min(1,dx/200)).toFixed(3)); });
       var end=function(e){ if(sx===null || (e && e.pointerId!==id)) return; var dx=(e?e.clientX:sx)-sx, dy=(e?e.clientY:sy)-sy; sx=null; stage.style.setProperty('--drag','0');
-        if(Math.abs(dx)>46 && Math.abs(dx)>Math.abs(dy)*1.4){ pressFx(dx<0?document.getElementById('krNext'):document.getElementById('krPrev')); turn(dx<0?1:-1); } };
+        if(Math.abs(dx)>46 && Math.abs(dx)>Math.abs(dy)*1.4){ pressFx(dx<0?document.getElementById('krNext'):document.getElementById('krPrev')); turn(dx<0?-1:1); } };
       stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', function(){ sx=null; stage.style.setProperty('--drag','0'); });
       stage.addEventListener('click', function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); moved=false; } }, true);
     })();
-    stage.tabIndex=0; stage.addEventListener('keydown', function(e){ if(e.key==='ArrowRight'){ e.preventDefault(); turn(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); turn(-1); } });
+    stage.tabIndex=0; stage.addEventListener('keydown', function(e){ if(e.key==='ArrowRight'){ e.preventDefault(); turn(-1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); turn(1); } });
     // reels under the table follow the guest in the middle
     var track=document.getElementById('reelTrack'), rname=document.getElementById('krReelName'), shown=-1;
     var reels=function(){ var mid=((Math.round(rot)%N)+N)%N; if(mid===shown || !track) return; var first=shown<0; shown=mid; var g=G[mid];
