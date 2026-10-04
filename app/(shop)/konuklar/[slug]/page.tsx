@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { D } from '@/components/Display';
+import VideoSlider from '@/components/VideoSlider';
 import { getProfiles } from '@/lib/guestProfiles';
 import { applyTemplate } from '@/lib/seo';
 import { getSeoBundle } from '@/lib/seoServer';
@@ -51,11 +52,7 @@ export default async function Konuk({ params }: Props) {
       {p.videos.length > 0 && (
         <section className="kp-videos">
           <h2>Videolar</h2>
-          {p.videos.map((id) => (
-            <div className="kp-video" key={id}>
-              <iframe src={`https://www.youtube-nocookie.com/embed/${id}`} title={`${p.name} videosu`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
-            </div>
-          ))}
+          <VideoSlider ids={p.videos} name={p.name} />
         </section>
       )}
       {p.photos.length > 0 && (
