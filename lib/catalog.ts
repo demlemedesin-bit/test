@@ -33,7 +33,7 @@ export type SiteProduct = {
   colors: Color[];
   sizes?: SizeBlock;
   showColors?: boolean;
-  video?: { yt?: string; src?: string };
+  video?: { yt?: string; src?: string; cover?: string };
   chart?: unknown;
   details: string[][];
   sort: number;
@@ -50,7 +50,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; video?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
+  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; video?: string; video_cover?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -104,7 +104,7 @@ function fromRow(r: Row): SiteProduct {
     ...(d.episode_title?.trim() && /^https?:\/\//i.test(d.episode_url ?? '') ? { episode: { title: d.episode_title.trim().slice(0, 140), url: (d.episode_url as string).trim() } } : {}),
     ...(Array.isArray(d.gallery) && d.gallery.length ? { gallery: d.gallery.filter((g) => typeof g === 'string').slice(0, 10) } : {}),
     sizes,
-    ...(parseVideo(d.video) ? { video: parseVideo(d.video) } : {}),
+    ...(parseVideo(d.video) ? { video: { ...parseVideo(d.video), ...(d.video_cover ? { cover: d.video_cover } : {}) } } : {}),
     ...(typeof d.show_colors === 'boolean' ? { showColors: d.show_colors } : {}),
     chart: d.chart,
     details: d.details ?? [],
