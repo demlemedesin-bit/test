@@ -31,3 +31,20 @@
 @media (max-width:600px){
   .yz-cover{ max-height:260px; }
 }
+
+/* konuk listesi ve profil sayfası */
+.kp-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr)); gap:var(--s-32) var(--s-24); list-style:none; margin:var(--s-32) 0 0; padding:0; }
+.kp-card{ display:flex; flex-direction:column; gap:var(--s-8); height:100%; }
+.kp-img{ aspect-ratio:4/5; display:flex; align-items:flex-end; justify-content:center; background:var(--cream); border:1px solid var(--line); overflow:hidden; }
+.kp-img img{ height:96%; width:auto; max-width:100%; object-fit:contain; display:block; }
+.kp-card h2{ font-size:clamp(20px,2vw,26px); line-height:1.1; margin:var(--s-4) 0 0; }
+.kp-card:hover h2{ text-decoration:underline; text-underline-offset:4px; }
+.kp-card p{ margin:0; color:var(--ink-2); font-size:var(--t-14); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.kp-head{ display:flex; align-items:flex-end; gap:var(--s-24); margin:0 0 var(--s-24); }
+.kp-head .page-title{ margin:0; }
+.kp-portrait{ height:clamp(120px,22vw,190px); width:auto; display:block; flex:none; }
+.kp-nav{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--s-12); margin-top:var(--s-48); padding-top:var(--s-16); border-top:1px solid var(--line-strong); font-size:var(--t-14); }
+.kp-nav a:hover{ text-decoration:underline; text-underline-offset:4px; }
+@media (max-width:600px){ .kp-head{ flex-direction:column; align-items:flex-start; } }
+.kp-photos{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr)); gap:var(--s-12); margin-top:var(--s-32); }
+.kp-photos img{ width:100%; aspect-ratio:4/5; object-fit:cover; display:block; background:var(--cream); border:1px solid var(--line); }
