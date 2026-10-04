@@ -82,7 +82,7 @@ function Team({ toast }: { toast: (t: string, err?: boolean) => void }) {
     <>
       <div className="alert warn sy-info">
         <Info size={17} style={{ flexShrink: 0, marginTop: 1 }} />
-        <span>Tam yöneticiler <b>shop_settings.admin_emails</b> ile belirlenir (Ayarlar sayfasında); buradan değil. Buradaki kişiler yalnızca seçilen bölümlere girebilir. Kişi önce sitede üye olmalıdır.</span>
+        <span>Tam yöneticiler <b>shop_settings.admin_emails</b> ile belirlenir (Ayarlar sayfasında); buradan değil. Buradaki kişiler yalnızca seçilen bölümlere girebilir. E-posta ve şifre yazarsan hesap hemen oluşturulur, kişinin ayrıca üye olması gerekmez.</span>
       </div>
       {err && <div className="alert err">{err}</div>}
       <section className="card">
