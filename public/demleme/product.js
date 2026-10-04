@@ -18,7 +18,7 @@
           else if(part) frag.appendChild(document.createTextNode(part));
         });
         node.parentNode.replaceChild(frag, node);
-      } else if(node.nodeType===1 && node.tagName!=='SCRIPT' && node.tagName!=='STYLE' && !node.classList.contains('tg')){
+      } else if(node.nodeType===1 && node.tagName!=='SCRIPT' && node.tagName!=='STYLE' && !node.classList.contains('tg') && !node.classList.contains('pv-h') && !node.classList.contains('pv-jump')){
         [].slice.call(node.childNodes).forEach(walk);
       }
     };
