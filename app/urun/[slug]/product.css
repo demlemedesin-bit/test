@@ -163,3 +163,6 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pv-jump:hover{ background:#17130F; color:#F6F0E3; } .pv-jump:active{ transform:scale(.96); }
 .pv-jump svg{ animation:pvbob 1.6s ease-in-out infinite; } @keyframes pvbob{ 50%{ transform:translateY(3px) } }
 @media (prefers-reduced-motion:reduce){ .pv-jump svg{ animation:none } }
+
+.pp-msg.is-low{ color:#DD262C; font-weight:600; }
+.pp-det details[open] summary{ padding-bottom:6px; }
