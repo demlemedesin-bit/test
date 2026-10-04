@@ -159,7 +159,7 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pv-btn svg{ margin-left:3px; } .pv-play:hover .pv-btn{ transform:scale(1.1); } .pv-play:active .pv-btn{ transform:scale(.92); }
 @media (max-width:600px){ .pv{ margin-top:32px; padding:0 16px; } .pv-btn{ width:60px; height:60px; margin:-30px 0 0 -30px; } }
 
-.pv-jump{ display:inline-flex; align-items:center; gap:8px; margin:8px 0 2px; padding:9px 16px; border:1.5px solid #17130F; border-radius:99px; background:transparent; color:#17130F; font:600 13px/1 inherit; font-family:inherit; cursor:pointer; transition:background .2s,color .2s,transform .15s; }
+.pv-jump{ display:inline-flex; align-items:center; gap:8px; box-sizing:border-box; height:40px; margin:8px 8px 2px 0; padding:0 16px; border:1.5px solid #17130F; border-radius:99px; background:transparent; color:#17130F; font-family:inherit; font-size:13px; font-weight:600; line-height:1; text-decoration:none; white-space:nowrap; cursor:pointer; transition:background .2s,color .2s,transform .15s; }
 .pv-jump:hover{ background:#17130F; color:#F6F0E3; } .pv-jump:active{ transform:scale(.96); }
 .pv-jump svg{ animation:pvbob 1.6s ease-in-out infinite; } @keyframes pvbob{ 50%{ transform:translateY(3px) } }
 @media (prefers-reduced-motion:reduce){ .pv-jump svg{ animation:none } }
