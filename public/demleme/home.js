@@ -289,7 +289,7 @@
   // (rot), so any number of presses queue smoothly and the circle never ends. The middle guest drives the reels.
   (function(){
     var stage=document.getElementById('krStage'), host=document.getElementById('krSeats'), el=document.getElementById('krData'); if(!stage || !el) return;
-    var D=JSON.parse(el.textContent), G=D.guests, COV=D.covers, TEAS=D.teas||[], N=G.length, STEP=2*Math.PI/N, R=[0.7569, 0.6953, 0.6502, 0.6146, 0.5833, 0.5565, 0.5339, 0.513, 0.4939, 0.4766, 0.4618, 0.4488, 0.4375, 0.4288, 0.421, 0.4149, 0.4087, 0.405, 0.4028, 0.4019, 0.401, 0.4028, 0.4054, 0.4097, 0.4158, 0.4227, 0.4314, 0.4427, 0.454, 0.467, 0.4826, 0.4991, 0.5179, 0.5381, 0.5599, 0.5851, 0.6155, 0.6502, 0.6927, 0.7465, 0.8264], TAR=2.3333;
+    var D=JSON.parse(el.textContent), G=D.guests, COV=D.covers, TEAS=D.teas||[], N=G.length, STEP=2*Math.PI/N, R=[0.7538,0.7071,0.6604,0.6243,0.5916,0.5651,0.5426,0.5216,0.5018,0.4854,0.4702,0.4574,0.4457,0.4364,0.4294,0.4224,0.4175,0.4131,0.4107,0.4096,0.4096,0.4107,0.4142,0.4177,0.4247,0.4317,0.4399,0.4504,0.4621,0.4761,0.4912,0.5076,0.5265,0.5473,0.5694,0.5951,0.6254,0.6604,0.7036,0.7608,0.818], TAR=2.3333;
     var cups=TEAS.map(function(t,i){ var dl=(i*.83)%3.4;   // one steam per tea glass on the table, each on its own beat
       stage.insertAdjacentHTML('beforeend','<svg class="kr-steam kr-steam--cup" viewBox="0 0 100 160" aria-hidden="true"><path class="w1" style="animation-delay:-'+dl.toFixed(2)+'s" d="M58 150 C44 128 70 112 54 90 C40 70 60 56 46 34"/><path class="w2" style="animation-delay:'+(1.7-dl).toFixed(2)+'s" d="M42 152 C30 132 50 118 36 98 C24 80 40 66 28 46"/></svg>'); return stage.lastElementChild; });
     var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
