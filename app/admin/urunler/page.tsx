@@ -225,6 +225,9 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu — YouTube bağlantısı (Liste dışı olabilir) veya .mp4; ürün sayfasında gösterilir'], ['episode_title', 'Podcast bölümü adı (bu ürünün geçtiği bölüm)'], ['episode_url', 'Podcast bölümü bağlantısı (https://…)']] as const).map(([k, l]) => (
           <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
         ))}
+        <Field label="Diğer podcast bölümleri" hint="Ürün birden fazla bölümde geçtiyse her satıra bir bölüm yaz: Bölüm adı | https://bağlantı">
+          <textarea className="inp" rows={3} placeholder={'Alara bölümü | https://youtube.com/watch?v=...\nBaşka bölüm | https://youtube.com/watch?v=...'} value={((d.data as Record<string, unknown>).episodes_extra as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, episodes_extra: e.target.value } }))} />
+        </Field>
         <Field label="Video kapak görseli" hint="İsteğe bağlı. Boş bırakırsan YouTube'un kendi kapağı kullanılır. Yatay (16:9) görsel önerilir.">
           {(() => { const cov = ((d.data as Record<string, unknown>).video_cover as string) || ''; return (
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>

@@ -30,6 +30,7 @@ export type SiteProduct = {
   thumb: string;
   gallery?: string[];
   episode?: { title: string; url: string };
+  episodes?: { title: string; url: string }[];
   colors: Color[];
   sizes?: SizeBlock;
   showColors?: boolean;
@@ -50,7 +51,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; video?: string; video_cover?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
+  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; episodes_extra?: string; video?: string; video_cover?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -101,6 +102,16 @@ function fromRow(r: Row): SiteProduct {
     out: r.stock != null && r.stock <= 0,
     thumb: r.thumb || r.colors?.[0]?.img || '',
     colors: r.colors ?? [],
+    ...(() => {
+      const eps: { title: string; url: string }[] = [];
+      if (d.episode_title?.trim() && /^https?:\/\//i.test(d.episode_url ?? '')) eps.push({ title: d.episode_title.trim().slice(0, 140), url: (d.episode_url as string).trim() });
+      for (const line of String(d.episodes_extra ?? '').split('\n')) {
+        const i = line.lastIndexOf('|'); if (i < 1) continue;
+        const title = line.slice(0, i).trim().slice(0, 140), url = line.slice(i + 1).trim();
+        if (title && /^https?:\/\//i.test(url)) eps.push({ title, url });
+      }
+      return eps.length ? { episodes: eps.slice(0, 8) } : {};
+    })(),
     ...(d.episode_title?.trim() && /^https?:\/\//i.test(d.episode_url ?? '') ? { episode: { title: d.episode_title.trim().slice(0, 140), url: (d.episode_url as string).trim() } } : {}),
     ...(Array.isArray(d.gallery) && d.gallery.length ? { gallery: d.gallery.filter((g) => typeof g === 'string').slice(0, 10) } : {}),
     sizes,
