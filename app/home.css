@@ -434,6 +434,7 @@ em{ font-style:normal; font-weight:400; }
 .hero-lead{ min-height:calc(94vh - 65px); }   /* title + buttons fill the first screen; the stats begin right under the fold */
 .title--b{ font-size:var(--title-fs); line-height:1.02; letter-spacing:-.02em; margin:0; }
 .title--b .line{ white-space:nowrap; }
+.title--b .mo{ display:none; }
 .title--b em{ font-style:normal; font-weight:400; }
 .hero-links--left{ justify-content:flex-start; margin-top:clamp(56px, 7vh, 96px); gap:clamp(64px, 7vw, 120px); }
 .hero--d .stats{ margin-top:var(--s-48); grid-template-columns:repeat(4, 1fr); column-gap:clamp(24px, 3vw, 56px); text-align:center; border-top:1px solid var(--line); padding-top:var(--s-32); }   /* full-width strip under the about copy AND Garen's photo (JS pushes it below the photo) */
@@ -467,7 +468,7 @@ em{ font-style:normal; font-weight:400; }
   .title--b, .hero-links--left, .hero-about, .hero--d .stats{ margin-left:var(--pad); margin-right:var(--pad); }
   .title--b{ order:1; margin-top:var(--s-32); } .hero-links--left{ order:2; } .hero-b-art{ order:3; } .hero--d .stats{ order:4; grid-template-columns:repeat(2, 1fr); margin-top:var(--s-40); } .hero-about{ order:5; }
   .hero--d{ --title-fs:clamp(20px, 6.4vw, 38px); padding-top:var(--s-24); } .hero-b-art{ top:auto; }
-  .title--b{ margin-top:var(--s-8); }
+  .title--b{ margin-top:var(--s-8); } .title--b .mo{ display:inline; }
   .hero-links--left{ margin-top:var(--s-32); gap:var(--s-40); } .hero-link img{ height:64px; } .hero-link span{ font-size:14px; }
   .hero-about{ max-width:none; }
   .hero--d .stats{ grid-template-columns:1fr 1fr; row-gap:var(--s-32); column-gap:var(--s-16); margin-top:var(--s-48); border-top:0; padding-top:0; }
