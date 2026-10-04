@@ -166,3 +166,6 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 
 .pp-msg.is-low{ color:#DD262C; font-weight:600; }
 .pp-det details[open] summary{ padding-bottom:6px; }
+.pp-det summary{ padding:14px 0; }
+.pp-det details[open] summary{ padding-bottom:0; }
+.pp-det details[open] p{ margin:0 0 14px; line-height:1.5; }
