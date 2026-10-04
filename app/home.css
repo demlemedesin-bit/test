@@ -466,7 +466,7 @@ em{ font-style:normal; font-weight:400; }
   .hero-lead{ display:contents; }
   .title--b, .hero-links--left, .hero-about, .hero--d .stats{ margin-left:var(--pad); margin-right:var(--pad); }
   .title--b{ order:1; margin-top:var(--s-32); } .hero-links--left{ order:2; } .hero-b-art{ order:3; } .hero--d .stats{ order:4; grid-template-columns:repeat(2, 1fr); margin-top:var(--s-40); } .hero-about{ order:5; }
-  .hero--d{ --title-fs:clamp(26px, 7.8vw, 40px); padding-top:var(--s-24); } .hero-b-art{ top:auto; }
+  .hero--d{ --title-fs:clamp(20px, 6.4vw, 38px); padding-top:var(--s-24); } .hero-b-art{ top:auto; }
   .title--b{ margin-top:var(--s-8); }
   .hero-links--left{ margin-top:var(--s-32); gap:var(--s-40); } .hero-link img{ height:64px; }
   .hero-about{ max-width:none; }
