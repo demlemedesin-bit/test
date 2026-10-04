@@ -150,11 +150,16 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 /* Ürün videosu */
 .pv{ max-width:960px; margin:48px auto 0; padding:0 20px; }
 .pv-h{ font-family:inherit; font-weight:600; letter-spacing:-.01em; font-size:clamp(22px,3vw,30px); margin:0 0 16px; text-align:center; }
-.pv-frame{ position:relative; aspect-ratio:16/9; background:#17130F; border:2px solid #17130F; border-radius:14px; overflow:hidden; box-shadow:6px 6px 0 #DD262C; }
+.pv-frame{ position:relative; aspect-ratio:16/9; background:#17130F; border:2px solid #17130F; border-radius:14px; overflow:hidden; }
 .pv-frame iframe,.pv-frame video,.pv-play{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
 .pv-play{ padding:0; border:0; background:#17130F; cursor:pointer; }
 .pv-play img{ width:100%; height:100%; object-fit:cover; opacity:.92; transition:transform .5s ease,opacity .2s; }
 .pv-play:hover img{ transform:scale(1.03); opacity:1; }
 .pv-btn{ position:absolute; left:50%; top:50%; width:76px; height:76px; margin:-38px 0 0 -38px; border-radius:50%; background:#F6F0E3; color:#17130F; border:2px solid #17130F; display:grid; place-items:center; transition:transform .2s; }
 .pv-btn svg{ margin-left:3px; } .pv-play:hover .pv-btn{ transform:scale(1.1); } .pv-play:active .pv-btn{ transform:scale(.92); }
-@media (max-width:600px){ .pv{ margin-top:32px; padding:0 16px; } .pv-btn{ width:60px; height:60px; margin:-30px 0 0 -30px; } .pv-frame{ box-shadow:4px 4px 0 #DD262C; } }
+@media (max-width:600px){ .pv{ margin-top:32px; padding:0 16px; } .pv-btn{ width:60px; height:60px; margin:-30px 0 0 -30px; } }
+
+.pv-jump{ display:inline-flex; align-items:center; gap:8px; margin:8px 0 2px; padding:9px 16px; border:1.5px solid #17130F; border-radius:99px; background:transparent; color:#17130F; font:600 13px/1 inherit; font-family:inherit; cursor:pointer; transition:background .2s,color .2s,transform .15s; }
+.pv-jump:hover{ background:#17130F; color:#F6F0E3; } .pv-jump:active{ transform:scale(.96); }
+.pv-jump svg{ animation:pvbob 1.6s ease-in-out infinite; } @keyframes pvbob{ 50%{ transform:translateY(3px) } }
+@media (prefers-reduced-motion:reduce){ .pv-jump svg{ animation:none } }
