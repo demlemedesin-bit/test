@@ -187,6 +187,11 @@
       else { card._h=false; v.onplaying=null; try{ v.pause(); v.currentTime=0; }catch(e){} card.classList.remove('is-playing'); } };
     rt.addEventListener('mouseover', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,true); });
     rt.addEventListener('mouseout', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,false); });
+    // Dokunmatik ekranda fare yok: kart görünür alana yeterince girince sessiz önizleme kendiliğinden oynar, uzaklaşınca durur
+    (function(){ if(!window.IntersectionObserver || !matchMedia('(hover: none)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.connection && navigator.connection.saveData)) return;
+      var io=new IntersectionObserver(function(es){ es.forEach(function(en){ hv(en.target, en.isIntersecting && en.intersectionRatio>=.6); }); }, {threshold:[0,.6,1]});
+      var seen=new WeakSet(), scan=function(){ [].forEach.call(rt.querySelectorAll('a.rl-card.has-v'), function(c){ if(!seen.has(c)){ seen.add(c); io.observe(c); } }); };
+      scan(); new MutationObserver(scan).observe(rt,{childList:true}); })();
     rt.addEventListener('click', function(e){
       var a=e.target.closest('a.rl-card'); if(!a) return; var vs=a.getAttribute('data-v'), hr=a.getAttribute('href')||'';
       if(vs){ e.preventDefault(); hv(a,false); open('<video class="rl-m-v" src="'+vs+'" controls autoplay playsinline loop></video>'); return; }
