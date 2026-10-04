@@ -172,7 +172,7 @@ a:active .dbtn, button:not([disabled]):active .dbtn{ transform:translateY(1px); 
 .shop-art{ position:relative; }
 .shop-hero{ display:block; width:100%; height:auto; -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 12%); mask-image:linear-gradient(90deg, transparent 0, #000 12%); }
 .shop-note{ position:absolute; left:9%; top:4%; width:clamp(120px, 12vw, 190px); height:auto; }
-.shop-rail{ display:grid; grid-template-columns:56px 1fr 56px; gap:var(--s-16); align-items:center; margin:var(--s-24) var(--pad) 0 8%; }
+.shop-rail{ display:grid; grid-template-columns:56px 1fr 56px; gap:var(--s-16); align-items:center; margin:var(--s-48) var(--pad) 0; }
 .shop-arrow{ background:none; border:0; padding:0; cursor:pointer; } .shop-arrow img{ width:56px; height:56px; display:block; } .shop-arrow:disabled{ opacity:.3; cursor:default; }
 .shop-track{ display:grid; grid-auto-flow:column; grid-auto-columns:calc((100% - 3 * var(--s-16)) / 4); gap:var(--s-16); overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-behavior:smooth; }
 .shop-track::-webkit-scrollbar{ display:none; }
