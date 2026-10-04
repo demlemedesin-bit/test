@@ -754,3 +754,20 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 .rl-m-v{ flex:1; width:100%; min-height:0; background:#000; object-fit:contain; }
 /* Konuklar: düğme satırı kayarken menünün (logo) üstüne binmesin (menü z-index 50; .kr'ye z-index VERME: videoların multiply karışımını bozar, beyaz kutu çıkar) */
 @media (min-width: 769px){ .kr-controls{ z-index:49; } }
+
+/* Mağaza kartları: birden çok rengi olan ürünlerde renk noktaları (renkler panelden: Ürünler → Renkler) */
+.sh-sw{ display:flex; align-items:center; gap:6px; margin:4px 0 2px; }
+.sh-sw i{ width:14px; height:14px; border-radius:50%; background:var(--c); border:1.5px solid #fff; box-shadow:0 0 0 1px rgba(23,19,15,.28); }
+.sh-sw em{ font-style:normal; font-size:12px; color:var(--ink-2); }
+
+/* Konuklar: oklara basma hissi + sürüklenebilir masa */
+.konuk-nav button{ transition:transform .15s ease; }
+.konuk-nav button:hover{ transform:scale(1.06); } .konuk-nav button:active{ transform:scale(.88); }
+.konuk-nav button.is-press{ animation:krpress .5s cubic-bezier(.3,1.5,.5,1); position:relative; }
+.konuk-nav button.is-press::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid #DD262C; animation:krring .55s ease-out forwards; pointer-events:none; }
+@keyframes krpress{ 0%{ transform:scale(.8) } 55%{ transform:scale(1.12) } 100%{ transform:scale(1) } }
+@keyframes krring{ from{ opacity:.9; transform:scale(.8) } to{ opacity:0; transform:scale(1.6) } }
+.kr-stage.is-drag{ cursor:grab; } .kr-stage.is-drag:active{ cursor:grabbing; }
+.kr-stage.is-nudge .kr-table{ animation:krnudge .5s ease; }
+@keyframes krnudge{ 0%,100%{ transform:none } 40%{ transform:scale(1.008) } }
+@media (prefers-reduced-motion: reduce){ .konuk-nav button.is-press, .konuk-nav button.is-press::after, .kr-stage.is-nudge .kr-table{ animation:none; } }

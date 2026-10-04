@@ -46,7 +46,7 @@ export type AdminProduct = {
   active: boolean;
   thumb: string | null;
   sort: number;
-  data: { desc?: string; badge?: string; details?: string[][]; chart?: unknown; sizes?: unknown; size_label?: string };
+  data: { desc?: string; badge?: string; details?: string[][]; chart?: unknown; sizes?: unknown; size_label?: string; show_colors?: boolean };
 };
 
 export type Customer = {

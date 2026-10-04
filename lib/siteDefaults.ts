@@ -582,6 +582,13 @@ export const FIELDS: Field[] = [
   "def": "110"
  },
  {
+  "id": "anim_namePos",
+  "group": "Animasyonlar",
+  "label": "Konuk isim kartı konumu (1 = kafanın üstünde, 0 = masanın önünde)",
+  "kind": "number",
+  "def": "1"
+ },
+ {
   "id": "anim_tableMs",
   "group": "Animasyonlar",
   "label": "Konuk masası dönüş süresi (ms)",
