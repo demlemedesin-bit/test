@@ -226,6 +226,9 @@ export default function Content() {
                     <Field label="Konuk hakkında yazı (paragraflar arasına boş satır bırak)">
                       <textarea className="inp" rows={9} value={g.bio ?? (PROFILES as { slug: string; bio: string[] }[]).find((b) => b.slug === guestSlug(g.name))?.bio.join('\n\n') ?? ''} onChange={(e) => setGuests((a) => setAt(a, gi, { bio: e.target.value }))} />
                     </Field>
+                    <Field label="YouTube videoları (her satıra bir bağlantı; sayfanın altında oynatıcı olarak görünür)">
+                      <textarea className="inp" rows={3} placeholder="https://www.youtube.com/watch?v=…" value={g.videos ?? ''} onChange={(e) => setGuests((a) => setAt(a, gi, { videos: e.target.value }))} />
+                    </Field>
                     <span className="lbl">Profil fotoğrafları</span>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
                       {(g.photos ?? []).map((u, pi) => (

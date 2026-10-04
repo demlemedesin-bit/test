@@ -48,3 +48,7 @@
 @media (max-width:600px){ .kp-head{ flex-direction:column; align-items:flex-start; } }
 .kp-photos{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr)); gap:var(--s-12); margin-top:var(--s-32); }
 .kp-photos img{ width:100%; aspect-ratio:4/5; object-fit:cover; display:block; background:var(--cream); border:1px solid var(--line); }
+.kp-videos{ margin-top:var(--s-48); display:grid; gap:var(--s-16); }
+.kp-videos h2{ margin:0; }
+.kp-video{ aspect-ratio:16/9; width:100%; background:var(--ink); }
+.kp-video iframe{ width:100%; height:100%; border:0; display:block; }
