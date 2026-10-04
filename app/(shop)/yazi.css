@@ -52,3 +52,14 @@
 .kp-videos h2{ margin:0; }
 .kp-video{ aspect-ratio:16/9; width:100%; background:var(--ink); }
 .kp-video iframe{ width:100%; height:100%; border:0; display:block; }
+
+.kp-slider{ display:grid; gap:var(--s-12); }
+.kp-track{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.kp-track::-webkit-scrollbar{ display:none; }
+.kp-track .kp-video{ flex:0 0 100%; scroll-snap-align:start; }
+.kp-ctl{ display:flex; align-items:center; justify-content:center; gap:var(--s-16); }
+.kp-ctl > button{ width:40px; height:40px; border:1px solid var(--line-strong); font-size:18px; }
+.kp-ctl > button:disabled{ opacity:.35; cursor:default; }
+.kp-dots{ display:flex; gap:10px; }
+.kp-dots button{ width:10px; height:10px; border-radius:50%; border:1px solid var(--ink); }
+.kp-dots button[aria-current="true"]{ background:var(--ink); }
