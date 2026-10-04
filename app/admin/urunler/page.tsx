@@ -65,6 +65,8 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
   const [errs, setErrs] = useState<string[]>([]);
   const [ask, setAsk] = useState(false);
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((s) => ({ ...s, [k]: v }));
+  const [slugs, setSlugs] = useState<{ slug: string; name: string }[]>([]);
+  useEffect(() => { supabase().from('products').select('slug,name').order('name').then((r) => setSlugs((r.data ?? []) as { slug: string; name: string }[])); }, []);
 
   const setColor = (i: number, patch: Partial<Color>) => setD((s) => ({ ...s, colors: s.colors.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
 
@@ -260,6 +262,11 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
             </div>
           ))}
         </div>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12, fontSize: 13 }}>
+          <input type="checkbox" checked={(d.data as { show_colors?: boolean }).show_colors ?? d.colors.length > 1} onChange={(e) => set('data', { ...d.data, show_colors: e.target.checked })} />
+          Renk seçeneğini müşteriye göster (ürün sayfasında ve mağaza kartında renk noktaları)
+        </label>
+        <p className="hint" style={{ margin: '4px 0 0' }}>Tek renkli ürünlerde kapalı gelir; açarsan tek renk adı ve noktası görünür.</p>
         <button type="button" className="btn ghost sm" style={{ marginTop: 10 }} onClick={() => set('colors', [...d.colors, { key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }])}>
           <Plus size={14} /> Renk ekle
         </button>
@@ -281,6 +288,27 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <Field label="Beden listesi (virgülle)" hint="Örn. S, M, L, XL. Doluysa müşteri beden seçmeden sepete ekleyemez. Beden yoksa boş bırak.">
           <input className="inp" value={d.sizes} onChange={(e) => set('sizes', e.target.value)} placeholder="S, M, L, XL" />
         </Field>
+        {(() => {
+          const sb = (d.data as { sizes?: { label?: string; items?: string[][] } }).sizes;
+          const items = sb?.items ?? [];
+          const put = (label: string, rows: string[][]) => set('data', { ...d.data, sizes: rows.length ? { label: label || 'Boyut', items: rows } : undefined });
+          return (
+            <div style={{ marginTop: 14 }}>
+              <span className="lbl">Boyut / model bağlantıları (başka ürünlere)</span>
+              <p className="hint" style={{ margin: '2px 0 8px' }}>Ürün sayfasında “Boyut” düğmeleri olarak çıkar; her biri başka bir ürüne gider (örn. Uzun → cam-kavanoz-uzun). Hiç satır yoksa bu bölüm sayfada görünmez. Beden listesi doluysa o kullanılır.</p>
+              <Field label="Başlık"><input className="inp" value={sb?.label ?? 'Boyut'} onChange={(e) => put(e.target.value, items)} placeholder="Boyut" /></Field>
+              {items.map((r, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                  <input className="inp" placeholder="Düğme yazısı (örn. Büyük · Ø 40)" value={r[0]} onChange={(e) => put(sb?.label ?? 'Boyut', items.map((x, j) => (j === i ? [e.target.value, x[1]] : x)))} />
+                  <input className="inp" list="pe-slugs" placeholder="Ürün adresi (slug)" value={r[1]} onChange={(e) => put(sb?.label ?? 'Boyut', items.map((x, j) => (j === i ? [x[0], e.target.value] : x)))} />
+                  <button type="button" className="icon-btn" aria-label="Kaldır" onClick={() => put(sb?.label ?? 'Boyut', items.filter((_, j) => j !== i))}><X size={16} /></button>
+                </div>
+              ))}
+              <datalist id="pe-slugs">{slugs.map((x) => <option key={x.slug} value={x.slug}>{x.name}</option>)}</datalist>
+              <button type="button" className="btn ghost sm" onClick={() => put(sb?.label ?? 'Boyut', [...items, ['', '']])}><Plus size={14} /> Boyut / model ekle</button>
+            </div>
+          );
+        })()}
         </div>
       </section>
 

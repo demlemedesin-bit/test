@@ -304,11 +304,11 @@
       a.innerHTML=h; host.appendChild(a);
       var c=document.createElement('a'); c.className='kc'; c.href=g.url; c.textContent=String(g.name).trim().replace(/\s+(?=\S+$)/,'\n'); /* ad üstte, soyad altta */ host.appendChild(c); var v=document.createElement('video'); v.className='kr-v'; v.muted=true; v.playsInline=true; v.preload='auto'; v.setAttribute('aria-hidden','true'); host.appendChild(v);
       return {g:a, c:c, v:v, i:i, vid:false, ar:+g.ar||1.1}; });
-    var rot=0, from=0, target=0, t0=0, DUR=an('tableMs',620), raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
+    var rot=0, from=0, target=0, t0=0, DUR=an('tableMs',620), NP=an('namePos',1), raf=0, W=1, th=1, Hs=1, VIS=2, A=.486;
     var layout=function(){ var m=mob(); VIS=m?1:2; A=m?.69:.486;
       var calc=function(W){ var th=W/TAR, need=0; for(var k=-VIS;k<=VIS;k++){ var x=.5-A*Math.sin(k*STEP), e=edge(x), sc=.9+(e-edge(.5))/(edge(0)-edge(.5))*.22, gw=W*(m?.27:.165)*sc;
           need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.2); if(Math.abs(k)===VIS) need=Math.max(need, th-e*th-W*(m?.035:.026)+gw*1.3*1.343*.86); }   // room for a guest standing up at the edge seats
-        return Math.ceil(need+W*.015); };
+        return Math.ceil(need+W*(NP?.05:.015)); };
       // the section title, the table and the buttons under it fit on one screen: the height grows with the width,
       // so the table gets as wide as the leftover height allows (centred; its cut ends fade out when narrower)
       var cw=stage.parentNode.clientWidth, full=calc(cw), sec=stage.closest('.konuk'), head=sec ? sec.querySelector('.konuk-head') : null, ctr=sec ? sec.querySelector('.kr-controls') : null;
@@ -331,7 +331,8 @@
         o.v.style.width=vw.toFixed(1)+'px'; o.v.style.zIndex=o.g.style.zIndex; o.v.style.opacity=o.vid ? op.toFixed(3) : '0';
         o.v.style.transform='translate('+(x*W-vw/2).toFixed(1)+'px,'+(y+sink-vh).toFixed(1)+'px)';
         var cop=1-ss(a0*.8,a0*1.05,aa); o.c.style.visibility=cop>.01?'visible':'hidden'; o.c.style.opacity=cop.toFixed(3); o.c.tabIndex=-1;
-        o.c.style.transform='translate('+(x*W).toFixed(1)+'px,'+(y+W*(m?.06:.045)).toFixed(1)+'px) translateX(-50%) rotate('+(Math.atan(slope(xe)*th/W)*180/Math.PI).toFixed(2)+'deg) scale('+sc.toFixed(3)+')';
+        if(NP) o.c.style.transform='translate('+(x*W).toFixed(1)+'px,'+(y+sink-gh+gh*.02).toFixed(1)+'px) translate(-50%,-100%) scale('+sc.toFixed(3)+')';   // isim kartı kafanın hemen üstünde
+        else o.c.style.transform='translate('+(x*W).toFixed(1)+'px,'+(y+W*(m?.06:.045)).toFixed(1)+'px) translateX(-50%) rotate('+(Math.atan(slope(xe)*th/W)*180/Math.PI).toFixed(2)+'deg) scale('+sc.toFixed(3)+')';
         o.c.classList.toggle('is-mid', i===mid); }); };
     var ease=function(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; };
     var done=null, dur=DUR;
@@ -358,8 +359,19 @@
             (ok[1] ? play(E) : Promise.resolve()).then(function(){ vid(E,false); reels(); step(); });   // 3. and sits down
           }); }, ok[0] ? 850 : 0); }); };
     var turn=function(dir){ queue.push(dir); if(!busy) step(); };
-    document.getElementById('krNext').addEventListener('click', function(){ turn(1); });
-    document.getElementById('krPrev').addEventListener('click', function(){ turn(-1); });
+    var pressFx=function(b){ b.classList.remove('is-press'); void b.offsetWidth; b.classList.add('is-press'); stage.classList.remove('is-nudge'); void stage.offsetWidth; stage.classList.add('is-nudge'); };
+    document.getElementById('krNext').addEventListener('click', function(){ pressFx(this); turn(1); });
+    document.getElementById('krPrev').addEventListener('click', function(){ pressFx(this); turn(-1); });
+    // masayı sürükleyerek / kaydırarak da çevir (fare ve dokunma): sola sürükle = bir sonraki konuk
+    (function(){ var sx=null, sy=0, id=null, moved=false;
+      stage.style.touchAction='pan-y'; stage.classList.add('is-drag');
+      stage.addEventListener('pointerdown', function(e){ if(e.pointerType==='mouse' && e.button!==0) return; sx=e.clientX; sy=e.clientY; id=e.pointerId; moved=false; });
+      stage.addEventListener('pointermove', function(e){ if(sx===null || e.pointerId!==id) return; var dx=e.clientX-sx; if(Math.abs(dx)>8) moved=true; stage.style.setProperty('--drag', Math.max(-1,Math.min(1,dx/200)).toFixed(3)); });
+      var end=function(e){ if(sx===null || (e && e.pointerId!==id)) return; var dx=(e?e.clientX:sx)-sx, dy=(e?e.clientY:sy)-sy; sx=null; stage.style.setProperty('--drag','0');
+        if(Math.abs(dx)>46 && Math.abs(dx)>Math.abs(dy)*1.4){ pressFx(dx<0?document.getElementById('krNext'):document.getElementById('krPrev')); turn(dx<0?1:-1); } };
+      stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', function(){ sx=null; stage.style.setProperty('--drag','0'); });
+      stage.addEventListener('click', function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); moved=false; } }, true);
+    })();
     stage.tabIndex=0; stage.addEventListener('keydown', function(e){ if(e.key==='ArrowRight'){ e.preventDefault(); turn(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); turn(-1); } });
     // reels under the table follow the guest in the middle
     var track=document.getElementById('reelTrack'), rname=document.getElementById('krReelName'), shown=-1;
