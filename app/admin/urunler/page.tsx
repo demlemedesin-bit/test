@@ -222,7 +222,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       <section className="card pe-sec">
         <div className="card-h"><h2 className="card-t">Katalog bilgisi</h2></div>
         <div className="card-b">
-        {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu (YouTube/MP4 bağlantısı)'], ['episode_title', 'Podcast bölümü adı (bu ürünün geçtiği bölüm)'], ['episode_url', 'Podcast bölümü bağlantısı (https://…)']] as const).map(([k, l]) => (
+        {([['brand', 'Marka'], ['sku', 'SKU (stok kodu)'], ['barcode', 'Barkod (GTIN/EAN)'], ['short', 'Kısa açıklama (liste ve kartlarda)'], ['video', 'Ürün videosu — YouTube bağlantısı (Liste dışı olabilir) veya .mp4; ürün sayfasında gösterilir'], ['episode_title', 'Podcast bölümü adı (bu ürünün geçtiği bölüm)'], ['episode_url', 'Podcast bölümü bağlantısı (https://…)']] as const).map(([k, l]) => (
           <Field key={k} label={l}><input className="inp" value={((d.data as Record<string, unknown>)[k] as string) ?? ''} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, [k]: e.target.value } }))} /></Field>
         ))}
         <Field label="Kritik stok seviyesi" hint="Stok bu sayıya inince panelde uyarı çıkar (varsayılan 5)"><input className="inp" type="number" min={0} value={String((d.data as Record<string, unknown>).crit ?? '')} onChange={(e) => setD((x) => ({ ...x, data: { ...x.data, crit: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) } }))} /></Field>
