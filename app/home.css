@@ -430,7 +430,7 @@ em{ font-style:normal; font-weight:400; }
 .stage{ position:relative; }   /* height = hero + PIN px (JS): the page holds still while the wrist tilts, then moves as the tea falls */
 .hero--d{ position:sticky; top:calc(var(--nav-h) + 1px); padding:0 0 var(--s-48); overflow:visible; --frame-w:min(46vw, 125vh); --land-w:calc(var(--frame-w) * .72); --land-crop:40px; --gx:.33; --gy:.42; --land-ar:1.498; min-height:calc(6vh + var(--title-fs) * 1.02 + 8px + var(--frame-w) * 1039 / 800 + var(--land-w) * var(--land-ar) * (1 - var(--gy)) + 40px); }
 .hero-b-copy{ margin-left:var(--pad); padding-top:6vh; text-align:left; z-index:3; max-width:none; margin-right:var(--pad); }
-.hero--d{ --title-fs:clamp(34px, 6.4vw, 108px); }  /* Strenuous runs ~16% wider than Kodchasan */  /* two nowrap lines across the full width; the pour sits under the title band on the right */
+.hero--d{ --title-fs:clamp(30px, 5vw, 92px); }  /* Strenuous runs ~16% wider than Kodchasan */  /* two nowrap lines across the full width; the pour sits under the title band on the right */
 .hero-lead{ min-height:calc(94vh - 65px); }   /* title + buttons fill the first screen; the stats begin right under the fold */
 .title--b{ font-size:var(--title-fs); line-height:1.02; letter-spacing:-.02em; margin:0; }
 .title--b .line{ white-space:nowrap; }
@@ -459,7 +459,7 @@ em{ font-style:normal; font-weight:400; }
 @media (prefers-reduced-motion: reduce){ .tea-in .steam path{ animation:none; opacity:.8; } }
 .landing img{ width:100%; height:auto; display:block; }
 .landing{ clip-path:inset(var(--land-crop) 0 0 0); }   /* top of the photo cropped by 40 px */
-@media (max-width: 1024px){ .hero--d{ --title-fs:clamp(28px, 5.8vw, 74px); } .hero--d{ --frame-w:min(46vw, 125vh); } }
+@media (max-width: 1024px){ .hero--d{ --title-fs:clamp(24px, 4.8vw, 62px); } .hero--d{ --frame-w:min(46vw, 125vh); } }
 @media (max-width: 768px){ /* phones: copy, then the pour with Garen under it, then the about copy */
   .hero--d{ --frame-w:100vw; min-height:0; display:flex; flex-direction:column; position:relative; top:auto; }
   .hero-b-copy{ display:contents; }   /* its children become flex items so the pour can sit between the buttons and the about copy */
