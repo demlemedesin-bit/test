@@ -234,11 +234,11 @@
     var cats=document.getElementById('shopCats'), track=document.getElementById('shopTrack'); if(!cats || !track) return;
     var prev=document.getElementById('shopPrev'), next=document.getElementById('shopNext');
     var cards=[].slice.call(track.querySelectorAll('.sh-card'));
-    var setArrows=function(){ prev.disabled = track.scrollLeft < 4; next.disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 4; };
+    var setArrows=function(){ var many=track.scrollWidth > track.clientWidth + 4; prev.disabled = !many; next.disabled = !many; };   // döngü: sonda ileri = başa, başta geri = sona
     cats.addEventListener('click', function(e){ var b=e.target.closest('button'); if(!b) return;
       [].forEach.call(cats.querySelectorAll('button'), function(x){ x.classList.toggle('is-active', x===b); });
       var c=b.getAttribute('data-cat'); cards.forEach(function(el){ el.hidden = el.getAttribute('data-cat')!==c; }); track.scrollLeft=0; setArrows(); });
-    var step=function(d){ var card=cards.filter(function(el){ return !el.hidden; })[0]; var w=card ? card.getBoundingClientRect().width + 16 : 240; track.scrollBy({left:d*w, behavior:'smooth'}); };
+    var step=function(d){ var card=cards.filter(function(el){ return !el.hidden; })[0]; var w=card ? card.getBoundingClientRect().width + 16 : 240; var atEnd=track.scrollLeft + track.clientWidth >= track.scrollWidth - 6, atStart=track.scrollLeft < 6; if(d>0 && atEnd) track.scrollTo({left:0, behavior:'smooth'}); else if(d<0 && atStart) track.scrollTo({left:track.scrollWidth, behavior:'smooth'}); else track.scrollBy({left:d*w, behavior:'smooth'}); };
     prev.addEventListener('click', function(){ step(-1); }); next.addEventListener('click', function(){ step(1); });
     track.addEventListener('scroll', setArrows, {passive:true}); addEventListener('resize', setArrows);
     cards.forEach(function(el){ el.hidden = el.getAttribute('data-cat')!=='sofra'; }); setArrows();
