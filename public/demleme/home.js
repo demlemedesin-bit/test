@@ -242,6 +242,7 @@
     prev.addEventListener('click', function(){ step(-1); }); next.addEventListener('click', function(){ step(1); });
     track.addEventListener('scroll', setArrows, {passive:true}); addEventListener('resize', setArrows);
     cards.forEach(function(el){ el.hidden = el.getAttribute('data-cat')!=='sofra'; }); setArrows();
+    try{ var kq=new URLSearchParams(location.search).get('kat'); var kb=kq && cats.querySelector('button[data-cat="'+kq.replace(/[^a-z]/g,'')+'"]'); if(kb) kb.click(); }catch(_){}
   })();
 
   // Konuklar reel: play each scene for its data-dur, then the next; the img is re-inserted so the loop restarts
