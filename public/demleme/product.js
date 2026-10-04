@@ -42,6 +42,7 @@
         tick(); if(window.__pxSaleT) clearInterval(window.__pxSaleT); window.__pxSaleT=setInterval(tick,1000); } })();  $('ppDesc').textContent=p.desc; (function(){ var e=$('pxEp'); if(e) e.remove(); if(p.episode){ e=document.createElement('a'); e.id='pxEp'; e.href=p.episode.url; e.target='_blank'; e.rel='noopener'; e.textContent='🎧 Podcastte konuşuldu: '+p.episode.title; e.style.cssText='display:inline-block;margin:6px 0 2px;padding:8px 14px;border:1px solid currentColor;border-radius:99px;font-size:13px;text-decoration:none;color:inherit'; $('ppDesc').parentNode.insertBefore(e,$('ppDesc').nextSibling); } })(); $('ppBadge').textContent=p.badge||'';
     // colours: swatches + one thumbnail per colour (the photo swaps)
     var c=p.colors;
+    if(!(p.showColors!=null ? p.showColors : c.length>1)){ $('ppColors').innerHTML='<span id="colName" hidden></span>'; } else
     $('ppColors').innerHTML='<div class="pp-opt-h"><b>Renk</b><span id="colName"></span></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+'"></button>'; }).join('')+'</div>' : '');
     $('ppThumbs').innerHTML=c.length>1 ? c.map(function(x,i){ return '<button type="button" data-i="'+i+'" aria-label="'+esc(x.name)+'"><img src="'+x.img+'" alt="">'+(x.imgs&&x.imgs.length ? '<em class="th-n" title="Bu renkte '+x.imgs.length+' ek görsel var">+'+x.imgs.length+'</em>' : '')+'</button>'; }).join('') : '';
     $('ppThumbs').innerHTML+='<span id="ppXtra" class="th-x"></span>';
