@@ -33,6 +33,7 @@ export type SiteProduct = {
   colors: Color[];
   sizes?: SizeBlock;
   showColors?: boolean;
+  video?: { yt?: string; src?: string };
   chart?: unknown;
   details: string[][];
   sort: number;
@@ -49,7 +50,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
+  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; video?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -103,6 +104,7 @@ function fromRow(r: Row): SiteProduct {
     ...(d.episode_title?.trim() && /^https?:\/\//i.test(d.episode_url ?? '') ? { episode: { title: d.episode_title.trim().slice(0, 140), url: (d.episode_url as string).trim() } } : {}),
     ...(Array.isArray(d.gallery) && d.gallery.length ? { gallery: d.gallery.filter((g) => typeof g === 'string').slice(0, 10) } : {}),
     sizes,
+    ...(parseVideo(d.video) ? { video: parseVideo(d.video) } : {}),
     ...(typeof d.show_colors === 'boolean' ? { showColors: d.show_colors } : {}),
     chart: d.chart,
     details: d.details ?? [],
@@ -166,4 +168,15 @@ export function configFromMap(m: Record<string, string | number | null | undefin
 export async function getConfig(): Promise<ShopConfig> {
   const rows = await rest<{ key: string; value: string | number }[]>('shop_settings?select=key,value');
   return configFromMap(Object.fromEntries((rows ?? []).map((r) => [r.key, r.value])));
+}
+
+
+/** Admin'deki video bağlantısını (YouTube watch/youtu.be/shorts/embed ya da doğrudan .mp4) çözer. */
+export function parseVideo(u?: string): { yt?: string; src?: string } | undefined {
+  const v = (u ?? '').trim();
+  if (!v) return undefined;
+  const m = v.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/|v\/))([\w-]{11})/i);
+  if (m) return { yt: m[1] };
+  if (/^https?:\/\/\S+\.(mp4|webm|mov)(\?\S*)?$/i.test(v)) return { src: v };
+  return undefined;
 }
