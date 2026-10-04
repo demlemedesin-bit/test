@@ -16,12 +16,19 @@ export const FIELDS: Field[] = [
   "group": "Ana sayfa · Üst bölüm",
   "label": "Başlık, 1. satır",
   "kind": "text",
-  "def": "Bir demin 40 yıllık hatırı var."
+  "def": "Bir demin"
  },
  {
   "id": "hero_l2",
   "group": "Ana sayfa · Üst bölüm",
   "label": "Başlık, 2. satır",
+  "kind": "text",
+  "def": "40 yıllık hatırı var."
+ },
+ {
+  "id": "hero_l3",
+  "group": "Ana sayfa · Üst bölüm",
+  "label": "Başlık, 3. satır",
   "kind": "text",
   "def": "Gel, beraber demleyelim."
  },
