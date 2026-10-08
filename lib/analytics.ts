@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 import type { AdminOrder, AdminProduct } from './admin';
 
 export type Ev = { d: string; type: string; product: string; rec: string; n: number; s: number; v: number };
-export type Ret = { id: string; order_no: string; product_slug: string; qty: number; amount: number; kind: 'iade' | 'degisim'; reason: string; status: string; note: string | null; customer_note?: string | null; source?: string; created_at: string };
+export type Ret = { id: string; order_no: string; product_slug: string; qty: number; amount: number; kind: 'iade' | 'degisim'; reason: string; status: string; note: string | null; customer_note?: string | null; source?: string; late?: boolean; created_at: string };
 export type Data = { orders: AdminOrder[]; products: AdminProduct[]; events: Ev[]; returns: Ret[] };
 
 export const DAY = 86400000;
