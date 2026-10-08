@@ -65,3 +65,6 @@
 .kp-dots button[aria-current="true"]{ background:var(--ink); }
 .kp-img--photo img{ height:100%; width:100%; object-fit:cover; }
 .kp-photo{ height:clamp(150px,26vw,230px); width:clamp(120px,21vw,184px); object-fit:cover; border-radius:6px; border:1px solid var(--line); background:var(--cream); }
+.kp-head .kp-name{ flex:1; min-width:0; font-size:clamp(34px,6vw,76px); line-height:1.12; overflow-wrap:normal; word-break:normal; }
+.kp-ln{ display:block; white-space:nowrap; }
+@media (max-width:600px){ .kp-head .kp-name{ font-size:clamp(30px,10vw,46px); } }
