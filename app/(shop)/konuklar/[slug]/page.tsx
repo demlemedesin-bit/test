@@ -40,8 +40,17 @@ export default async function Konuk({ params }: Props) {
       </p>
       <div className="kp-head">
         {p.photo ? <img className="kp-portrait kp-photo" src={p.photo} alt={p.name} /> : p.img && <img className="kp-portrait" src={p.img} alt="" />}
-        <h1 className="page-title">
-          <D>{p.name}</D>
+        <h1 className="page-title kp-name">
+          {(() => {
+            const w = p.name.split(/\s+/);
+            const last = w.length > 1 ? w.pop() : '';
+            return (
+              <>
+                <span className="kp-ln"><D>{w.join(' ')}</D></span>
+                {last && <span className="kp-ln"><D>{last}</D></span>}
+              </>
+            );
+          })()}
         </h1>
       </div>
       <div className="prose yz-body">
