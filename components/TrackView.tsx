@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Alert, Field, emailOk } from './ui';
+import { ReturnRequest } from './ReturnRequest';
 import { OrderBody, StatusBadge, StatusSteps, dateTr, type OrderRow } from './OrderParts';
 
 export function TrackView({ initialNo = '', initialEmail = '' }: { initialNo?: string; initialEmail?: string }) {
@@ -55,7 +56,7 @@ export function TrackView({ initialNo = '', initialEmail = '' }: { initialNo?: s
           </div>
           <div className="order-b">
             <StatusSteps status={order.status} payment={order.payment_method} />
-            <OrderBody o={order} />
+            <OrderBody o={order} extra={<ReturnRequest order={order} email={email.trim().toLowerCase()} />} />
           </div>
         </div>
       )}
