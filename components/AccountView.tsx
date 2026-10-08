@@ -8,6 +8,7 @@ import { authMessage, useAuth } from '@/lib/auth';
 import { Alert, Field, phoneOk } from './ui';
 import { Favorites } from './Favorites';
 import { LoyaltyTab } from './Loyalty';
+import { ReturnRequest } from './ReturnRequest';
 import { OrderBody, StatusBadge, dateTr, type OrderRow } from './OrderParts';
 
 type Tab = 'orders' | 'favorites' | 'points' | 'profile' | 'addresses';
@@ -122,7 +123,7 @@ function Orders() {
             <StatusBadge status={o.status} />
           </div>
           <div className="order-b">
-            <OrderBody o={o} />
+            <OrderBody o={o} extra={<ReturnRequest order={o} email={String((o as { email?: string }).email ?? '')} />} />
           </div>
         </article>
       ))}

@@ -43,13 +43,13 @@ export default function Iadeler() {
   if (!rows) return (<><TopBar title="İade ve değişim" onMenu={menu} /><div className="adm-scroll"><Loading /></div></>);
   return (
     <>
-      <TopBar title="İade ve değişim" sub="Gelen iadeler, hasarlı ürünler, durum takibi" onMenu={menu}>
+      <TopBar title="İade ve değişim" sub="Müşteri talepleri (🛍), hasarlı ürünler, durum takibi" onMenu={menu}>
         <button className="btn" onClick={() => setOpen(true)}><Plus size={15} /> Kayıt ekle</button>
       </TopBar>
       <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <Card title={`${rows.length} kayıt`}>
-          <Tbl min={900} cols={[['Sipariş', '100px'], ['Ürün', 'minmax(0,1fr)'], ['Tür', '70px'], ['Adet', '50px'], ['Tutar', '90px'], ['Sebep', '140px'], ['Tarih', '100px'], ['Durum', '150px']]}
-            rows={rows.map((r) => [r.order_no, r.product_slug || '—', r.kind === 'iade' ? 'İade' : 'Değişim', r.qty, tl(r.amount), RET_REASON[r.reason] ?? r.reason, dt(r.created_at),
+          <Tbl min={900} cols={[['Sipariş', '100px'], ['Ürün', 'minmax(0,1fr)'], ['Tür', '70px'], ['Adet', '50px'], ['Tutar', '90px'], ['Sebep', '140px'], ['Müşteri notu', 'minmax(0,1fr)'], ['Tarih', '100px'], ['Durum', '150px']]}
+            rows={rows.map((r) => [r.order_no, r.product_slug || '—', r.kind === 'iade' ? 'İade' : 'Değişim', r.qty, tl(r.amount), RET_REASON[r.reason] ?? r.reason, <span key="n" title={r.customer_note ?? ''}>{r.source === 'musteri' ? '🛍 ' : ''}{r.customer_note || r.note || '—'}</span>, dt(r.created_at),
               <select key="s" className="inp" value={r.status} onChange={(e) => setStatus(r.id, e.target.value)}>{Object.entries(RET_STATUS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>])} empty="İade kaydı yok" />
         </Card>
       </div></div>
