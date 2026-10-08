@@ -229,13 +229,14 @@ export default function Content() {
                     <Field label="YouTube videoları (her satıra bir bağlantı; sayfanın altında oynatıcı olarak görünür)">
                       <textarea className="inp" rows={3} placeholder="https://www.youtube.com/watch?v=…" value={g.videos ?? ''} onChange={(e) => setGuests((a) => setAt(a, gi, { videos: e.target.value }))} />
                     </Field>
-                    <span className="lbl">Profil fotoğrafları</span>
+                    <span className="lbl">Profil fotoğrafları <span style={{ fontWeight: 400 }}>(★ olan ana profil: sayfanın başında ve /konuklar listesinde görünür; diğerleri sayfanın altında)</span></span>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
                       {(g.photos ?? []).map((u, pi) => (
                         <div key={pi} style={{ position: 'relative' }}>
                           { }
                           <img src={u} alt="" style={{ width: 84, height: 105, objectFit: 'cover', borderRadius: 6, background: 'var(--s3)', display: 'block' }} />
                           <button type="button" className="btn ghost sm" style={{ position: 'absolute', top: 2, right: 2, padding: '0 6px' }} onClick={() => setGuests((a) => setAt(a, gi, { photos: without(g.photos ?? [], pi) }))}>×</button>
+                          <button type="button" className={`btn ghost sm${pi === 0 ? ' on' : ''}`} style={{ position: 'absolute', bottom: 2, left: 2, padding: '0 6px' }} title={pi === 0 ? 'Ana profil' : 'Ana profil yap'} onClick={() => pi > 0 && setGuests((a) => setAt(a, gi, { photos: [(g.photos ?? [])[pi], ...(g.photos ?? []).filter((_, k) => k !== pi)] }))}>{pi === 0 ? '★ Ana' : '☆'}</button>
                         </div>
                       ))}
                       <label className="btn ghost sm" style={{ position: 'relative', alignSelf: 'center' }}>

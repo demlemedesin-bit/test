@@ -29,7 +29,7 @@ export default async function Konuklar() {
         {list.map((p) => (
           <li key={p.slug}>
             <a className="kp-card" href={`/konuklar/${p.slug}`}>
-              <span className="kp-img">{p.img ? <img src={p.img} alt="" loading="lazy" /> : <span aria-hidden="true" />}</span>
+              <span className={`kp-img${p.photo ? ' kp-img--photo' : ''}`}>{p.photo || p.img ? <img src={(p.photo ?? p.img) as string} alt="" loading="lazy" /> : <span aria-hidden="true" />}</span>
               <h2>{p.name}</h2>
               <p>{p.bio[0]}</p>
             </a>
