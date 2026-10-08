@@ -5,11 +5,13 @@ import { supabase } from '@/lib/supabase';
 import { RET_REASON, RET_STATUS } from '@/lib/analytics';
 import { dateTr, variant, type OrderRow } from './OrderParts';
 
-type Req = { product_slug: string; qty: number; kind: string; reason: string; status: string; customer_note: string | null; created_at: string };
+type Req = { product_slug: string; qty: number; kind: string; reason: string; status: string; late?: boolean; created_at: string };
 
 /** Müşteri: kargodaki / teslim edilen siparişte iade veya değişim talebi açar, sebebini yazar; mevcut taleplerin durumunu görür. */
 export function ReturnRequest({ order, email }: { order: OrderRow; email: string }) {
   const [reqs, setReqs] = useState<Req[]>([]);
+  const [late, setLate] = useState(false);
+  const [deadline, setDeadline] = useState('');
   const [open, setOpen] = useState(false);
   const [pick, setPick] = useState<Record<number, number>>({});
   const [kind, setKind] = useState('iade');
@@ -19,8 +21,11 @@ export function ReturnRequest({ order, email }: { order: OrderRow; email: string
   const [msg, setMsg] = useState<{ err: boolean; t: string } | null>(null);
 
   const load = useCallback(async () => {
-    const { data } = await supabase().rpc('get_returns', { p_order_no: order.order_no, p_email: email });
-    setReqs(Array.isArray(data) ? (data as Req[]) : []);
+    const { data } = await supabase().rpc('get_return_status', { p_order_no: order.order_no, p_email: email });
+    const d = data as { late?: boolean; deadline?: string; items?: Req[] } | null;
+    setReqs(Array.isArray(d?.items) ? d.items : []);
+    setLate(!!d?.late);
+    setDeadline(d?.deadline ?? '');
   }, [order.order_no, email]);
   useEffect(() => { const t = setTimeout(load, 0); return () => clearTimeout(t); }, [load]);
 
@@ -30,17 +35,17 @@ export function ReturnRequest({ order, email }: { order: OrderRow; email: string
   async function send() {
     const items = Object.entries(pick).filter(([, q]) => q > 0).map(([idx, qty]) => ({ idx: Number(idx), qty }));
     if (!items.length) return setMsg({ err: true, t: 'İade etmek istediğin ürünü seç.' });
-    if (reason === 'diger' && note.trim().length < 5) return setMsg({ err: true, t: 'Lütfen sebebi kısaca yaz.' });
+    if (note.trim().length < 5) return setMsg({ err: true, t: 'İade sebebini yazman gerekiyor.' });
     setBusy(true);
     setMsg(null);
     const { data, error } = await supabase().rpc('request_return', { p_order_no: order.order_no, p_email: email, p_items: items, p_kind: kind, p_reason: reason, p_note: note });
     setBusy(false);
-    const r = data as { ok?: boolean; error?: string } | null;
+    const r = data as { ok?: boolean; error?: string; late?: boolean } | null;
     if (error || !r?.ok) return setMsg({ err: true, t: r?.error ?? 'Talep gönderilemedi. Biraz sonra tekrar dene.' });
     setOpen(false);
     setPick({});
     setNote('');
-    setMsg({ err: false, t: 'Talebin alındı. Ekibimiz inceleyip e-posta ile dönüş yapacak.' });
+    setMsg({ err: false, t: r.late ? 'Talebin alındı. 14 günlük iade süresi geçtiği için talebin yetkili onayına bağlı; ekibimiz inceleyip e-posta ile dönüş yapacak.' : 'Talebin alındı. Ekibimiz inceleyip e-posta ile dönüş yapacak.' });
     load();
   }
 
@@ -52,7 +57,7 @@ export function ReturnRequest({ order, email }: { order: OrderRow; email: string
           <ul style={{ margin: '8px 0 0', padding: 0, listStyle: 'none', display: 'grid', gap: 6 }}>
             {reqs.map((r, k) => (
               <li key={k} className="small">
-                {r.qty}× {r.product_slug || 'ürün'} · {r.kind === 'degisim' ? 'Değişim' : 'İade'} · {RET_REASON[r.reason] ?? r.reason} · <b>{RET_STATUS[r.status] ?? r.status}</b>
+                {r.qty}× {r.product_slug || 'ürün'} · {r.kind === 'degisim' ? 'Değişim' : 'İade'} · {RET_REASON[r.reason] ?? r.reason} · <b>{RET_STATUS[r.status] ?? r.status}</b>{r.late && r.status === 'talep' ? <span className="muted"> (14 gün geçti, onaya bağlı)</span> : null}
                 <span className="muted"> · {dateTr(r.created_at)}</span>
               </li>
             ))}
@@ -63,6 +68,11 @@ export function ReturnRequest({ order, email }: { order: OrderRow; email: string
       {can && !open && <button type="button" className="btn" onClick={() => { setOpen(true); setMsg(null); }}>İade / değişim talebi oluştur</button>}
       {can && open && (
         <div className="form" style={{ gap: 12 }}>
+          {late ? (
+            <p className="small" style={{ margin: 0 }}>14 günlük iade süresi doldu. Yine de talep açabilirsin; talebin yetkili onayına bağlı değerlendirilir.</p>
+          ) : deadline ? (
+            <p className="small" style={{ margin: 0 }}>İade hakkın {dateTr(deadline)} tarihine kadar (14 gün).</p>
+          ) : null}
           <b>Hangi ürün?</b>
           {order.items.map((i, k) => (
             <label key={k} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -89,7 +99,7 @@ export function ReturnRequest({ order, email }: { order: OrderRow; email: string
             </select>
           </label>
           <label>
-            <span className="small">Açıklama{reason === 'diger' ? '' : ' (isteğe bağlı)'}</span>
+            <span className="small">İade sebebi (zorunlu)</span>
             <textarea rows={3} maxLength={600} value={note} onChange={(e) => setNote(e.target.value)} style={{ display: 'block', width: '100%' }} />
           </label>
           <div style={{ display: 'flex', gap: 10 }}>
