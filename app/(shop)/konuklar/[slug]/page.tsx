@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: applyTemplate(seo, p.name) },
     description,
     alternates: { canonical: `/konuklar/${p.slug}` },
-    openGraph: { type: 'profile', title: applyTemplate(seo, p.name), description, siteName: seo.site_name, ...(p.img ? { images: [p.img] } : {}) },
+    openGraph: { type: 'profile', title: applyTemplate(seo, p.name), description, siteName: seo.site_name, ...(p.photo || p.img ? { images: [(p.photo ?? p.img) as string] } : {}) },
   };
 }
 
@@ -39,7 +39,7 @@ export default async function Konuk({ params }: Props) {
         <a href="/">Ana sayfa</a> <span aria-hidden="true">/</span> <a href="/konuklar">Konuklar</a>
       </p>
       <div className="kp-head">
-        {p.img && <img className="kp-portrait" src={p.img} alt="" />}
+        {p.photo ? <img className="kp-portrait kp-photo" src={p.photo} alt={p.name} /> : p.img && <img className="kp-portrait" src={p.img} alt="" />}
         <h1 className="page-title">
           <D>{p.name}</D>
         </h1>

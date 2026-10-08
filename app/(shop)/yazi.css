@@ -63,3 +63,5 @@
 .kp-dots{ display:flex; gap:10px; }
 .kp-dots button{ width:10px; height:10px; border-radius:50%; border:1px solid var(--ink); }
 .kp-dots button[aria-current="true"]{ background:var(--ink); }
+.kp-img--photo img{ height:100%; width:100%; object-fit:cover; }
+.kp-photo{ height:clamp(150px,26vw,230px); width:clamp(120px,21vw,184px); object-fit:cover; border-radius:6px; border:1px solid var(--line); background:var(--cream); }
