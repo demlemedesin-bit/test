@@ -34,7 +34,7 @@ const META: Record<string, Meta> = {
   '/admin/tasarim': { tone: 'ac', desc: 'Ana sayfa banner şeridi ve özel betikler; canlı önizleme ve yerleşim haritasıyla.', chips: ['Banner', 'Önizleme', 'Betikler'], site: ['/', 'Canlı siteyi aç'] },
   '/admin/medya': { tone: 'blue', desc: 'Yüklenen görseller, sıkıştırma ayarları ve depolama kullanımı.', chips: ['WebP dönüşümü', 'Kullanılmayanlar', 'Sürükle-bırak'] },
   '/admin/veri-kontrol': { tone: 'green', desc: 'Pixel, olay ve reklam entegrasyonlarının gerçekten çalıştığını doğrula.', chips: ['Purchase olayı', 'Para birimi', 'Tekrar kontrolü'] },
-  '/admin/entegrasyonlar': { tone: 'blue', desc: 'Ödeme, e-posta, SMS, kargo ve analitik bağlantıları.', chips: ['iyzico', 'E-posta / SMS', 'Webhook'] },
+  '/admin/entegrasyonlar': { tone: 'blue', desc: 'Ödeme, e-posta, SMS, kargo ve analitik bağlantıları.', chips: ['Paynkolay', 'E-posta / SMS', 'Webhook'] },
   '/admin/sistem': { tone: 'red', desc: 'Ekip üyeleri, yetkiler ve işlem kayıtları.', chips: ['Departman yetkisi', 'Denetim kaydı', 'Mesaj şablonları'] },
   '/admin/ayarlar': { tone: 'amber', desc: 'Kargo ücreti, ücretsiz kargo eşiği ve mağaza bilgileri.', chips: ['Kargo', 'Satıcı bilgisi', 'Havale'] },
 };
