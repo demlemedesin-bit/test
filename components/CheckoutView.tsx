@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
+import { postForm } from '@/lib/payForm';
 import { useCart } from '@/lib/cart';
 import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
 import { CouponBox } from './CouponBox';
@@ -38,7 +39,7 @@ export function CheckoutView() {
   useEffect(() => {
     fetch('/api/odeme/durum')
       .then((r) => r.json())
-      .then((d) => setCardOn(!!d.iyzico))
+      .then((d) => setCardOn(!!d.kart))
       .catch(() => {});
   }, []);
   // Terk edilen sepet: geçerli e-posta girildiyse sepeti sessizce kaydet (sipariş verilince silinir)
@@ -139,10 +140,10 @@ export function CheckoutView() {
         /* sorun değil */
       }
       try {
-        const r = await fetch('/api/odeme/iyzico/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: data.order_no, email: v.email }) });
-        const j = (await r.json()) as { ok?: boolean; url?: string };
-        if (j.ok && j.url) {
-          window.location.href = j.url;
+        const r = await fetch('/api/odeme/paynkolay/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: data.order_no, email: v.email }) });
+        const j = (await r.json()) as { ok?: boolean; url?: string; fields?: Record<string, string> };
+        if (j.ok && j.url && j.fields) {
+          postForm(j.url, j.fields);
           return;
         }
       } catch {
@@ -250,7 +251,7 @@ export function CheckoutView() {
               <input type="radio" name="pay" disabled={!cardOn} checked={payment === 'kart'} onChange={() => setPayment('kart')} />
               <div>
                 <b>Kredi / banka kartı</b>
-                <span>{cardOn ? 'iyzico güvencesiyle, 3D Secure ile ödersin. Kart bilgilerin bize ulaşmaz.' : 'Çok yakında.'}</span>
+                <span>{cardOn ? 'Paynkolay güvenli ödeme sayfasında, 3D Secure ile ödersin. Kart bilgilerin bize ulaşmaz.' : 'Çok yakında.'}</span>
               </div>
             </label>
           </div>
