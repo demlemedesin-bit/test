@@ -1,0 +1,10 @@
+/* Duyuru çubuğu: ana sayfa ve mağaza sayfalarında en üstte ince şerit. */
+.ann{ position:relative; display:flex; align-items:center; justify-content:center; min-height:36px; padding:6px 44px; font-family:var(--font-body,system-ui,sans-serif); font-size:13px; line-height:1.35; text-align:center; background:var(--ink,#17130F); color:var(--cream-light,#F8F4EA); }
+.ann--accent{ background:var(--red,#DD262C); color:#fff; }
+.ann--cream{ background:var(--cream,#F3EEE1); color:var(--ink,#17130F); border-bottom:1px solid var(--line,rgba(23,19,15,.14)); }
+.ann a{ color:inherit; text-decoration:underline; text-underline-offset:3px; }
+.ann a:hover{ text-decoration-thickness:2px; }
+.ann-x{ position:absolute; right:6px; top:50%; transform:translateY(-50%); width:32px; height:32px; display:grid; place-items:center; border:0; background:none; color:inherit; cursor:pointer; opacity:.8; }
+.ann-x:hover{ opacity:1; }
+.ann-x:focus-visible, .ann a:focus-visible{ outline:2px solid currentColor; outline-offset:2px; }
+.ann-x svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }

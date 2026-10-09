@@ -1,0 +1,14 @@
+.rp-bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 16px; }
+.rp-bar .inp { width: auto; padding: 7px 10px; }
+.rp-cmp { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--tx2); cursor: pointer; }
+.rp-cmp input { width: 16px; height: 16px; accent-color: var(--ac); }
+.rp-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.rp-chart text { font-size: 10.5px; fill: var(--tx3); }
+.rp-chart .rp-grid { stroke: var(--bdr); stroke-width: 1; }
+.rp-chart .rp-b { fill: var(--ac); opacity: 0.88; }
+.rp-chart .rp-b:hover { opacity: 1; }
+.rp-chart .rp-l { fill: none; stroke: var(--ac); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.rp-chart .rp-a { fill: var(--ac); opacity: 0.1; }
+.rp-chart .rp-dot { fill: var(--s1); stroke: var(--ac); stroke-width: 2; }
+.rp-mode { margin-left: auto; }
+.rp-scroll { overflow-x: auto; }

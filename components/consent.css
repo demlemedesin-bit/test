@@ -1,0 +1,19 @@
+/* Çerez onay bandı (components/Consent.tsx) */
+.ck { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90; display: flex; justify-content: center; pointer-events: none; }
+.ck.ck--static { position: static; pointer-events: auto; }
+.ck-card { pointer-events: auto; width: min(680px, 100%); background: var(--cream-light, #f8f4ea); color: var(--ink, #17130f); border: 1.5px solid var(--ink, #17130f); border-radius: 14px; box-shadow: 0 10px 34px rgba(23, 19, 15, 0.22); padding: 16px 18px; font-size: 14px; line-height: 1.5; }
+.ck-card h2 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+.ck-card p { margin: 0; }
+.ck-card a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ck-opts { display: grid; gap: 8px; margin: 12px 0 2px; }
+.ck-opt { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.ck-opt input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink, #17130f); flex-shrink: 0; }
+.ck-opt b { font-weight: 600; display: block; }
+.ck-opt span { font-size: 12.5px; opacity: 0.8; }
+.ck-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.ck-btn { font: inherit; font-weight: 500; cursor: pointer; border-radius: 99px; padding: 9px 18px; border: 1.5px solid var(--ink, #17130f); background: transparent; color: var(--ink, #17130f); }
+.ck-btn:hover { background: rgba(23, 19, 15, 0.07); }
+.ck-btn:focus-visible, .ck-opt input:focus-visible, .ck-card a:focus-visible { outline: 2px solid var(--ink, #17130f); outline-offset: 2px; }
+.ck-btn--solid { background: var(--ink, #17130f); color: var(--cream-light, #f8f4ea); }
+.ck-btn--solid:hover { background: var(--ink, #17130f); opacity: 0.88; }
+@media (max-width: 520px) { .ck { left: 8px; right: 8px; bottom: 8px; } .ck-btn { flex: 1 1 auto; text-align: center; } }
