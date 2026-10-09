@@ -21,4 +21,4 @@ export function sellerLine(c: ShopConfig): string {
   return [s.name, s.address, tax, s.mersis && `Mersis ${s.mersis}`, s.phone && `Tel ${s.phone}`].filter((x) => x && String(x).trim()).join(' · ');
 }
 
-export const PAY_NOTE = 'Güvenli ödeme: iyzico altyapısı · 3D Secure · Visa · Mastercard · Troy';
+export const PAY_NOTE = 'Güvenli ödeme: Paynkolay altyapısı · 3D Secure · Visa · Mastercard · Troy';

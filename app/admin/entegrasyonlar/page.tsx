@@ -12,7 +12,7 @@ import { PageHero } from '@/components/admin/PageHero';
 
 type Tab = 'odeme' | 'mesaj' | 'webhook' | 'besleme' | 'kargo' | 'dogrulama' | 'gunluk';
 const TABS: [Tab, string][] = [
-  ['odeme', 'Ödeme (iyzico)'],
+  ['odeme', 'Ödeme (Paynkolay)'],
   ['mesaj', 'E-posta ve SMS'],
   ['webhook', 'Webhook (n8n)'],
   ['besleme', 'Beslemeler'],
@@ -94,10 +94,9 @@ function Status({ checks, names, err }: { checks: Check[] | null; names: string[
 type PayRow = { order_no: string; status: string; paid_price: number | null; payment_id: string | null; created_at: string };
 const PAY_ST: Record<string, [string, string]> = { init: ['Başlatıldı', 'b-gray'], paid: ['Ödendi', 'b-green'], failed: ['Başarısız', 'b-red'], review: ['İncelemede', 'b-amber'], refunded: ['İade edildi', 'b-blue'], cancelled: ['İptal', 'b-gray'] };
 
-function Payment({ toast }: { toast: Toast }) {
+function Payment() {
   const { checks, err } = useChecks();
   const [rows, setRows] = useState<PayRow[] | null>(null);
-  const [origin] = useState(() => (typeof window === 'undefined' ? '' : window.location.origin));
   useEffect(() => {
     const t = setTimeout(async () => {
       const { data } = await supabase().from('payments').select('order_no,status,paid_price,payment_id,created_at').order('created_at', { ascending: false }).limit(20);
@@ -109,23 +108,21 @@ function Payment({ toast }: { toast: Toast }) {
     <div className="int-stack">
       <section className="card">
         <div className="card-h"><h2 className="card-t">Canlı durum</h2><span className="card-m">Yalnızca “tanımlı / tanımsız”; değerler gösterilmez</span></div>
-        <Status checks={checks} err={err} names={['IYZICO_API_KEY', 'IYZICO_SECRET_KEY', 'IYZICO_BASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'NEXT_PUBLIC_SITE_URL']} />
+        <Status checks={checks} err={err} names={['PAYNKOLAY_SX', 'PAYNKOLAY_SX_LIST', 'PAYNKOLAY_SX_IPTAL', 'PAYNKOLAY_SECRET', 'PAYNKOLAY_BASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'NEXT_PUBLIC_SITE_URL']} />
       </section>
 
       <section className="card">
         <div className="card-h"><h2 className="card-t">Kurulum adımları</h2></div>
         <div className="card-b">
           <ol className="int-steps">
-            <li>iyzico (sandbox ya da canlı) panelinden API anahtarlarını al. Sandbox için <b>sandbox-merchant.iyzipay.com</b> → Ayarlar → Firma Ayarları.</li>
-            <li>Vercel → Project → Settings → Environment Variables bölümüne şunları ekle: <code>IYZICO_API_KEY</code>, <code>IYZICO_SECRET_KEY</code>, <code>IYZICO_BASE_URL</code> (sandbox: <code>https://sandbox-api.iyzipay.com</code> · canlı: <code>https://api.iyzipay.com</code>), <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>NEXT_PUBLIC_SITE_URL</code> (https ile, örn. <code>https://alanadin.com</code>).</li>
+            <li>Paynkolay panelinden (canlı için) <b>sx</b>, <b>sx list</b>, <b>sx iptal</b> değerlerini ve <b>Merchant Secret Key</b>’i al. Değerleri panelde göremiyorsan Paynkolay destek ekibinden API yetkisinin açılmasını iste.</li>
+            <li>Vercel → Project → Settings → Environment Variables bölümüne şunları ekle: <code>PAYNKOLAY_SX</code>, <code>PAYNKOLAY_SX_LIST</code>, <code>PAYNKOLAY_SX_IPTAL</code>, <code>PAYNKOLAY_SECRET</code>, <code>PAYNKOLAY_BASE_URL</code> (test: <code>https://paynkolaytest.nkolayislem.com.tr/Vpos</code> · canlı: <code>https://paynkolay.nkolayislem.com.tr/Vpos</code>), <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>NEXT_PUBLIC_SITE_URL</code> (https ile, örn. <code>https://alanadin.com</code>).</li>
             <li>Değişkenleri ekledikten sonra Vercel’de yeniden dağıtım (redeploy) yap; yukarıdaki durum kartı “Tanımlı” olmalı.</li>
-            <li>iyzico panelinde webhook adresini aşağıdaki adres olarak gir.</li>
-            <li>Sandbox’ta deneme kartıyla bir sipariş ver; sipariş “Hazırlanıyor”a geçmeli ve aşağıdaki listede “Ödendi” görünmeli.</li>
+            <li>Paynkolay webhook göndermez; sonuç müşteri dönüş adresine gelir. Dönüş adresi otomatik ayarlanır, panelde ayrıca bir adres girmen gerekmez.</li>
+            <li>Test kartıyla bir sipariş ver; sipariş “Hazırlanıyor”a geçmeli ve aşağıdaki listede “Ödendi” görünmeli.</li>
           </ol>
-          <p className="int-p" style={{ marginTop: 14, marginBottom: 6 }}>iyzico webhook adresi</p>
-          <CopyField value={`${origin}/api/odeme/iyzico/webhook`} toast={toast} />
           <p className="hint" style={{ marginTop: 12 }}>
-            Test kartları ve sandbox bilgisi: <a href="https://docs.iyzico.com/on-hazirliklar/sandbox" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ac)' }}>docs.iyzico.com → Sandbox</a>. Ayrıntılı plan ve başvuru listesi depoda <code>docs/iyzico/01-basvuru-kontrol-listesi.md</code> ile <code>docs/iyzico/02-teknik-entegrasyon-plani.md</code> dosyalarındadır.
+            Test kartları ve test ortamı bilgisi: <a href="https://paynkolay.com.tr/entegrasyon/07-test-cards.php" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ac)' }}>paynkolay.com.tr → Test Kartları</a>. Kurulum ayrıntıları depoda <code>docs/paynkolay/README.md</code> dosyasındadır.
           </p>
         </div>
       </section>
@@ -544,7 +541,7 @@ export default function Integrations() {
               <button key={k} className={`tab${tab === k ? ' on' : ''}`} onClick={() => setTab(k)}>{l}</button>
             ))}
           </div>
-          {tab === 'odeme' && <Payment toast={show} />}
+          {tab === 'odeme' && <Payment />}
           {tab === 'mesaj' && <Messages toast={show} />}
           {tab === 'webhook' && <Webhook toast={show} />}
           {tab === 'besleme' && <Feeds toast={show} />}

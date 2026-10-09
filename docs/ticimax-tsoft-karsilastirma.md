@@ -4,7 +4,7 @@
 |---|---|---|
 | Ürün, varyant (renk/beden), stok | Var | Ürünler paneli |
 | Kupon, kampanya, ücretsiz kargo | Var | Kampanya ve indirim |
-| Kart ödemesi (iyzico), havale, kapıda | Var | Webhook + iade |
+| Kart ödemesi (Paynkolay), havale, kapıda | Var | Dönüş doğrulama + iade |
 | Terk edilen sepet + hatırlatma e-postası | Var | Cron 07:15 |
 | Yorum / puan (onaylı) | Var | Ürün yorumları |
 | Bunu da beğenebilirsin, sepet çapraz satış, son baktıkların | Var | Vitrin modülleri |

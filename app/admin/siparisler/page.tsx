@@ -107,7 +107,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
     setBusy(true);
     try {
       const { data } = await supabase().auth.getSession();
-      const r = await fetch('/api/odeme/iyzico/iade', {
+      const r = await fetch('/api/odeme/paynkolay/iade', {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + (data.session?.access_token ?? ''), 'Content-Type': 'application/json' },
         body: JSON.stringify({ order_no: order.order_no }),
@@ -115,7 +115,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
       const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!r.ok || !j.ok) toast(j.error || 'İade yapılamadı. Tekrar dene.', true);
       else {
-        toast('İade / iptal iyzico\'ya iletildi');
+        toast('İade / iptal Paynkolay\'a iletildi');
         onChanged();
       }
     } catch {
@@ -245,7 +245,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
 
       {order.payment_method === 'kart' && (
         <div className="sec no-print">
-          <p className="sec-t">Kart ödemesi (iyzico)</p>
+          <p className="sec-t">Kart ödemesi (Paynkolay)</p>
           {pay ? (
             <dl className="kv">
               <dt>Durum</dt>
@@ -261,7 +261,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           {pay && (pay.status === 'paid' || pay.status === 'review') && (
             <div className="actions" style={{ marginTop: 12 }}>
               <button className="btn danger" disabled={busy} onClick={() => setAsk('iade')}>
-                <Undo2 size={15} /> İade et / iptal et (iyzico)
+                <Undo2 size={15} /> İade et / iptal et (Paynkolay)
               </button>
             </div>
           )}
@@ -299,8 +299,8 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
       )}
       {ask === 'iade' && (
         <Confirm
-          title="iyzico üzerinden iade / iptal edilsin mi?"
-          text={`${order.order_no} için kart ödemesi iyzico'da iade ya da iptal edilir. Bu işlem geri alınamaz.`}
+          title="Paynkolay üzerinden iade / iptal edilsin mi?"
+          text={`${order.order_no} için kart ödemesi Paynkolay'da iade ya da iptal edilir. Bu işlem geri alınamaz.`}
           confirmText="Evet, iade et"
           busy={busy}
           onCancel={() => setAsk(null)}
