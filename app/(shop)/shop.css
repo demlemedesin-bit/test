@@ -138,3 +138,7 @@ main.page{ width:100%; padding:var(--s-48) var(--pad) var(--s-96); }
   .steps{ font-size:var(--t-12); }
 }
 @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+
+.pf-seller{ flex:1 0 100%; display:grid; gap:6px; font-size:var(--t-12); color:var(--on-brown-2); border-top:1px solid #f8f4ea29; padding-top:var(--s-16); }
+.pf-seller p{ margin:0; max-width:90ch; }
+.pf-seller a{ text-decoration:underline; text-underline-offset:3px; }
