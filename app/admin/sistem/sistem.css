@@ -1,0 +1,15 @@
+.sy-info { display: flex; gap: 10px; align-items: flex-start; }
+.sy-perms { display: flex; flex-wrap: wrap; gap: 4px; }
+.sy-perms .badge { font-size: 11px; }
+.sy-detail { display: flex; flex-direction: column; gap: 1px; font-size: 12.5px; min-width: 0; }
+.sy-detail span { overflow-wrap: anywhere; }
+.sy-detail b { font-weight: 600; color: var(--tx2); }
+.sy-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.sy-filters .inp { width: auto; min-width: 160px; }
+.sy-act { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 18px 20px; }
+.sy-act > div { border: 1px solid var(--bdr); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.sy-act p { font-size: 13px; color: var(--tx2); margin: 0; }
+.sy-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 8px; background: var(--tx3); }
+.sy-dot.ok { background: var(--green); }
+.sy-dot.bad { background: var(--red); }
+.sy-scroll { overflow-x: auto; }
