@@ -169,3 +169,5 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pp-det summary{ padding:14px 0; }
 .pp-det details[open] summary{ padding-bottom:0; }
 .pp-det details[open] p{ margin:0 0 14px; line-height:1.5; }
+
+.pp-vat{ margin:-18px 0 var(--s-24); font-size:12px; color:var(--ink-2); }

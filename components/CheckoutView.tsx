@@ -308,6 +308,7 @@ export function CheckoutView() {
           <span>Toplam</span>
           <span>{tl(quote ? quote.total : priced.total)}</span>
         </div>
+        <p className="small muted" style={{ margin: '6px 0 0' }}>Fiyatlara KDV dahildir.</p>
         <LoyaltyHint kind="order" amount={Math.max(priced.subtotal - (quote ? quote.discount : 0), 0)} />
         <button className="btn btn--red btn--block" type="submit" disabled={busy || priced.hasProblem} style={{ marginTop: 20 }}>
           {busy ? 'Siparişin oluşturuluyor…' : payment === 'kart' ? 'Ödemeye geç' : 'Siparişi tamamla'}

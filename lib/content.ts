@@ -1,3 +1,4 @@
+import { PAY_NOTE, sellerLine } from './sellerInfo';
 import { profileHref } from './guestProfiles';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -58,6 +59,7 @@ export async function homeHtml(): Promise<string> {
   const html = fill(read('home.html'), site)
     .replace('{{BANNERS}}', () => bannersHtml(banners))
     .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
+    .replace('{{SELLER_INFO}}', () => { const l = sellerLine(cfg); return (l ? `<p>${esc(l)} · <a href="/iletisim">İletişim</a></p>` : '') + `<p class="footer-pay">🔒 ${esc(PAY_NOTE)}</p>`; })
     .replace('{{FOOTER_COLS}}', () => footerCols(site.footer))
     .replace('{{FOOTER_LEGAL}}', () => footerLegal({ ...site.footer, legal }))
     .replace('{{DM_MONTH}}', () => esc(site.dm.month))

@@ -773,3 +773,8 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 .kr-stage.is-nudge .kr-table{ animation:krnudge .5s ease; }
 @keyframes krnudge{ 0%,100%{ transform:none } 40%{ transform:scale(1.008) } }
 @media (prefers-reduced-motion: reduce){ .konuk-nav button.is-press, .konuk-nav button.is-press::after, .kr-stage.is-nudge .kr-table{ animation:none; } }
+
+.footer-seller{ display:grid; gap:6px; padding-top:var(--s-24); font-size:var(--t-12); color:var(--on-brown-2); border-top:1px solid #f8f4ea29; margin-top:var(--s-24); }
+.footer-seller p{ margin:0; max-width:95ch; }
+.footer-seller a{ text-decoration:underline; text-underline-offset:3px; }
+.footer-seller a:hover{ color:var(--on-brown); }
