@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { fetchSettings } from '@/lib/shop';
 import { CARD_PENDING_KEY, LAST_ORDER_KEY } from './CheckoutView';
 import { writeCart } from '@/lib/cart';
+import { postForm } from '@/lib/payForm';
 import { OrderBody, type OrderRow } from './OrderParts';
 
 type Placed = OrderRow & { email: string };
@@ -36,8 +37,10 @@ export function OrderDone() {
     () => window.location.search,
     () => '',
   );
-  const durum = new URLSearchParams(qs).get('durum') || '';
+  const durumQs = new URLSearchParams(qs).get('durum') || '';
   const qno = new URLSearchParams(qs).get('no') || '';
+  const [checked, setChecked] = useState('');
+  const durum = checked || durumQs;
   const [retryBusy, setRetryBusy] = useState(false);
   const [retryErr, setRetryErr] = useState('');
   const order = useMemo<Placed | null | undefined>(() => {
@@ -65,6 +68,21 @@ export function OrderDone() {
       /* sorun değil */
     }
   }, [durum]);
+  // Müşteri ödeme sonrası sayfaya dönemediyse (sekme kapandı vb.) ödemeyi Paynkolay'dan teyit ettir.
+  const email = order?.email;
+  useEffect(() => {
+    if (!ono || !email || !isCard || durum === 'ok' || durum === 'hata') return;
+    let alive = true;
+    fetch('/api/odeme/paynkolay/kontrol', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: ono, email }) })
+      .then((r) => r.json())
+      .then((j: { durum?: string }) => {
+        if (alive && j.durum && j.durum !== 'bekliyor') setChecked(j.durum);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [ono, email, isCard, durum]);
   useEffect(() => {
     if (!ono) return;
     if (isCard && durum !== 'ok') return; // kart satışı yalnızca ödeme onayında sayılır
@@ -82,10 +100,10 @@ export function OrderDone() {
     setRetryBusy(true);
     setRetryErr('');
     try {
-      const r = await fetch('/api/odeme/iyzico/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: order.order_no, email: order.email }) });
-      const j = (await r.json()) as { ok?: boolean; url?: string; error?: string };
-      if (j.ok && j.url) {
-        window.location.href = j.url;
+      const r = await fetch('/api/odeme/paynkolay/baslat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_no: order.order_no, email: order.email }) });
+      const j = (await r.json()) as { ok?: boolean; url?: string; fields?: Record<string, string>; error?: string };
+      if (j.ok && j.url && j.fields) {
+        postForm(j.url, j.fields);
         return;
       }
       setRetryErr(j.error || 'Ödeme sayfası açılamadı.');

@@ -46,7 +46,7 @@ npm run build
 - Veritabanı: Supabase. Şema `supabase/migrations/0001_eticaret.sql`. Fiyatlar ve kargo hesabı sunucuda (`create_order`) yapılır, tarayıcıdan gelen fiyat dikkate alınmaz.
 - Ortam değişkenleri: `.env.example` (yalnızca anon anahtar; `service_role` asla koda/repoya girmez).
 - Satıcı/banka bilgileri: `content/shop-config.json` (boşsa yasal metinlerde ve havale ekranında yer tutucu gösterilir).
-- Ödeme: havale/EFT ve kapıda ödeme aktif; kart ödemesi için sanal pos (iyzico/PayTR) bilgileri gerekir.
+- Ödeme: havale/EFT ve kapıda ödeme aktif; kart ödemesi Paynkolay ortak ödeme sayfasıyla alınır (kurulum: docs/paynkolay/README.md).
 
 ## Yönetim paneli (`/admin`)
 
