@@ -100,6 +100,7 @@ export function CartView() {
           <span>Toplam</span>
           <span>{tl(quote ? quote.total : priced.total)}</span>
         </div>
+        <p className="small muted" style={{ margin: '6px 0 0' }}>Fiyatlara KDV dahildir.</p>
         <p className="small" style={{ margin: '8px 0 20px' }}>
           Ödeme seçeneğini bir sonraki adımda seçersin.
         </p>

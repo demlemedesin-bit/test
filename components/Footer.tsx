@@ -15,7 +15,7 @@ const DEFAULT_LINKS: FooterLink[] = [
 const safe = (u: string) => (/^(\/|#|https?:\/\/|mailto:|tel:)/i.test(u.trim()) ? u.trim() : '#');
 
 /** Alt bilgi. Metin ve bağlantılar yönetim panelinden (İçerik → Menü ve footer) gelir; verilmezse varsayılanlar. */
-export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', links = DEFAULT_LINKS, extra = [] }: { copy?: string; links?: FooterLink[]; extra?: FooterLink[] }) {
+export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', links = DEFAULT_LINKS, extra = [], seller = '', pay = '' }: { copy?: string; links?: FooterLink[]; extra?: FooterLink[]; seller?: string; pay?: string }) {
   // Panelden “Footer'da göster” denen sayfalar; aynı adrese giden bağlantı iki kez yazılmaz.
   const all = [...links, ...extra.filter((e) => !links.some((l) => l.href === e.href))];
   return (
@@ -29,6 +29,12 @@ export function Footer({ copy = '© 2026 Demleme. Tüm hakları saklıdır.', li
         </div>
         <NewsletterForm source="footer" tone="dark" />
       </div>
+      {(seller || pay) && (
+        <div className="pf-seller">
+          {seller && <p>{seller} · <a href="/iletisim">İletişim</a></p>}
+          {pay && <p className="pf-pay">🔒 {pay}</p>}
+        </div>
+      )}
       <span>{copy}</span>
       <span className="pf-links">
         <a href="/">Ana sayfa</a>

@@ -65,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   }
+  out.push({ url: `${base}/iletisim`, changeFrequency: 'yearly', priority: 0.3 });
   out.push({ url: `${base}/konuklar`, changeFrequency: 'monthly', priority: 0.6 });
   for (const g of await getProfiles()) out.push({ url: `${base}/konuklar/${g.slug}`, changeFrequency: 'monthly', priority: 0.5 });
   return out.filter((e) => !excluded(c.exclude, e.url.slice(base.length) || '/'));

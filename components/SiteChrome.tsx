@@ -1,5 +1,7 @@
 import { getSite, text } from '@/lib/site';
 import { getFooterPages } from '@/lib/cms';
+import { getConfig } from '@/lib/catalog';
+import { PAY_NOTE, sellerLine } from '@/lib/sellerInfo';
 import { AnnounceBar } from './AnnounceBar';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -26,6 +28,6 @@ export async function SiteHeader() {
 
 /** Alt bilgi: telif satırı ve bağlantılar panelden (İçerik → Footer, Menü ve footer). */
 export async function SiteFooter() {
-  const [s, extra] = await Promise.all([getSite(), getFooterPages()]);
-  return <Footer copy={text(s, 'footer_copy')} links={s.footer.legal} extra={extra} />;
+  const [s, extra, cfg] = await Promise.all([getSite(), getFooterPages(), getConfig()]);
+  return <Footer copy={text(s, 'footer_copy')} links={s.footer.legal} extra={extra} seller={sellerLine(cfg)} pay={PAY_NOTE} />;
 }
