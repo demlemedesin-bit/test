@@ -328,6 +328,20 @@ export const FIELDS: Field[] = [
   "def": "/demleme/03-shop/illustrations/cat-tea-720.webp"
  },
  {
+  "id": "kr_ig_on",
+  "group": "Ana sayfa · Konuklar",
+  "label": "Reels şeridi Instagram'dan gelsin (kapalıysa konuğa özel reels ve kapak)",
+  "kind": "bool",
+  "def": "0"
+ },
+ {
+  "id": "kr_ig_feed",
+  "group": "Ana sayfa · Konuklar",
+  "label": "Instagram reels JSON adresi (Behold feed adresi, https://feeds.behold.so/…)",
+  "kind": "text",
+  "def": ""
+ },
+ {
   "id": "konuk_label",
   "group": "Ana sayfa · Konuklar",
   "label": "Küçük etiket",

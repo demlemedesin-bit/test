@@ -383,7 +383,14 @@
     stage.tabIndex=0; stage.addEventListener('keydown', function(e){ if(e.key==='ArrowRight'){ e.preventDefault(); turn(-1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); turn(1); } });
     // reels under the table follow the guest in the middle
     var track=document.getElementById('reelTrack'), rname=document.getElementById('krReelName'), shown=-1;
+    var IG=(D.ig && D.ig.reels && D.ig.reels.length) ? D.ig : null;
+    // Instagram modu: şerit konuktan bağımsız, hesabın son reels'lerini gösterir (bir kez doldurulur)
+    var igFill=function(){ var lab=rname.previousSibling; if(lab && lab.nodeType===3) lab.nodeValue='Instagram\u2019dan \u00b7 '; rname.textContent=IG.user ? '@'+IG.user : '';
+      var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+      track.innerHTML=IG.reels.map(function(r){ return '<a class="rl-card" href="'+esc(r.u)+'" target="_blank" rel="noopener" aria-label="'+esc(r.t||'Instagram reels')+'"><img class="rl-cover" src="'+esc(r.c)+'" alt="" loading="lazy"><img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt=""></a>'; }).join('');
+      track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
     var reels=function(){ var mid=((Math.round(rot)%N)+N)%N; if(mid===shown || !track) return; var first=shown<0; shown=mid; var g=G[mid];
+      if(IG){ if(first) igFill(); return; }
       var fill=function(){ rname.textContent=g.name; track.innerHTML=(g.reels||[]).map(function(r){
         var cov=(r.c>=0 && COV[r.c]) ? '<img class="rl-cover" src="'+COV[r.c]+'" alt="" loading="lazy">' : (r.v ? '<video class="rl-cover rl-still" src="'+r.v+'#t=0.1" preload="metadata" muted playsinline aria-hidden="true"></video>' : '');
         var inner=cov+(r.v?'<video class="rl-vid" data-src="'+r.v+'" muted loop playsinline preload="none" aria-hidden="true"></video>':'')+'<img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt=""><span class="rl-name">'+g.name+'</span><span class="rl-bar"><i style="width:'+r.p+'%"></i></span>';
