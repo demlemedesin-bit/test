@@ -61,6 +61,7 @@ export async function homeHtml(): Promise<string> {
   const banners = parseBanners(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.banners')) ?? [])[0]?.value);
   const html = fill(read('home.html'), site)
     .replace('{{BANNERS}}', () => bannersHtml(banners))
+    .replace(/(<em class="line">[^<]*?)\s+(\S+<\/em>)/, '$1<br class="mo2"> $2')   // mobilde 3. satır son kelimeden önce bölünür
     .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
     .replace('{{SELLER_INFO}}', () => { const l = sellerLine(cfg); return (l ? `<p>${esc(l)} · <a href="/iletisim">İletişim</a></p>` : '') + `<p class="footer-pay">🔒 ${esc(PAY_NOTE)}</p>`; })
     .replace('{{FOOTER_COLS}}', () => footerCols(site.footer))
