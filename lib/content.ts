@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getConfig, getProducts, rest, type SiteProduct } from './catalog';
 import { getFooterPages } from './cms';
-import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite } from './site';
+import { animCfg, fill, faqHtml, footerCols, footerLegal, getSite, on, text } from './site';
 import { DRAWINGS } from './siteDefaults';
 import type { Storefront } from './storefront';
 import { bannersHtml, parseBanners } from './design';
+import { getIgReels } from './instagramReels';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -53,6 +54,8 @@ export async function homeHtml(): Promise<string> {
     })),
     covers: covers.map((f) => (isUrl(f) ? f : `${KONUK}reel-covers/${f}`)),
     teas: tea,
+    // Panelden açıksa ve veri alınabildiyse: şerit konuğa değil Instagram'a bağlı olur
+    ig: on(site, 'kr_ig_on') ? await getIgReels(text(site, 'kr_ig_feed')) : null,
   };
   const dm = { month: site.dm.month, photos: site.dm.photos, sehpa_base: site.dm.sehpa_base, sehpa_colors: site.dm.sehpa_colors };
   const banners = parseBanners(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.banners')) ?? [])[0]?.value);
