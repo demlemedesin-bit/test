@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { authMessage, useAuth } from '@/lib/auth';
-import { Alert, Field, phoneOk } from './ui';
+import { Alert, CityDistrict, Field, phoneOk } from './ui';
 import { Favorites } from './Favorites';
 import { LoyaltyTab } from './Loyalty';
 import { ReturnRequest } from './ReturnRequest';
@@ -275,10 +275,7 @@ function Addresses({ userId }: { userId: string }) {
           <Field id="a_name" label="Alıcı ad soyad" value={edit.v.full_name} onChange={setF('full_name')} error={errs.full_name} autoComplete="name" />
           <Field id="a_phone" label="Telefon" type="tel" value={edit.v.phone} onChange={setF('phone')} error={errs.phone} autoComplete="tel" />
         </div>
-        <div className="row2">
-          <Field id="a_city" label="İl" value={edit.v.city} onChange={setF('city')} error={errs.city} />
-          <Field id="a_district" label="İlçe" value={edit.v.district} onChange={setF('district')} error={errs.district} />
-        </div>
+        <CityDistrict idPrefix="a_" city={edit.v.city} district={edit.v.district} onCity={setF('city')} onDistrict={setF('district')} errCity={errs.city} errDistrict={errs.district} />
         <div className="fld">
           <label htmlFor="a_address">Açık adres</label>
           <textarea id="a_address" value={edit.v.address} onChange={(e) => setF('address')(e.target.value)} aria-invalid={errs.address ? true : undefined} />

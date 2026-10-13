@@ -10,7 +10,7 @@ import { postForm } from '@/lib/payForm';
 import { useCart } from '@/lib/cart';
 import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
 import { CouponBox } from './CouponBox';
-import { Alert, Field, emailOk, phoneOk } from './ui';
+import { Alert, CityDistrict, Field, emailOk, phoneOk } from './ui';
 
 type Addr = { id: string; title: string; full_name: string; phone: string; city: string; district: string; address: string; zip: string | null };
 
@@ -212,10 +212,7 @@ export function CheckoutView() {
             <Field id="full_name" label="Ad soyad" autoComplete="name" value={v.full_name} onChange={set('full_name')} error={errs.full_name} required />
             <Field id="phone" label="Telefon" type="tel" autoComplete="tel" value={v.phone} onChange={set('phone')} error={errs.phone} placeholder="05xx xxx xx xx" required />
           </div>
-          <div className="row2">
-            <Field id="city" label="İl" autoComplete="address-level1" value={v.city} onChange={set('city')} error={errs.city} required />
-            <Field id="district" label="İlçe" autoComplete="address-level2" value={v.district} onChange={set('district')} error={errs.district} required />
-          </div>
+          <CityDistrict city={v.city} district={v.district} onCity={set('city')} onDistrict={set('district')} errCity={errs.city} errDistrict={errs.district} />
           <div className="fld">
             <label htmlFor="address">Açık adres</label>
             <textarea id="address" name="address" autoComplete="street-address" value={v.address} onChange={(e) => set('address')(e.target.value)} aria-invalid={errs.address ? true : undefined} required />
