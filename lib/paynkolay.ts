@@ -154,10 +154,13 @@ export async function settleResult(c: PaynCfg, f: Record<string, string>, sb: Su
   // İmza yok / başarısız görünüyor: tarayıcıya güvenme, Paynkolay'a sor.
   const r = await reconcilePayment(c, pay as PayRow, sb);
   if (r.state === 'ok' || r.state === 'tutar') return r;
+  console.log('[paynkolay] sonuc', pay.order_no, 'imza:', v.signed, 'kod:', f.RESPONSE_CODE ?? '-', 'mesaj:', String(f.RESPONSE_DATA ?? f.ERROR_MESSAGE ?? '-').slice(0, 120), 'alanlar:', Object.keys(f).join(','));
   if (v.signed && f.RESPONSE_CODE !== '2') {
     await applyFailed(sb, pay as PayRow);
     return { state: 'hata', orderNo: pay.order_no };
   }
+  // İmzasız ama açıkça başarısız dönüş (ör. kart reddi): müşteriye "alındı" deme, hata göster (veritabanını değiştirme).
+  if (f.RESPONSE_CODE && f.RESPONSE_CODE !== '2') return { state: 'hata', orderNo: pay.order_no };
   return { state: r.state === 'hata' ? 'hata' : 'bekliyor', orderNo: pay.order_no };
 }
 

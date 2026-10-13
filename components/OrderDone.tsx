@@ -143,10 +143,14 @@ export function OrderDone() {
   return (
     <>
       <div className="done-box">
-        <p className="eyebrow">{isCard && durum !== 'ok' ? 'Ödeme bekleniyor' : 'Teşekkürler'}</p>
+        <p className="eyebrow">{isCard && durum === 'hata' ? 'Ödeme alınamadı' : isCard && durum !== 'ok' ? 'Ödeme bekleniyor' : 'Teşekkürler'}</p>
         <p className="ono">{order.order_no}</p>
         <p style={{ margin: 0 }}>
-          {isCard && durum === 'ok' ? 'Ödemen alındı, siparişin hazırlanıyor. Bu numarayı sipariş takibi için sakla.' : 'Siparişin alındı. Bu numarayı sipariş takibi için sakla.'}
+          {isCard && durum === 'ok'
+            ? 'Ödemen alındı, siparişin hazırlanıyor. Bu numarayı sipariş takibi için sakla.'
+            : isCard && durum === 'hata'
+              ? 'Kart ödemen tamamlanamadı, siparişin henüz onaylanmadı.'
+              : 'Siparişin alındı. Bu numarayı sipariş takibi için sakla.'}
         </p>
       </div>
 
