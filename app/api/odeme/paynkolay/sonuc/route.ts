@@ -20,7 +20,8 @@ export async function POST(req: Request) {
   }
   const r = await settleResult(cfg, f);
   const no = r.orderNo ? `no=${encodeURIComponent(r.orderNo)}&` : '';
-  return to(`?${no}durum=${r.state === 'bilinmiyor' ? 'hata' : r.state}`);
+  const mesaj = r.state === 'hata' && r.msg ? `&mesaj=${encodeURIComponent(r.msg)}` : '';
+  return to(`?${no}durum=${r.state === 'bilinmiyor' ? 'hata' : r.state}${mesaj}`);
 }
 
 // Tarayıcı adresi doğrudan açılırsa ana akışa dön.

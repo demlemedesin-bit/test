@@ -110,7 +110,7 @@ export function checkoutForm(c: PaynCfg, o: OrderRow, ip: string): { url: string
   };
 }
 
-export type Settle = { state: 'ok' | 'bekliyor' | 'hata' | 'tutar' | 'bilinmiyor'; orderNo?: string };
+export type Settle = { state: 'ok' | 'bekliyor' | 'hata' | 'tutar' | 'bilinmiyor'; orderNo?: string; msg?: string };
 
 type PayRow = { id: string; order_no: string; status: string; token: string | null; payment_id: string | null; created_at: string };
 
@@ -135,6 +135,9 @@ async function applyFailed(sb: SupabaseClient, pay: PayRow) {
   await sb.from('payments').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', pay.id);
 }
 
+/** Paynkolay'ın verdiği kısa hata mesajı (banka/kart reddi). Yalnızca düz metin, kısaltılmış. */
+const failMsg = (f: Record<string, string>) => String(f.RESPONSE_DATA || f.ERROR_MESSAGE || f.ERROR_DESCRIPTION || '').replace(/[<>\r\n]/g, ' ').trim().slice(0, 140);
+
 const refOf = (v: string) => v.split('|')[0].trim();
 
 /** Başarı/başarısızlık sayfasına post edilen sonucu işler. */
@@ -157,10 +160,10 @@ export async function settleResult(c: PaynCfg, f: Record<string, string>, sb: Su
   console.log('[paynkolay] sonuc', pay.order_no, 'imza:', v.signed, 'kod:', f.RESPONSE_CODE ?? '-', 'mesaj:', String(f.RESPONSE_DATA ?? f.ERROR_MESSAGE ?? '-').slice(0, 120), 'alanlar:', Object.keys(f).join(','));
   if (v.signed && f.RESPONSE_CODE !== '2') {
     await applyFailed(sb, pay as PayRow);
-    return { state: 'hata', orderNo: pay.order_no };
+    return { state: 'hata', orderNo: pay.order_no, msg: failMsg(f) };
   }
   // İmzasız ama açıkça başarısız dönüş (ör. kart reddi): müşteriye "alındı" deme, hata göster (veritabanını değiştirme).
-  if (f.RESPONSE_CODE && f.RESPONSE_CODE !== '2') return { state: 'hata', orderNo: pay.order_no };
+  if (f.RESPONSE_CODE && f.RESPONSE_CODE !== '2') return { state: 'hata', orderNo: pay.order_no, msg: failMsg(f) };
   return { state: r.state === 'hata' ? 'hata' : 'bekliyor', orderNo: pay.order_no };
 }
 

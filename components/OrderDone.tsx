@@ -39,6 +39,7 @@ export function OrderDone() {
   );
   const durumQs = new URLSearchParams(qs).get('durum') || '';
   const qno = new URLSearchParams(qs).get('no') || '';
+  const qmsg = (new URLSearchParams(qs).get('mesaj') || '').slice(0, 140);
   const [checked, setChecked] = useState('');
   const durum = checked || durumQs;
   const [retryBusy, setRetryBusy] = useState(false);
@@ -171,6 +172,7 @@ export function OrderDone() {
               {retryBusy ? 'Yönlendiriliyor…' : 'Ödemeyi tamamla'}
             </button>
           )}
+          {durum === 'hata' && qmsg && <p className="fld-err">Ödeme sayfasının mesajı: {qmsg}</p>}
           {retryErr && <p className="fld-err">{retryErr}</p>}
         </div>
       )}
