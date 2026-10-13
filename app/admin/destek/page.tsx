@@ -83,7 +83,7 @@ export default function Destek() {
             {c && (
               <>
                 <div className="kpis">
-                  {[['Toplam harcama', tl(c.orders.filter((o) => o.status !== 'iptal').reduce((n, o) => n + Number(o.total), 0))], ['Sipariş', String(c.orders.length)], ['İptal', String(c.orders.filter((o) => o.status === 'iptal').length)], ['İade', String(c.rets.length)], ['Son sipariş', c.orders[0] ? dt(c.orders[0].created_at) : '—']].map(([l, v]) => <div className="kpi" key={l}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}
+                  {[['Toplam harcama', tl(c.orders.filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor').reduce((n, o) => n + Number(o.total), 0))], ['Sipariş', String(c.orders.length)], ['İptal', String(c.orders.filter((o) => o.status === 'iptal').length)], ['İade', String(c.rets.length)], ['Son sipariş', c.orders[0] ? dt(c.orders[0].created_at) : '—']].map(([l, v]) => <div className="kpi" key={l}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}
                 </div>
                 <Card title="Sipariş geçmişi"><Tbl min={640} cols={[['Sipariş', '100px'], ['Tarih', '110px'], ['Tutar', '100px'], ['Durum', '130px'], ['Kupon', 'minmax(0,1fr)']]} rows={c.orders.map((o) => [o.order_no, dt(o.created_at), tl(Number(o.total)), o.status, o.coupon_code ?? '—'])} empty="Sipariş yok" /></Card>
                 <div className="grid2 even">

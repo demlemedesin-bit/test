@@ -35,7 +35,7 @@ export default function Muhasebe() {
     const from = startOfDay() - (days - 1) * DAY;
     const inR = (iso: string) => new Date(iso).getTime() >= from;
     const all = (os ?? []).filter((o) => inR(o.created_at));
-    const live = all.filter((o) => o.status !== 'iptal');
+    const live = all.filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor'); // yalnızca ödemesi onaylananlar
     const sum = (l: AdminOrder[], k: 'total' | 'discount' | 'shipping' | 'subtotal') => l.reduce((n, o) => n + Number(o[k] ?? 0), 0);
     const ret = rs.filter((x) => x.kind === 'iade' && x.status !== 'red' && inR(x.created_at)).reduce((n, x) => n + Number(x.amount), 0);
     const byDay = new Map<string, { n: number; t: number; d: number; s: number }>();

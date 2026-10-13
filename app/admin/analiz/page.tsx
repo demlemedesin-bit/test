@@ -38,7 +38,7 @@ export default function Analiz() {
     const days = Math.min(90, Math.max(1, Math.round((Math.min(r.to, Date.now() + DAY) - r.from) / DAY)));
     return Array.from({ length: days }, (_, i) => {
       const t0 = r.from + i * DAY;
-      const os = d.orders.filter((o) => o.status !== 'iptal' && new Date(o.created_at).getTime() >= t0 && new Date(o.created_at).getTime() < t0 + DAY);
+      const os = d.orders.filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor' && new Date(o.created_at).getTime() >= t0 && new Date(o.created_at).getTime() < t0 + DAY);
       return { label: new Date(t0).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }), value: os.reduce((n, o) => n + Number(o.total), 0), note: `${os.length} sipariş` };
     });
   }, [d, r]);

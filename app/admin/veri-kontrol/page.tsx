@@ -30,7 +30,7 @@ export default function VeriKontrol() {
       ]);
       const ev = (Array.isArray(e.data) ? e.data : []) as Ev[];
       const n = (t: string) => ev.filter((x) => x.type === t).reduce((s, x) => s + +x.n, 0);
-      const orders = ((o.data ?? []) as { total: number; status: string }[]).filter((x) => x.status !== 'iptal');
+      const orders = ((o.data ?? []) as { total: number; status: string }[]).filter((x) => x.status !== 'iptal' && x.status !== 'odeme_bekleniyor');
       const evSum = ev.filter((x) => x.type === 'order').reduce((s, x) => s + +x.v, 0);
       const ordSum = orders.reduce((s, x) => s + Number(x.total), 0);
       const ads = (a.data?.value ?? {}) as Record<string, unknown>;

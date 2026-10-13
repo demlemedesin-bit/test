@@ -41,7 +41,8 @@ export const PERIODS: { key: string; label: string; cur: () => Range; prev?: () 
   { key: 'yil', label: 'Geçen yıl aynı dönem (30 gün)', cur: () => ({ from: startOfDay() - 365 * DAY - 29 * DAY, to: startOfDay() - 365 * DAY + DAY }), prev: () => ({ from: startOfDay() - 29 * DAY, to: startOfDay() + DAY }) },
 ];
 
-export const live = (o: AdminOrder) => o.status !== 'iptal';
+/** Ciroya yalnızca ödemesi onaylanmış siparişler girer (ödeme bekleyen ve iptal edilenler hariç). */
+export const live = (o: AdminOrder) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor';
 const ts = (o: { created_at: string }) => new Date(o.created_at).getTime();
 export const ordersIn = (d: Data, r: Range) => d.orders.filter((o) => live(o) && ts(o) >= r.from && ts(o) < r.to);
 const evIn = (d: Data, r: Range, type: string, f?: (e: Ev) => boolean) =>

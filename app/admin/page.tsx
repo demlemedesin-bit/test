@@ -45,13 +45,13 @@ function FullDashboard() {
   }, [load]);
 
   const s = useMemo(() => {
-    const live = (orders ?? []).filter((o) => o.status !== 'iptal');
+    const live = (orders ?? []).filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor'); // ciro: ödemesi onaylananlar
     const now = new Date();
     const today = dayKey(now);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
     const todayOrders = live.filter((o) => dayKey(new Date(o.created_at)) === today);
     const month = live.filter((o) => new Date(o.created_at).getTime() >= monthStart);
-    const pay = (orders ?? []).filter((o) => o.status === 'odeme_bekleniyor');
+    const pay = (orders ?? []).filter((o) => o.status === 'odeme_bekleniyor' && o.payment_method !== 'kart'); // ödenmemiş kart denemeleri Siparişler > "Ödeme alınamadı"da
     const ship = (orders ?? []).filter((o) => o.status === 'hazirlaniyor');
     const days = Array.from({ length: 14 }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (13 - i));
@@ -77,7 +77,7 @@ function FullDashboard() {
     const stLabel: Record<string, [string, string]> = { odeme_bekleniyor: ['Ödeme bekliyor', '#f3ad4a'], hazirlaniyor: ['Hazırlanıyor', '#5aaefc'], kargoda: ['Kargoda', '#7c6af7'], teslim_edildi: ['Teslim edildi', '#25d6a0'], iptal: ['İptal', '#6c6c85'] };
     const statusSegs = Object.entries(stLabel).map(([k, [label, color]]) => ({ label, color, value: last30.filter((o) => o.status === k).length }));
     const payMap = new Map<string, number>();
-    last30.filter((o) => o.status !== 'iptal').forEach((o) => payMap.set(o.payment_method, (payMap.get(o.payment_method) ?? 0) + Number(o.total)));
+    last30.filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor').forEach((o) => payMap.set(o.payment_method, (payMap.get(o.payment_method) ?? 0) + Number(o.total)));
     const payName: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme', kart: 'Kredi kartı' };
     const payRows = [...payMap.entries()].map(([k, v]) => ({ label: payName[k] ?? k, value: v })).sort((a, b) => b.value - a.value);
     const w1 = days.slice(7).reduce((n, d) => n + d.total, 0), w0 = days.slice(0, 7).reduce((n, d) => n + d.total, 0);
