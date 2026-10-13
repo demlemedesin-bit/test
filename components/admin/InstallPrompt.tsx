@@ -11,6 +11,7 @@ export function InstallPrompt() {
   const [evt, setEvt] = useState<BIP | null>(null);
   const [ios, setIos] = useState(false);
   const [hide, setHide] = useState(true);
+  const [desktop, setDesktop] = useState(false);
 
   useEffect(() => {
     try {
@@ -21,15 +22,21 @@ export function InstallPrompt() {
       const ua = navigator.userAgent;
       const isIos = /iPhone|iPad|iPod/.test(ua) || (ua.includes('Mac') && navigator.maxTouchPoints > 1);
       const isMobile = isIos || /Android/.test(ua);
-      if (!isMobile) return; // bilgisayarda gösterme
       setIos(isIos);
-      setHide(false);
+      setDesktop(!isMobile);
+      if (isMobile) setHide(false); // bilgisayarda, tarayıcı yüklemeye hazır olunca (aşağıda) gösterilir
     } catch {
       /* sorun değil */
     }
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setEvt(e as BIP);
+      try {
+        const closedAt = Number(localStorage.getItem(KEY) || 0);
+        if (!(closedAt && Date.now() - closedAt < 14 * 24 * 3600 * 1000)) setHide(false);
+      } catch {
+        setHide(false);
+      }
     };
     window.addEventListener('beforeinstallprompt', onPrompt);
     const onInstalled = () => setHide(true);
@@ -58,11 +65,11 @@ export function InstallPrompt() {
   };
   // Android'de tarayıcı henüz yükleme olayını vermediyse (ya da başka tarayıcıdaysa) menü yolu gösterilir.
   return (
-    <div role="region" aria-label="Uygulamayı yükle" style={{ position: 'fixed', left: 12, right: 12, bottom: 12, zIndex: 60, background: '#1f1b16', color: '#fff', borderRadius: 14, padding: '12px 14px', boxShadow: '0 8px 30px rgba(0,0,0,.25)', display: 'flex', gap: 12, alignItems: 'center', fontSize: 14, lineHeight: 1.35 }}>
+    <div role="region" aria-label="Uygulamayı yükle" style={{ position: 'fixed', left: 12, right: 12, bottom: 12, maxWidth: 460, marginLeft: 'auto', zIndex: 60, background: '#1f1b16', color: '#fff', borderRadius: 14, padding: '12px 14px', boxShadow: '0 8px 30px rgba(0,0,0,.25)', display: 'flex', gap: 12, alignItems: 'center', fontSize: 14, lineHeight: 1.35 }}>
       <div style={{ flex: 1 }}>
         <b>Paneli uygulama olarak ekle</b>
         <div style={{ opacity: 0.85, marginTop: 2 }}>
-          {ios ? 'Safari’de Paylaş simgesine dokun, sonra “Ana Ekrana Ekle”yi seç.' : evt ? 'Ana ekrana eklenir, tam ekran açılır.' : 'Tarayıcı menüsünden (⋮) “Ana ekrana ekle” ya da “Uygulamayı yükle”yi seç.'}
+          {desktop ? 'Bilgisayarına uygulama olarak yüklenir, ayrı pencerede açılır.' : ios ? 'Safari’de Paylaş simgesine dokun, sonra “Ana Ekrana Ekle”yi seç.' : evt ? 'Ana ekrana eklenir, tam ekran açılır.' : 'Tarayıcı menüsünden (⋮) “Ana ekrana ekle” ya da “Uygulamayı yükle”yi seç.'}
         </div>
       </div>
       {!ios && evt && (
