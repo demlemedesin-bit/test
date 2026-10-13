@@ -38,7 +38,7 @@ const pct = (a: number, b: number) => (b > 0 ? ((a - b) / b) * 100 : a > 0 ? 100
 
 export function OrdersInsight({ orders, now }: { orders: AdminOrder[]; now: number }) {
   const d = useMemo(() => {
-    const live = orders.filter((o) => o.status !== 'iptal');
+    const live = orders.filter((o) => o.status !== 'iptal' && o.status !== 'odeme_bekleniyor');
     const rev = series(live.map((o) => ({ at: o.created_at, v: Number(o.total) })), 14, now);
     const cnt = series(live.map((o) => ({ at: o.created_at, v: 1 })), 14, now);
     const cur = rev.slice(7).reduce((n, p) => n + p.value, 0);

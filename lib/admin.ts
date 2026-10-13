@@ -142,7 +142,7 @@ export function usePendingCounts(enabled: boolean) {
   const load = useCallback(async () => {
     const sb = supabase();
     const [a, b] = await Promise.all([
-      sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'odeme_bekleniyor'),
+      sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'odeme_bekleniyor').neq('payment_method', 'kart'),
       sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'hazirlaniyor'),
     ]);
     setC({ pay: a.count ?? 0, ship: b.count ?? 0 });
