@@ -33,7 +33,7 @@
         o.innerHTML='<div class="sc-top"><span class="sc-fire" aria-hidden="true">🔥</span><span class="sc-t"><b>Süreli indirim</b><small>Süre dolunca fiyat eski haline döner</small></span>'+(save>0?'<span class="sc-save">'+save.toLocaleString("tr-TR")+' ₺<small>kazanç</small></span>':'')+'</div>'
           +'<div class="sc-cd" role="timer" aria-label="Kampanya bitimine kalan süre"><div><b data-u="d">00</b><small>gün</small></div><i>:</i><div><b data-u="h">00</b><small>saat</small></div><i>:</i><div><b data-u="m">00</b><small>dk</small></div><i>:</i><div><b data-u="s">00</b><small>sn</small></div></div>'
           +'<div class="sc-bar" aria-hidden="true"><span></span></div>';
-        e.parentNode.insertBefore(o,e.nextSibling); var end=new Date(p.saleEnds).getTime(); var span=Math.max(end-Date.now(),1); var total=Math.max(span,7*864e5);
+        var vt=e.parentNode.querySelector('.pp-vat'); e.parentNode.insertBefore(o,(vt||e).nextSibling); var end=new Date(p.saleEnds).getTime(); var span=Math.max(end-Date.now(),1); var total=Math.max(span,7*864e5);
         var q=function(u){ return o.querySelector('[data-u="'+u+'"]'); }; var z=function(n){ return (n<10?'0':'')+n; }; var prev={};
         var set=function(u,v){ var el=q(u); if(!el||prev[u]===v) return; prev[u]=v; el.textContent=v; if(u==='s'){ el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick'); } };
         var tick=function(){ var ms=end-Date.now(); if(ms<=0){ o.className='sale-card ended'; o.innerHTML='<div class="sc-top"><span class="sc-fire">⏱</span><span class="sc-t"><b>Kampanya sona erdi</b></span></div>'; clearInterval(window.__pxSaleT); return; }
