@@ -25,7 +25,7 @@ const TABS: [string, string][] = [
 const unpaidCard = (o: { payment_method: string; status: string }) => o.payment_method === 'kart' && o.status === 'odeme_bekleniyor';
 const FLOW = ['odeme_bekleniyor', 'hazirlaniyor', 'kargoda', 'teslim_edildi'];
 
-type Pay = { status: string; payment_id: string | null; paid_price: number | null; created_at: string };
+type Pay = { status: string; payment_id: string | null; paid_price: number | null; created_at: string; fail_code?: string | null; fail_reason?: string | null };
 const PAY_STATUS: Record<string, string> = { init: 'Başlatıldı', paid: 'Ödendi', failed: 'Başarısız', review: 'İncelemede', refunded: 'İade edildi', cancelled: 'İptal edildi' };
 const PAY_TONE: Record<string, string> = { init: 'b-gray', paid: 'b-green', failed: 'b-red', review: 'b-amber', refunded: 'b-blue', cancelled: 'b-gray' };
 
@@ -77,7 +77,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
     let off = false;
     supabase()
       .from('payments')
-      .select('status,payment_id,paid_price,created_at')
+      .select('status,payment_id,paid_price,created_at,fail_code,fail_reason')
       .eq('order_no', order.order_no)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -257,6 +257,12 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
               <dd className="mono">{pay.payment_id || '—'}</dd>
               <dt>Ödenen tutar</dt>
               <dd>{pay.paid_price != null ? tl(Number(pay.paid_price)) : '—'}</dd>
+              {(pay.fail_reason || pay.fail_code) && (
+                <>
+                  <dt>Hata</dt>
+                  <dd style={{ color: 'var(--red, #b3261e)' }}>{pay.fail_reason || 'Mesaj yok'}{pay.fail_code ? ` (kod: ${pay.fail_code})` : ''}</dd>
+                </>
+              )}
             </dl>
           ) : (
             <p className="cell-muted">Bu sipariş için ödeme kaydı yok.</p>
