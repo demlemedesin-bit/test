@@ -59,6 +59,21 @@ export default function Carts() {
   const [del, setDel] = useState<Cart | null>(null);
   const [busy, setBusy] = useState(false);
   const first = useRef(false);
+  const [live, setLive] = useState<{ n: number; qty: number } | null>(null);
+  useEffect(() => {
+    let off = false;
+    const run = async () => {
+      const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data } = await supabase().from('live_carts').select('qty').gt('updated_at', since);
+      if (!off && data) setLive({ n: data.length, qty: data.reduce((s, r) => s + Number((r as { qty: number }).qty || 0), 0) });
+    };
+    run();
+    const t = setInterval(run, 30000);
+    return () => {
+      off = true;
+      clearInterval(t);
+    };
+  }, []);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase().from('abandoned_carts').select('*').order('updated_at', { ascending: false });
@@ -139,6 +154,11 @@ export default function Carts() {
       <div className="adm-scroll">
         <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
+          {live && (
+            <div className="kpis">
+              <Kpi label="Şu an sepeti dolu" value={String(live.n)} sub={`ziyaretçi · ${live.qty} ürün · son 5 dakika (anonim)`} tone="green" icon={<ShoppingCart size={17} />} />
+            </div>
+          )}
           {list && (
             <div className="kpis">
               <Kpi label="Terk edilen sepet" value={String(abandoned.length)} sub="1 saatten uzun süredir hareketsiz" tone="amber" icon={<ShoppingCart size={17} />} />
