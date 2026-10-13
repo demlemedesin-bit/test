@@ -31,7 +31,7 @@ function Bell_() {
       const out: N[] = [];
       if (perms.includes('orders')) {
         const [pay, prep] = await Promise.all([
-          c(sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'odeme_bekleniyor')),
+          c(sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'odeme_bekleniyor').neq('payment_method', 'kart')),
           c(sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'hazirlaniyor')),
         ]);
         out.push({ text: 'ödemesi bekleyen sipariş', href: '/admin/siparisler?durum=odeme_bekleniyor', n: pay, tone: 'amber' }, { text: 'sipariş kargoya hazır', href: '/admin/siparisler?durum=hazirlaniyor', n: prep, tone: 'blue' });

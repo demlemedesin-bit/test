@@ -6,6 +6,7 @@ import { fetchSettings } from '@/lib/shop';
 import { CARD_PENDING_KEY, LAST_ORDER_KEY } from './CheckoutView';
 import { writeCart } from '@/lib/cart';
 import { postForm } from '@/lib/payForm';
+import { D } from './Display';
 import { OrderBody, type OrderRow } from './OrderParts';
 
 type Placed = OrderRow & { email: string };
@@ -236,4 +237,33 @@ export function OrderDone() {
       </p>
     </>
   );
+}
+
+/** Sayfa başlığı: kart ödemesi alınmadıysa "Siparişin alındı" denmez. */
+export function OrderTitle() {
+  const raw = useSyncExternalStore(
+    () => () => {},
+    () => {
+      try {
+        return sessionStorage.getItem(LAST_ORDER_KEY);
+      } catch {
+        return null;
+      }
+    },
+    () => null,
+  );
+  const qs = useSyncExternalStore(
+    () => () => {},
+    () => window.location.search,
+    () => '',
+  );
+  const durum = new URLSearchParams(qs).get('durum') || '';
+  let isCard = false;
+  try {
+    isCard = !!raw && (JSON.parse(raw) as { payment_method?: string }).payment_method === 'kart';
+  } catch {
+    /* sorun değil */
+  }
+  const t = isCard && durum === 'hata' ? 'Ödeme alınamadı' : isCard && durum !== 'ok' ? 'Ödeme bekleniyor' : durum === 'ok' ? 'Ödemen alındı' : 'Siparişin alındı';
+  return <D>{t}</D>;
 }
