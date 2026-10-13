@@ -15,11 +15,14 @@ import { PageHero } from '@/components/admin/PageHero';
 const TABS: [string, string][] = [
   ['hepsi', 'Tümü'],
   ['odeme_bekleniyor', 'Ödeme bekleyen'],
+  ['kart_odenmedi', 'Ödeme alınamadı'],
   ['hazirlaniyor', 'Hazırlanıyor'],
   ['kargoda', 'Kargoda'],
   ['teslim_edildi', 'Teslim edildi'],
   ['iptal', 'İptal'],
 ];
+/** Kartla verilmiş ama ödemesi (henüz) alınmamış sipariş: ödeme gelene kadar normal listede sayılmaz. */
+const unpaidCard = (o: { payment_method: string; status: string }) => o.payment_method === 'kart' && o.status === 'odeme_bekleniyor';
 const FLOW = ['odeme_bekleniyor', 'hazirlaniyor', 'kargoda', 'teslim_edildi'];
 
 type Pay = { status: string; payment_id: string | null; paid_price: number | null; created_at: string };
@@ -350,14 +353,20 @@ function Orders() {
   }, [no, orders]);
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { hepsi: orders?.length ?? 0 };
-    (orders ?? []).forEach((o) => (c[o.status] = (c[o.status] ?? 0) + 1));
+    const c: Record<string, number> = { hepsi: 0, kart_odenmedi: 0 };
+    (orders ?? []).forEach((o) => {
+      if (unpaidCard(o)) c.kart_odenmedi += 1;
+      else {
+        c.hepsi += 1;
+        c[o.status] = (c[o.status] ?? 0) + 1;
+      }
+    });
     return c;
   }, [orders]);
 
   const list = useMemo(() => {
     const k = q.trim().toLocaleLowerCase('tr-TR');
-    return (orders ?? []).filter((o) => (tab === 'hepsi' || o.status === tab) && (!k || [o.order_no, o.full_name, o.email, o.phone].some((v) => (v ?? '').toLocaleLowerCase('tr-TR').includes(k))));
+    return (orders ?? []).filter((o) => (tab === 'kart_odenmedi' ? unpaidCard(o) : !unpaidCard(o) && (tab === 'hepsi' || o.status === tab)) && (!k || [o.order_no, o.full_name, o.email, o.phone].some((v) => (v ?? '').toLocaleLowerCase('tr-TR').includes(k))));
   }, [orders, tab, q]);
 
   const open = orders?.find((o) => o.id === openId) ?? null;
@@ -368,7 +377,7 @@ function Orders() {
 
   return (
     <>
-      <TopBar title="Siparişler" sub={orders ? `${orders.length} kayıt` : ''} onMenu={menu}>
+      <TopBar title="Siparişler" sub={orders ? `${orders.filter((o) => !unpaidCard(o)).length} kayıt` : ''} onMenu={menu}>
         <button className="btn ghost sm" onClick={() => csv(list)} disabled={!list.length}>
           <Download size={14} /> CSV
         </button>
@@ -376,7 +385,7 @@ function Orders() {
       <div className="adm-scroll">
         <div className="adm-inner"><PageHero />
           {err && <div className="alert err">{err}</div>}
-          {orders && orders.length > 0 && <OrdersInsight orders={orders} now={nowTs} />}
+          {orders && orders.length > 0 && <OrdersInsight orders={orders.filter((o) => !unpaidCard(o))} now={nowTs} />}
           <div className="toolbar">
             <div className="search">
               <Search size={15} />
@@ -408,7 +417,7 @@ function Orders() {
                     <span className="cell-muted hide-m">{o.items.reduce((n, i) => n + i.qty, 0)} adet</span>
                     <span className="num">{tl(Number(o.total))}</span>
                     <span className="cell-muted hide-m">{PAY[o.payment_method]}</span>
-                    <span><span className={`badge ${STATUS_TONE[o.status]}`}>{STATUS[o.status]}</span></span>
+                    <span>{unpaidCard(o) ? <span className="badge b-red">Ödeme hatalı</span> : <span className={`badge ${STATUS_TONE[o.status]}`}>{STATUS[o.status]}</span>}</span>
                     <ChevronRight size={16} color="var(--tx3)" className="hide-m" />
                   </div>
                 ))}
