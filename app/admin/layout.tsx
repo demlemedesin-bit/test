@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { AdminShell } from '@/components/admin/Shell';
+import { InstallPrompt } from '@/components/admin/InstallPrompt';
 import './admin.css';
 import './pro.css';
 
@@ -18,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="adm">
       <AdminShell>{children}</AdminShell>
+      <InstallPrompt />
     </div>
   );
 }
