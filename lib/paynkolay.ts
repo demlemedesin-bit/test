@@ -55,8 +55,9 @@ export function cancelRefundHash(c: PaynCfg, p: { referenceCode: string; type: s
   return sha512b64([c.sxCancel, p.referenceCode, p.type, p.amount, p.trxDate, c.secret].join('|'));
 }
 
+/** Raporlama servisi: sx|startDate|endDate|clientReferenceCode|referenceCode|secret (referenceCode boş bırakılır). */
 export function listHash(c: PaynCfg, p: { startDate: string; endDate: string; clientRefCode: string }): string {
-  return sha512b64([c.sxList, p.startDate, p.endDate, p.clientRefCode, c.secret].join('|'));
+  return sha512b64([c.sxList, p.startDate, p.endDate, p.clientRefCode, '', c.secret].join('|'));
 }
 
 function safeEq(a: string, b: string) {
@@ -207,7 +208,8 @@ function records(x: unknown, depth = 0): Rec[] {
   if (depth > 3) return [];
   if (Array.isArray(x)) return x.filter(isRec);
   if (!isRec(x)) return [];
-  if (pick(x, 'REFERENCE_CODE', 'STATUS')) return [x];
+  if (Array.isArray(x.List)) return x.List.filter(isRec); // PfTransactionReportList yanıtı: { List: [...], responseCode, responseData }
+  if (pick(x, 'REFERENCE_CODE', 'referenceCode', 'STATUS')) return [x];
   for (const v of Object.values(x)) {
     const r = records(v, depth + 1);
     if (r.length) return r;
@@ -232,16 +234,16 @@ export async function lookup(c: PaynCfg, clientRefCode: string, from: Date): Pro
   const b = istanbul(new Date(Date.now() + 24 * 3600 * 1000));
   const startDate = `${a.d}.${a.m}.${a.y}`;
   const endDate = `${b.d}.${b.m}.${b.y}`;
-  const raw = await call(`${c.base}/Payment/PaymentList`, { sx: c.sxList, startDate, endDate, clientRefCode, hashDatav2: listHash(c, { startDate, endDate, clientRefCode }) });
+  const raw = await call(`${c.base}/Payment/PfTransactionReportList`, { sx: c.sxList, startDate, endDate, clientReferenceCode: clientRefCode, referenceCode: '', hashDatav2: listHash(c, { startDate, endDate, clientRefCode }) });
   if (raw == null) return null;
   return records(raw)
-    .filter((r) => refOf(pick(r, 'CLIENT_REFERENCE_CODE', 'CLIENT_REF_CODE', 'clientRefCode')) === clientRefCode)
+    .filter((r) => refOf(pick(r, 'clientReferenceCode', 'CLIENT_REFERENCE_CODE', 'CLIENT_REF_CODE', 'clientRefCode')) === clientRefCode)
     .map((r) => ({
       status: pick(r, 'STATUS').toUpperCase(),
-      type: pick(r, 'TRANSACTION_TYPE').toLowerCase(),
-      reference: pick(r, 'REFERENCE_CODE'),
-      amount: Number(pick(r, 'AUTHORIZATION_AMOUNT', 'TRANSACTION_AMOUNT', 'AMOUNT').replace(',', '.')),
-      date: dotDate(pick(r, 'TIMESTAMP', 'TRANSACTION_DATE', 'TRX_DATE', 'DATE')),
+      type: pick(r, 'transactionType', 'TRANSACTION_TYPE').toLowerCase(),
+      reference: pick(r, 'referenceCode', 'REFERENCE_CODE'),
+      amount: Number(pick(r, 'authorizationAmount', 'AUTHORIZATION_AMOUNT', 'TRANSACTION_AMOUNT', 'AMOUNT').replace(',', '.')),
+      date: dotDate(pick(r, 'trxDate', 'TIMESTAMP', 'TRANSACTION_DATE', 'TRX_DATE', 'DATE')),
     }));
 }
 
