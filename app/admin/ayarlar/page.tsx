@@ -7,6 +7,7 @@ import { refreshSite } from '@/lib/admin';
 import { useMenu } from '@/components/admin/Shell';
 import { Field, Loading, TopBar, useToast } from '@/components/admin/ui';
 import { PageHero } from '@/components/admin/PageHero';
+import { PushSettings } from '@/components/admin/PushSettings';
 
 const KEYS = [
   'free_shipping_threshold', 'shipping_fee', 'contact_email',
@@ -95,6 +96,8 @@ export default function Settings() {
       </TopBar>
       <div className="adm-scroll">
         <div className="adm-inner" style={{ maxWidth: 860 }}><PageHero />
+          <PushSettings toast={show} />
+
           <section className="card" style={{ marginBottom: 18 }}>
             <div className="card-h"><h2 className="card-t">Kargo</h2></div>
             <div className="card-b row2">

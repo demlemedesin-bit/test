@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { notifyOrder, serviceClient } from './notify';
+import { pushNewOrder } from './push';
 import { siteUrl } from './siteUrl';
 
 /**
@@ -128,6 +129,7 @@ async function applyPaid(sb: SupabaseClient, pay: PayRow, reference: string, pai
   await sb.from('payments').update({ status: ok ? 'paid' : 'review', payment_id: reference, paid_price: paid, updated_at: now }).eq('id', pay.id);
   if (!ok) return { state: 'tutar', orderNo: pay.order_no }; // sipariş iptal edilmişti: manuel iade gerekir
   await notifyOrder('order_paid', pay.order_no).catch(() => {});
+  await pushNewOrder(pay.order_no).catch(() => {}); // yönetici cihazlarına anlık bildirim
   return { state: 'ok', orderNo: pay.order_no };
 }
 
