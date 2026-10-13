@@ -55,9 +55,9 @@ export function cancelRefundHash(c: PaynCfg, p: { referenceCode: string; type: s
   return sha512b64([c.sxCancel, p.referenceCode, p.type, p.amount, p.trxDate, c.secret].join('|'));
 }
 
-/** Raporlama servisi: sx|startDate|endDate|clientReferenceCode|referenceCode|secret (referenceCode boş bırakılır). */
+/** İşlem Doğrulama Servisi (Payment/PaymentList): sx|startDate|endDate|clientRefCode|secret. */
 export function listHash(c: PaynCfg, p: { startDate: string; endDate: string; clientRefCode: string }): string {
-  return sha512b64([c.sxList, p.startDate, p.endDate, p.clientRefCode, '', c.secret].join('|'));
+  return sha512b64([c.sxList, p.startDate, p.endDate, p.clientRefCode, c.secret].join('|'));
 }
 
 function safeEq(a: string, b: string) {
@@ -208,7 +208,8 @@ function records(x: unknown, depth = 0): Rec[] {
   if (depth > 3) return [];
   if (Array.isArray(x)) return x.filter(isRec);
   if (!isRec(x)) return [];
-  if (Array.isArray(x.List)) return x.List.filter(isRec); // PfTransactionReportList yanıtı: { List: [...], responseCode, responseData }
+  const lst = x.LIST ?? x.List;
+  if (Array.isArray(lst)) return lst.filter(isRec); // Doğrulama servisi yanıtı: { LIST: [...], RESPONSE_CODE, ... }
   if (pick(x, 'REFERENCE_CODE', 'referenceCode', 'STATUS')) return [x];
   for (const v of Object.values(x)) {
     const r = records(v, depth + 1);
@@ -234,7 +235,7 @@ export async function lookup(c: PaynCfg, clientRefCode: string, from: Date): Pro
   const b = istanbul(new Date(Date.now() + 24 * 3600 * 1000));
   const startDate = `${a.d}.${a.m}.${a.y}`;
   const endDate = `${b.d}.${b.m}.${b.y}`;
-  const raw = await call(`${c.base}/Payment/PfTransactionReportList`, { sx: c.sxList, startDate, endDate, clientReferenceCode: clientRefCode, referenceCode: '', hashDatav2: listHash(c, { startDate, endDate, clientRefCode }) });
+  const raw = await call(`${c.base}/Payment/PaymentList`, { sx: c.sxList, startDate, endDate, clientRefCode, hashDatav2: listHash(c, { startDate, endDate, clientRefCode }) });
   if (raw == null) return null;
   return records(raw)
     .filter((r) => refOf(pick(r, 'clientReferenceCode', 'CLIENT_REFERENCE_CODE', 'CLIENT_REF_CODE', 'clientRefCode')) === clientRefCode)
