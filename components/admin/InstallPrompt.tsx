@@ -12,6 +12,7 @@ export function InstallPrompt() {
   const [ios, setIos] = useState(false);
   const [hide, setHide] = useState(true);
   const [desktop, setDesktop] = useState(false);
+  const [macSafari, setMacSafari] = useState(false);
 
   useEffect(() => {
     try {
@@ -24,7 +25,9 @@ export function InstallPrompt() {
       const isMobile = isIos || /Android/.test(ua);
       setIos(isIos);
       setDesktop(!isMobile);
-      if (isMobile) setHide(false); // bilgisayarda, tarayıcı yüklemeye hazır olunca (aşağıda) gösterilir
+      const safariMac = !isMobile && /Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS/.test(ua) && ua.includes('Mac');
+      setMacSafari(safariMac);
+      if (isMobile || safariMac) setHide(false); // bilgisayarda, tarayıcı yüklemeye hazır olunca (aşağıda) gösterilir
     } catch {
       /* sorun değil */
     }
@@ -69,7 +72,7 @@ export function InstallPrompt() {
       <div style={{ flex: 1 }}>
         <b>Paneli uygulama olarak ekle</b>
         <div style={{ opacity: 0.85, marginTop: 2 }}>
-          {desktop ? 'Bilgisayarına uygulama olarak yüklenir, ayrı pencerede açılır.' : ios ? 'Safari’de Paylaş simgesine dokun, sonra “Ana Ekrana Ekle”yi seç.' : evt ? 'Ana ekrana eklenir, tam ekran açılır.' : 'Tarayıcı menüsünden (⋮) “Ana ekrana ekle” ya da “Uygulamayı yükle”yi seç.'}
+          {macSafari ? 'Safari’de üst menüden Dosya > Dock’a Ekle’yi seç.' : desktop ? 'Bilgisayarına uygulama olarak yüklenir, ayrı pencerede açılır.' : ios ? 'Safari’de Paylaş simgesine dokun, sonra “Ana Ekrana Ekle”yi seç.' : evt ? 'Ana ekrana eklenir, tam ekran açılır.' : 'Tarayıcı menüsünden (⋮) “Ana ekrana ekle” ya da “Uygulamayı yükle”yi seç.'}
         </div>
       </div>
       {!ios && evt && (
