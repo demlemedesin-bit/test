@@ -10,10 +10,11 @@ import { Confirm, Empty, Field, Loading, Panel, TopBar, useToast } from '@/compo
 import './sistem.css';
 import { PageHero } from '@/components/admin/PageHero';
 
-type Tab = 'ekip' | 'kayit' | 'yedek' | 'durum';
+type Tab = 'ekip' | 'kayit' | 'hata' | 'yedek' | 'durum';
 const TABS: [Tab, string][] = [
   ['ekip', 'Ekip ve roller'],
   ['kayit', 'İşlem kayıtları'],
+  ['hata', 'Hatalar'],
   ['yedek', 'Yedek'],
   ['durum', 'Sistem durumu'],
 ];
@@ -241,6 +242,57 @@ function Audit() {
   );
 }
 
+/* ═══ Hatalar: site hataları + gönderilemeyen bildirimler ═══ */
+type ErrRow = { at: string; where: string; text: string };
+function Errors() {
+  const [rows, setRows] = useState<ErrRow[] | null>(null);
+  const [err, setErr] = useState('');
+  const load = useCallback(async () => {
+    setErr('');
+    const sb = supabase();
+    const [a, b] = await Promise.all([
+      sb.from('error_log').select('at,path,message').order('at', { ascending: false }).limit(100),
+      sb.from('message_log').select('at,channel,template,order_no,status,error').neq('status', 'sent').order('at', { ascending: false }).limit(100),
+    ]);
+    if (a.error || b.error) setErr((a.error ?? b.error)!.message);
+    const out: ErrRow[] = [
+      ...(a.data ?? []).map((r: { at: string; path: string | null; message: string }) => ({ at: r.at, where: `Site · ${r.path || '/'}`, text: r.message })),
+      ...(b.data ?? []).map((r: { at: string; channel: string; template: string | null; order_no: string | null; error: string | null }) => ({ at: r.at, where: `Bildirim · ${r.channel}${r.order_no ? ' · ' + r.order_no : ''}`, text: r.error || 'gönderilemedi' })),
+    ].sort((x, y) => (x.at < y.at ? 1 : -1));
+    setRows(out);
+  }, []);
+  useEffect(() => {
+    const t = setTimeout(load, 0);
+    return () => clearTimeout(t);
+  }, [load]);
+  return (
+    <>
+      {err && <div className="alert err">{err}</div>}
+      <section className="card">
+        <div className="card-h"><h2 className="card-t">Hatalar</h2><button type="button" className="btn ghost" onClick={load}><RefreshCw size={14} /> Yenile</button></div>
+        {!rows ? (
+          !err && <Loading />
+        ) : rows.length === 0 ? (
+          <Empty title="Hata kaydı yok" text="Sitede oluşan hatalar ve gönderilemeyen mail/SMS burada görünür." />
+        ) : (
+          <div className="sy-scroll">
+            <div className="tbl" style={{ minWidth: 640 }}>
+              <div className="tr hd" style={{ gridTemplateColumns: '130px minmax(0,1fr) minmax(0,2fr)' }}><span>Zaman</span><span>Yer</span><span>Hata</span></div>
+              {rows.map((r, i) => (
+                <div className="tr" key={i} style={{ gridTemplateColumns: '130px minmax(0,1fr) minmax(0,2fr)', alignItems: 'start' }}>
+                  <span className="cell-muted">{dt(r.at, true)}</span>
+                  <span className="cell-clip">{r.where}</span>
+                  <span className="sy-detail">{r.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    </>
+  );
+}
+
 /* ═══ 3. Yedek ═══ */
 const BACKUP: [string, string][] = [
   ['products', 'slug'],
@@ -422,6 +474,7 @@ export default function System() {
           </div>
           {tab === 'ekip' && <Team toast={toast} />}
           {tab === 'kayit' && <Audit />}
+          {tab === 'hata' && <Errors />}
           {tab === 'yedek' && <Backup toast={toast} />}
           {tab === 'durum' && <Status />}
         </div>
