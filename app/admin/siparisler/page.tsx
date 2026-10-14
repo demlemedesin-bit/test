@@ -69,7 +69,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
   const [trackNo, setTrackNo] = useState(order.tracking_no ?? '');
   const [note, setNote] = useState(order.admin_note ?? '');
   const [busy, setBusy] = useState(false);
-  const [ask, setAsk] = useState<null | 'iptal' | 'iade'>(null);
+  const [ask, setAsk] = useState<null | 'iptal' | 'iade' | 'sil'>(null);
   const [pay, setPay] = useState<Pay | null>(null);
 
   useEffect(() => {
@@ -104,6 +104,21 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
       const n = await notify(event, order.order_no);
       if (n) toast(`${ok} · ${n.toLocaleLowerCase('tr-TR')}`, n.includes('edilemedi'));
     }
+  }
+
+  /** Siparişi kalıcı siler (yalnızca ödeme bekleyen / iptal). Mail ya da SMS göndermez. */
+  async function remove() {
+    setBusy(true);
+    const { error } = await supabase().rpc('delete_order', { p_id: order.id });
+    setBusy(false);
+    setAsk(null);
+    if (error) {
+      toast(error.message.includes('yalnızca') ? 'Yalnızca ödeme bekleyen veya iptal edilmiş sipariş silinebilir.' : 'Silinemedi. Tekrar dene.', true);
+      return;
+    }
+    toast('Sipariş silindi');
+    onChanged();
+    onClose();
   }
 
   async function refund() {
@@ -192,6 +207,16 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
               Siparişi iptal et
             </button>
           </div>
+        </div>
+      )}
+
+      {(order.status === 'odeme_bekleniyor' || cancelled) && (
+        <div className="sec">
+          <p className="sec-t">Siparişi sil</p>
+          <p className="muted" style={{ marginBottom: 10 }}>Test ya da yanlış siparişi kalıcı olarak siler. Müşteriye mail veya SMS gitmez.</p>
+          <button className="btn danger" disabled={busy} onClick={() => setAsk('sil')}>
+            Siparişi sil
+          </button>
         </div>
       )}
 
@@ -304,6 +329,16 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
           busy={busy}
           onCancel={() => setAsk(null)}
           onConfirm={() => save({ status: 'iptal', ...meta }, 'Sipariş iptal edildi', 'order_cancelled')}
+        />
+      )}
+      {ask === 'sil' && (
+        <Confirm
+          title="Sipariş silinsin mi?"
+          text={`${order.order_no} kalıcı olarak silinir${order.status === 'odeme_bekleniyor' ? ', stoklu ürünler stoğa geri eklenir' : ''}. Müşteriye hiçbir bildirim gitmez. Bu işlem geri alınamaz.`}
+          confirmText="Evet, sil"
+          busy={busy}
+          onCancel={() => setAsk(null)}
+          onConfirm={remove}
         />
       )}
       {ask === 'iade' && (
