@@ -6,6 +6,9 @@ const headers = [
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(self)' },
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+  // Sayfaların çerçeveye alınmasını, <base> değiştirmeyi ve eklenti (object) yüklemeyi engeller; satır içi betikleri kısıtlamaz.
+  { key: 'Content-Security-Policy', value: "base-uri 'self'; object-src 'none'; frame-ancestors 'self'" },
 ];
 
 const nextConfig: NextConfig = {
