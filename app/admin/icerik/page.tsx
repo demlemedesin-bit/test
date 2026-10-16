@@ -307,6 +307,7 @@ export default function Content() {
 
           {tab === TABS[3] && (
             <>
+              <div style={{ marginBottom: 14 }}><Votes month={dm.month} /></div>
               <section className="card" style={{ marginBottom: 14 }}>
                 <div className="card-h"><h2 className="card-t">Sehpa renkleri</h2><AddBtn onClick={() => setDm((d) => ({ ...d, sehpa_colors: [...(d.sehpa_colors ?? []), { name: '', hex: '#8B1D1D', img: '' }] }))}>Renk ekle</AddBtn></div>
                 <div className="card-b">
@@ -372,6 +373,37 @@ export default function Content() {
       </div>
       {node}
     </>
+  );
+}
+
+function Votes({ month }: { month: string }) {
+  const [rows, setRows] = useState<{ photo: string; n: number }[] | null>(null);
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    let off = false;
+    supabase().from('demleyen_oylar').select('photo').eq('month', month).limit(20000).then(({ data, error }) => {
+      if (off) return;
+      if (error) return setErr(error.message);
+      const c = new Map<string, number>();
+      (data ?? []).forEach((r: { photo: string }) => c.set(r.photo, (c.get(r.photo) ?? 0) + 1));
+      setRows([...c].map(([photo, n]) => ({ photo, n })).sort((a, b) => b.n - a.n));
+    });
+    return () => { off = true; };
+  }, [month]);
+  const total = (rows ?? []).reduce((a, r) => a + r.n, 0);
+  return (
+    <section className="card">
+      <div className="card-h"><h2 className="card-t">Anket sonuçları</h2><span className="card-m">{month} · {total} oy</span></div>
+      <div className="card-b">
+        {err ? <div className="alert err">{err}</div> : !rows ? <Loading /> : rows.length === 0 ? <p className="cell-muted">Bu ay için henüz oy yok.</p> : rows.map((r) => (
+          <div key={r.photo} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 60px 50px', gap: 10, alignItems: 'center', padding: '6px 0' }}>
+            <span className="cell-clip">{r.photo}</span>
+            <b style={{ textAlign: 'right' }}>{r.n} oy</b>
+            <span className="cell-muted" style={{ textAlign: 'right' }}>%{total ? Math.round((r.n * 100) / total) : 0}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
