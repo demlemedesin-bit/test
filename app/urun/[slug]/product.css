@@ -175,5 +175,5 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 
 /* Mobilde ilk ekranda renk adı + renk sayısı (küçük resimlerin altında) */
 .th-sum{ display:none; flex-basis:100%; font-size:var(--t-14); color:var(--ink-2); margin-top:4px; }
-@media (max-width: 900px){ .th-sum{ display:block; } }
+@media (max-width: 900px){ .pp-thumbs button[data-i]{ display:none; } .th-sum{ display:none; } .pp-media #ppColors{ margin:14px 0 0; } }
 
