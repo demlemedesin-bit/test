@@ -176,3 +176,9 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 /* Mobilde ilk ekranda renk adı + renk sayısı (küçük resimlerin altında) */
 .th-sum{ display:none; flex-basis:100%; font-size:var(--t-14); color:var(--ink-2); margin-top:4px; }
 @media (max-width: 900px){ .th-sum{ display:block; } }
+
+/* Rengin üstünde çıkan isim balonu */
+.sw{ position:relative; }
+#swTip{ position:absolute; transform:translate(-50%,-100%) translateY(4px); padding:5px 11px; border-radius:999px; font-size:var(--t-14); font-weight:500; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 120ms, transform 120ms; box-shadow:0 4px 14px rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.12); z-index:5; }
+#swTip.on{ opacity:1; transform:translate(-50%,-100%); }
+@media (prefers-reduced-motion:reduce){ #swTip{ transition:none; } }
