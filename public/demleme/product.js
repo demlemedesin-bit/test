@@ -49,6 +49,11 @@
     $('ppThumbs').innerHTML+='<span id="ppXtra" class="th-x"></span>';
     xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.addEventListener('click', function(){ setCol(+b.getAttribute('data-i')); }); });
+    // Renk üzerine gelince (veya klavye odağında) adı renginde göster; ayrılınca seçili renge dön
+    [].forEach.call(document.querySelectorAll('#ppColors .sw button'), function(b){
+      var show=function(){ colLabel(cur.colors[+b.getAttribute('data-i')]); }, back=function(){ colLabel(cur.colors[col]); };
+      b.addEventListener('mouseenter', show); b.addEventListener('focus', show); b.addEventListener('mouseleave', back); b.addEventListener('blur', back);
+    });
     // sizes: either real sizes to pick (t-shirt) or links to the sibling product (jar / tray sizes) or a single fixed size
     var s=p.sizes, h='';
     if(s){ h='<div class="pp-opt-h"><b>'+s.label+'</b>'+(p.chart ? '<button type="button" class="pp-chart-btn" id="chartBtn">Beden tablosu</button>' : '')+'</div><div class="sz">'+s.items.map(function(it,i){
@@ -67,7 +72,11 @@
   var xtra=function(){ var box=$('ppXtra'); if(!box) return; var x=(cur.colors[col]||{}), list=[]; (x.imgs||[]).forEach(function(u){ list.push(['c',u]); }); (cur.gallery||[]).forEach(function(u){ list.push(['g',u]); });
     box.innerHTML=list.map(function(it,k){ return '<button type="button" data-x="'+k+'" class="'+(it[0]==='c' ? 'th-c' : 'th-g')+'" aria-label="Görsel '+(k+1)+'"><img src="'+esc(it[1])+'" alt="" loading="lazy"></button>'; }).join('');
     [].forEach.call(box.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ var im=$('ppImg'), u=list[+b.getAttribute('data-x')][1]; [].forEach.call(document.querySelectorAll('#ppThumbs button'), function(y){ y.classList.remove('on'); }); b.classList.add('on'); im.classList.add('fade'); setTimeout(function(){ im.src=u; im.classList.remove('fade'); },180); }); }); };
-  var setCol=function(i, now){ col=i; var x=cur.colors[i], im=$('ppImg'); $('colName').textContent=x.name; xtra();
+  var colLabel=function(x){ var el=$('colName'); if(!el||!x) return; el.textContent=x.name; var h=String(x.hex||'').replace('#',''); if(h.length===3) h=h.replace(/./g,function(c){ return c+c; });
+    var ok=/^[0-9a-f]{6}$/i.test(h); if(!ok){ el.style.color=''; return; } var r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16), l=(0.299*r+0.587*g+0.114*b)/255;
+    if(l>0.62){ var k=0.55; r=Math.round(r*(1-k)); g=Math.round(g*(1-k)); b=Math.round(b*(1-k)); } // açık renkleri okunur kalsın diye koyulaştır
+    el.style.color='rgb('+r+','+g+','+b+')'; el.style.fontWeight='500'; };
+  var setCol=function(i, now){ col=i; var x=cur.colors[i], im=$('ppImg'); colLabel(x); xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.classList.toggle('on', +b.getAttribute('data-i')===i); });
     if(now){ im.src=x.img; im.alt=cur.name+', '+x.name; return; }
     im.classList.add('fade'); setTimeout(function(){ im.src=x.img; im.alt=cur.name+', '+x.name; im.classList.remove('fade'); }, 180); };
