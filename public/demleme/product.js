@@ -55,6 +55,9 @@
       var show=function(){ colLabel(cur.colors[+b.getAttribute('data-i')]); }, back=function(){ colLabel(cur.colors[col]); };
       b.addEventListener('mouseenter', show); b.addEventListener('focus', show); b.addEventListener('mouseleave', back); b.addEventListener('blur', back);
     });
+    // Mobilde renk paleti, küçük görsellerin yerine ürün fotoğrafının hemen altında durur (aynı düğmeler, taşınır)
+    if(!window.__ppMq){ window.__ppMq=matchMedia('(max-width:900px)'); window.__ppMq.addEventListener('change', function(){ placeColors(); }); }
+    placeColors();
     // sizes: either real sizes to pick (t-shirt) or links to the sibling product (jar / tray sizes) or a single fixed size
     var s=p.sizes, h='';
     if(s){ h='<div class="pp-opt-h"><b>'+s.label+'</b>'+(p.chart ? '<button type="button" class="pp-chart-btn" id="chartBtn">Beden tablosu</button>' : '')+'</div><div class="sz">'+s.items.map(function(it,i){
@@ -73,6 +76,8 @@
   var xtra=function(){ var box=$('ppXtra'); if(!box) return; var x=(cur.colors[col]||{}), list=[]; (x.imgs||[]).forEach(function(u){ list.push(['c',u]); }); (cur.gallery||[]).forEach(function(u){ list.push(['g',u]); });
     box.innerHTML=list.map(function(it,k){ return '<button type="button" data-x="'+k+'" class="'+(it[0]==='c' ? 'th-c' : 'th-g')+'" aria-label="Görsel '+(k+1)+'"><img src="'+esc(it[1])+'" alt="" loading="lazy"></button>'; }).join('');
     [].forEach.call(box.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ var im=$('ppImg'), u=list[+b.getAttribute('data-x')][1]; [].forEach.call(document.querySelectorAll('#ppThumbs button'), function(y){ y.classList.remove('on'); }); b.classList.add('on'); im.classList.add('fade'); setTimeout(function(){ im.src=u; im.classList.remove('fade'); },180); }); }); };
+  var placeColors=function(){ var pc=$('ppColors'), media=document.querySelector('.pp-media'), th=$('ppThumbs'), sz=$('ppSizes'); if(!pc||!media||!th||!sz) return;
+    if(window.__ppMq && window.__ppMq.matches){ if(pc.parentNode!==media) media.insertBefore(pc, th.nextSibling); } else if(pc.parentNode===media){ sz.parentNode.insertBefore(pc, sz); } };
   var colLabel=function(x){ var el=$('colName'), sm=$('ppColSum'); if(sm&&x&&cur&&cur.colors) sm.textContent=x.name+' \u00b7 '+cur.colors.length+' renk'; if(!el||!x) return; el.textContent=x.name; var h=String(x.hex||'').replace('#',''); if(h.length===3) h=h.replace(/./g,function(c){ return c+c; });
     var ok=/^[0-9a-f]{6}$/i.test(h); if(!ok){ el.style.color=''; return; } var r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16), l=(0.299*r+0.587*g+0.114*b)/255;
     if(l>0.62){ var k=0.55; r=Math.round(r*(1-k)); g=Math.round(g*(1-k)); b=Math.round(b*(1-k)); } // açık renkleri okunur kalsın diye koyulaştır
