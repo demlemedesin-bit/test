@@ -47,6 +47,7 @@
     $('ppColors').innerHTML='<div class="pp-opt-h"><b>Renk</b><span id="colName"></span></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+'"></button>'; }).join('')+'</div>' : '');
     $('ppThumbs').innerHTML=c.length>1 ? c.map(function(x,i){ return '<button type="button" data-i="'+i+'" aria-label="'+esc(x.name)+'"><img src="'+x.img+'" alt="">'+(x.imgs&&x.imgs.length ? '<em class="th-n" title="Bu renkte '+x.imgs.length+' ek görsel var">+'+x.imgs.length+'</em>' : '')+'</button>'; }).join('') : '';
     $('ppThumbs').innerHTML+='<span id="ppXtra" class="th-x"></span>';
+    if(c.length>1) $('ppThumbs').innerHTML+='<span id="ppColSum" class="th-sum"></span>';
     xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.addEventListener('click', function(){ setCol(+b.getAttribute('data-i')); }); });
     // Renk üzerine gelince (veya klavye odağında) adı renginde göster; ayrılınca seçili renge dön
@@ -72,7 +73,7 @@
   var xtra=function(){ var box=$('ppXtra'); if(!box) return; var x=(cur.colors[col]||{}), list=[]; (x.imgs||[]).forEach(function(u){ list.push(['c',u]); }); (cur.gallery||[]).forEach(function(u){ list.push(['g',u]); });
     box.innerHTML=list.map(function(it,k){ return '<button type="button" data-x="'+k+'" class="'+(it[0]==='c' ? 'th-c' : 'th-g')+'" aria-label="Görsel '+(k+1)+'"><img src="'+esc(it[1])+'" alt="" loading="lazy"></button>'; }).join('');
     [].forEach.call(box.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ var im=$('ppImg'), u=list[+b.getAttribute('data-x')][1]; [].forEach.call(document.querySelectorAll('#ppThumbs button'), function(y){ y.classList.remove('on'); }); b.classList.add('on'); im.classList.add('fade'); setTimeout(function(){ im.src=u; im.classList.remove('fade'); },180); }); }); };
-  var colLabel=function(x){ var el=$('colName'); if(!el||!x) return; el.textContent=x.name; var h=String(x.hex||'').replace('#',''); if(h.length===3) h=h.replace(/./g,function(c){ return c+c; });
+  var colLabel=function(x){ var el=$('colName'), sm=$('ppColSum'); if(sm&&x&&cur&&cur.colors) sm.textContent=x.name+' \u00b7 '+cur.colors.length+' renk'; if(!el||!x) return; el.textContent=x.name; var h=String(x.hex||'').replace('#',''); if(h.length===3) h=h.replace(/./g,function(c){ return c+c; });
     var ok=/^[0-9a-f]{6}$/i.test(h); if(!ok){ el.style.color=''; return; } var r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16), l=(0.299*r+0.587*g+0.114*b)/255;
     if(l>0.62){ var k=0.55; r=Math.round(r*(1-k)); g=Math.round(g*(1-k)); b=Math.round(b*(1-k)); } // açık renkleri okunur kalsın diye koyulaştır
     el.style.color='rgb('+r+','+g+','+b+')'; el.style.fontWeight='500'; };
