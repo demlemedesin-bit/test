@@ -355,7 +355,9 @@
       var end=function(){ o.v.removeEventListener('ended', end); res(); }; o.v.addEventListener('ended', end); setTimeout(res, 3200/RATE+600); }); };
     var vid=function(o,on){ o.vid=on; o.g.classList.toggle('is-vid', on); place(); };
     var queue=[], busy=false;
-    var step=function(){ if(!queue.length){ busy=false; return; } busy=true;
+    // Tıklamadan önce komşu konukların kalkma/oturma kliplerini yükle: basınca hareket gecikmeden başlasın
+    var warm=function(){ if(reduce) return; var r=Math.round(target); [1,-1].forEach(function(dr){ var L=els[((r+(dr>0?-VIS:VIS))%N+N)%N], E=els[((r+(dr>0?VIS+1:-VIS-1))%N+N)%N]; if(!L.vid) ready(L,'stand'); if(!E.vid) ready(E,'sit'); }); };
+    var step=function(){ if(!queue.length){ busy=false; setTimeout(warm, 60); return; } busy=true;
       var dir=queue.shift(), r=Math.round(target), L=els[((r+(dir>0?-VIS:VIS))%N+N)%N], E=els[((r+(dir>0?VIS+1:-VIS-1))%N+N)%N];
       if(queue.length || reduce){ rotate(dir, 600, function(){ reels(); step(); }); return; }   // several presses in a row: just turn
       Promise.all([ready(L,'stand'), ready(E,'sit')]).then(function(ok){
@@ -366,7 +368,9 @@
             vid(L,false); L.v.pause();
             (ok[1] ? play(E) : Promise.resolve()).then(function(){ vid(E,false); reels(); step(); });   // 3. and sits down
           }); }, ok[0] ? 850 : 0); }); };
-    var turn=function(dir){ queue.push(dir); if(!busy) step(); };
+    var lastT=0;
+    var turn=function(dir){ var n=performance.now(); if(busy && n-lastT<700) return; /* yanlışlıkla çift basış tek hareket sayılır */ lastT=n; queue.push(dir); if(!busy) step(); };
+    setTimeout(warm, 800);
     var pressFx=function(b){ b.classList.remove('is-press'); void b.offsetWidth; b.classList.add('is-press'); stage.classList.remove('is-nudge'); void stage.offsetWidth; stage.classList.add('is-nudge'); };
     document.getElementById('krNext').addEventListener('click', function(){ pressFx(this); turn(-1); });   // sağ ok: sağdaki konuk öne gelir
     document.getElementById('krPrev').addEventListener('click', function(){ pressFx(this); turn(1); });    // sol ok: soldaki konuk öne gelir
