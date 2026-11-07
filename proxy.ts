@@ -52,8 +52,50 @@ async function rules(): Promise<Map<string, Rule>> {
   return inflight;
 }
 
+/**
+ * Bakım modu (Yönetim → Ayarlar). Açıkken panel, giriş ve api dışındaki tüm sayfalar
+ * sunucuda 503 + "Demleniyor" ekranıyla yanıtlanır; gerçek sayfa hiç üretilmez.
+ * Ayar bellekte 15 sn tutulur. Okunamazsa site açık kalır.
+ */
+let mt: { at: number; on: boolean } | null = null;
+async function maintenanceOn(): Promise<boolean> {
+  if (mt && Date.now() - mt.at < 15_000) return mt.on;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return false;
+  try {
+    const r = await fetch(`${url}/rest/v1/shop_settings?select=value&key=eq.maintenance`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!r.ok) throw new Error(String(r.status));
+    const rows = (await r.json()) as { value: string }[];
+    mt = { at: Date.now(), on: String(rows[0]?.value ?? '') === '1' };
+  } catch {
+    mt = { at: Date.now() - 10_000, on: mt?.on ?? false };
+  }
+  return mt.on;
+}
+
+const PAGE = `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Demleniyor…</title><style>
+html,body{height:100%;margin:0}body{display:flex;align-items:center;justify-content:center;background:#F8F4EA;color:#3a2a1c;font-family:Kodchasan,system-ui,sans-serif;text-align:center}
+.w{display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px}svg{width:112px;height:112px;animation:b 2.4s ease-in-out infinite}
+.s{fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;opacity:0;animation:s 2.4s ease-in-out infinite}.s2{animation-delay:.4s}.s3{animation-delay:.8s}
+p{margin:0;font-size:28px;letter-spacing:.02em}i{font-style:normal;opacity:.2;animation:d 1.2s infinite}i:nth-child(2){animation-delay:.2s}i:nth-child(3){animation-delay:.4s}
+@keyframes s{0%{opacity:0;transform:translateY(10px)}40%{opacity:.8}100%{opacity:0;transform:translateY(-8px)}}@keyframes b{50%{transform:translateY(-4px)}}@keyframes d{50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){svg,.s,i{animation:none}.s{opacity:.6}i{opacity:1}}
+</style></head><body><div class="w"><svg viewBox="0 0 120 120" aria-hidden="true"><path class="s" d="M44 40c-6-8 6-12 0-22"/><path class="s s2" d="M60 40c-6-8 6-12 0-22"/><path class="s s3" d="M76 40c-6-8 6-12 0-22"/><path d="M26 52h68v14a34 34 0 0 1-34 34 34 34 0 0 1-34-34z" fill="currentColor"/><path d="M94 58h6a10 10 0 0 1 0 20h-9" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><rect x="30" y="106" width="60" height="6" rx="3" fill="currentColor" opacity=".35"/></svg><p>Demleniyor<i>.</i><i>.</i><i>.</i></p></div></body></html>`;
+
 export async function proxy(req: NextRequest) {
   try {
+    const p = req.nextUrl.pathname;
+    if (!p.startsWith('/giris') && (await maintenanceOn())) {
+      return new NextResponse(PAGE, {
+        status: 503,
+        headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '300', 'cache-control': 'no-store', 'x-robots-tag': 'noindex' },
+      });
+    }
     const map = await rules();
     if (map.size === 0) return NextResponse.next();
     const here = norm(req.nextUrl.pathname);
