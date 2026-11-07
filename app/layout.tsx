@@ -12,6 +12,7 @@ import { Welcome } from '@/components/Welcome';
 import { Motion } from '@/components/Motion';
 import { LiveCartPing } from '@/components/LiveCartPing';
 import { AdsLoader, ConsentBanner } from '@/components/Consent';
+import { Maintenance } from '@/components/Maintenance';
 
 // Başlık, açıklama ve paylaşım bilgisi panelden (İçerik → SEO) değiştirilir.
 export async function generateMetadata(): Promise<Metadata> {
@@ -59,6 +60,8 @@ export const viewport: Viewport = { themeColor: '#F8F4EA' };
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { ads, consent } = await getSeoBundle();
   const sc = parseScripts(((await rest<{ value: unknown }[]>('site_content?select=value&key=eq.scripts')) ?? [])[0]?.value);
+  const mt = (await rest<{ value: string }[]>('shop_settings?select=value&key=eq.maintenance')) ?? [];
+  const maintenance = String(mt[0]?.value ?? '') === '1';
   return (
     <html lang="tr">
       <head>
@@ -75,6 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         {children}
+        <Maintenance on={maintenance} />
         {/* Reklam / izleme betikleri yalnızca geçerli kimlik varsa ve (gerekiyorsa) çerez onayından sonra yüklenir */}
         <AdsLoader ads={ads} />
         <ConsentBanner cfg={consent} />

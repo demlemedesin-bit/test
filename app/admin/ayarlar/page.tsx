@@ -23,6 +23,7 @@ export default function Settings() {
   const [admins, setAdmins] = useState<Adm[]>([]);
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
+  const [maint, setMaint] = useState(false);
   const [err, setErr] = useState('');
   const { show, node } = useToast();
 
@@ -30,6 +31,7 @@ export default function Settings() {
     const [s, a] = await Promise.all([supabase().from('shop_settings').select('key, value'), supabase().rpc('admin_admins')]);
     if (s.error) return setErr('Ayarlar yüklenemedi. Sayfayı yenile.');
     const m = Object.fromEntries((s.data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
+    setMaint(m.maintenance === '1');
     setF(Object.fromEntries(KEYS.map((k) => [k, m[k] ?? ''])) as Form);
     setAdmins((a.data ?? []) as Adm[]);
   }, []);
@@ -74,6 +76,17 @@ export default function Settings() {
     load();
   }
 
+  async function toggleMaint(on: boolean) {
+    setMaint(on);
+    const { error } = await supabase().from('shop_settings').upsert({ key: 'maintenance', value: on ? '1' : '0', is_public: true }, { onConflict: 'key' });
+    if (error) {
+      setMaint(!on);
+      return show('Kaydedilemedi: ' + error.message, true);
+    }
+    await refreshSite();
+    show(on ? 'Bakım modu AÇIK: ziyaretçiler “Demleniyor” ekranını görüyor' : 'Bakım modu kapatıldı, site açık');
+  }
+
   async function addAdmin() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return show('Geçerli bir e-posta gir.', true);
     const { error } = await supabase().rpc('admin_set_admin', { p_email: email, p_make: true });
@@ -97,6 +110,17 @@ export default function Settings() {
       <div className="adm-scroll">
         <div className="adm-inner" style={{ maxWidth: 860 }}><PageHero />
           <PushSettings toast={show} />
+
+          <section className="card" style={{ marginBottom: 18 }}>
+            <div className="card-h"><h2 className="card-t">Bakım modu</h2><span className="card-m">{maint ? 'AÇIK' : 'Kapalı'}</span></div>
+            <div className="card-b">
+              <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={maint} onChange={(e) => toggleMaint(e.target.checked)} />
+                <span>Siteyi tüm ziyaretçilere kapat, “Demleniyor…” animasyonu göster</span>
+              </label>
+              <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Yönetim paneli ve giriş sayfası açık kalır. Değişiklik en geç bir dakika içinde yansır.</p>
+            </div>
+          </section>
 
           <section className="card" style={{ marginBottom: 18 }}>
             <div className="card-h"><h2 className="card-t">Kargo</h2></div>
