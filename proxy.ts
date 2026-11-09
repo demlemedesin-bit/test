@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { checkPass, PASS_COOKIE } from '@/lib/maintenancePass';
 
 /**
  * Yönlendirmeler (redirects tablosu, panelde Sayfa, blog, yönlendirme → Yönlendirmeler).
@@ -54,7 +55,7 @@ async function rules(): Promise<Map<string, Rule>> {
 
 /**
  * Bakım modu (Yönetim → Ayarlar). Açıkken panel, giriş ve api dışındaki tüm sayfalar
- * sunucuda 503 + "Demleniyor" ekranıyla yanıtlanır; gerçek sayfa hiç üretilmez.
+ * sunucuda 503 (panele girmiş personel imzalı çerezle siteyi görür) + "Demleniyor" ekranıyla yanıtlanır; gerçek sayfa hiç üretilmez.
  * Ayar bellekte 15 sn tutulur. Okunamazsa site açık kalır.
  */
 let mt: { at: number; on: boolean } | null = null;
@@ -90,7 +91,7 @@ p{margin:0;font-size:28px;letter-spacing:.02em}i{font-style:normal;opacity:.2;an
 export async function proxy(req: NextRequest) {
   try {
     const p = req.nextUrl.pathname;
-    if (!p.startsWith('/giris') && (await maintenanceOn())) {
+    if (!p.startsWith('/giris') && !checkPass(req.cookies.get(PASS_COOKIE)?.value) && (await maintenanceOn())) {
       return new NextResponse(PAGE, {
         status: 503,
         headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '300', 'cache-control': 'no-store', 'x-robots-tag': 'noindex' },

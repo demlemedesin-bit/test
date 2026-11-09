@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
-import { useAdmin, usePendingCounts } from '@/lib/admin';
+import { grantPreview, useAdmin, usePendingCounts } from '@/lib/admin';
 import { Spinner } from './ui';
 import { initTheme } from './Tools';
 
@@ -171,6 +171,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const counts = usePendingCounts(admin && perms.includes('orders'));
 
   useEffect(() => { initTheme(); }, []);
+  useEffect(() => { if (admin) grantPreview(); }, [admin]);
   useEffect(() => {
     const t = setTimeout(() => setOpen(false), 0);
     return () => clearTimeout(t);

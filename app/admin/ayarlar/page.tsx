@@ -118,7 +118,7 @@ export default function Settings() {
                 <input type="checkbox" checked={maint} onChange={(e) => toggleMaint(e.target.checked)} />
                 <span>Siteyi tüm ziyaretçilere kapat, “Demleniyor…” animasyonu göster</span>
               </label>
-              <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Yönetim paneli ve giriş sayfası açık kalır; diğer tüm sayfalar sunucuda kapatılır, içerik hiç gönderilmez. Değişiklik yaklaşık 15 saniyede yansır.</p>
+              <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Yönetim paneli ve giriş sayfası açık kalır, panele girmiş personel siteyi normal görür (12 saat); diğer tüm sayfalar sunucuda kapatılır, içerik hiç gönderilmez. Değişiklik yaklaşık 15 saniyede yansır.</p>
             </div>
           </section>
 

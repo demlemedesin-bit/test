@@ -136,6 +136,18 @@ export async function refreshSite(): Promise<void> {
   }
 }
 
+/** Bakım modunda personelin siteyi görebilmesi için izin çerezi ister (panel açılınca). */
+export async function grantPreview(): Promise<void> {
+  try {
+    const { data } = await supabase().auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return;
+    await fetch('/api/onizleme', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  } catch {
+    /* sessizce geç */
+  }
+}
+
 /** Sipariş sayaçları (kenar çubuğu rozeti). */
 export function usePendingCounts(enabled: boolean) {
   const [c, setC] = useState({ pay: 0, ship: 0 });
