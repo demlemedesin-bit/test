@@ -1,15 +1,17 @@
 import { createHash } from 'crypto';
 
-// Ayın demleyenleri anketi: GET = sonuçlar, POST = oy ver (anon anahtarla RPC; tarayıcı başına 1 oy, IP başına en çok 5).
+// Ayın demleyenleri anketi: GET = sonuçlar, POST = oy ver (sonuç anon, oy service_role ile; tarayıcı başına 1 oy, IP başına en çok 5).
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-async function rpc(fn: string, body: Record<string, unknown>) {
-  if (!url || !key) return null;
+// Oy verme yalnızca sunucudan (service_role) çağrılabilir; tarayıcıdan doğrudan RPC ile sahte oy atılamaz.
+async function rpc(fn: string, body: Record<string, unknown>, priv = false) {
+  const k = priv ? process.env.SUPABASE_SERVICE_ROLE_KEY : key;
+  if (!url || !k) return null;
   try {
     const r = await fetch(`${url}/rest/v1/rpc/${fn}`, {
       method: 'POST',
-      headers: { apikey: key, Authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      headers: { apikey: k, Authorization: `Bearer ${k}`, 'content-type': 'application/json' },
       body: JSON.stringify(body),
       cache: 'no-store',
       signal: AbortSignal.timeout(4000),
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
   if (!month || voter.length < 8 || !photo) return json({ ok: false }, 400);
   const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim();
   const ipHash = ip ? createHash('sha256').update(ip + month).digest('hex').slice(0, 24) : '';
-  const ok = await rpc('demleyen_oy_ver', { p_month: month, p_voter: voter, p_photo: photo, p_ip: ipHash });
+  const ok = await rpc('demleyen_oy_ver', { p_month: month, p_voter: voter, p_photo: photo, p_ip: ipHash }, true);
   if (ok !== true) return json({ ok: false }, 429);
   return json({ ok: true, results: (await rpc('demleyen_oy_sonuc', { p_month: month })) ?? {} });
 }
