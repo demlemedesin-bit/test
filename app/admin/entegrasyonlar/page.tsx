@@ -393,7 +393,7 @@ function Feeds({ toast }: { toast: Toast }) {
 const HJ_FIELDS: [string, string, string][] = [
   ['hepsijet_company_name', 'Firma adı (name)', 'HepsiJET\'in size verdiği sabit mağaza adı'],
   ['hepsijet_company_code', 'Firma kısa kodu (abbreviationCode)', 'HepsiJET\'in verdiği sabit kısa kod'],
-  ['hepsijet_address_id', 'Toplama adresi kimliği (companyAddressId)', 'HepsiJET\'in verdiği sabit UUID'],
+  ['hepsijet_address_id', 'Toplama adresi kimliği (companyAddressId)', 'HepsiJET\'in verdiği sabit kimlik (UUID ya da metin olabilir)'],
   ['hepsijet_city', 'Toplama adresi · il', 'HepsiJET\'e bildirdiğin il'],
   ['hepsijet_town', 'Toplama adresi · ilçe', 'HepsiJET\'e bildirdiğin ilçe'],
   ['hepsijet_district', 'Toplama adresi · mahalle', 'HepsiJET\'e bildirdiğin mahalle'],
@@ -433,7 +433,7 @@ function HepsiJet({ toast }: { toast: Toast }) {
     if (prefix && !/^[A-Z0-9]{3}$/.test(prefix)) return toast('Firma kodu tam 3 harf/rakam olmalı.', true);
     const dd = Number(f.hepsijet_default_desi.replace(',', '.'));
     if (isNaN(dd) || dd < 1 || dd > 41) return toast('Sabit desi 1 ile 41 arasında olmalı.', true);
-    if (f.hepsijet_address_id.trim() && !/^[0-9a-fA-F-]{16,64}$/.test(f.hepsijet_address_id.trim())) return toast('Adres kimliği UUID biçiminde olmalı.', true);
+    if (f.hepsijet_address_id.trim() && !/^[\w.-]{3,80}$/.test(f.hepsijet_address_id.trim())) return toast('Adres kimliği yalnızca harf, rakam, tire, nokta ve alt çizgi içerebilir.', true);
     setBusy(true);
     const rows = Object.keys(f).map((k) => ({
       key: k,
