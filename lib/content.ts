@@ -91,8 +91,8 @@ export function shopCards(list: SiteProduct[]): string {
           : (p.was ? ` <span class="sh-sale">-%${p.salePct ?? ''}</span>` : '') + (p.left ? ` <span class="sh-low">Son ${p.left} adet</span>` : '');
       const priceHtml = p.was && !p.out && !p.soon ? `<s>${esc(p.was)}</s> <b class="sh-now">${esc(p.price)}</b>` : esc(p.price);
       return `            <article class="sh-card" data-cat="${esc(p.shopCat)}">
-              <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
-              <p class="sh-name">${esc(p.name)}${tag}</p></a>${(p.showColors ?? p.colors.length > 1) && p.colors.length > 0 ? `<span class="sh-sw" aria-label="${p.colors.length} renk">${p.colors.slice(0, 6).map((k) => `<i style="--c:${esc(k.hex || '#ccc')}" title="${esc(k.name || '')}"></i>`).join('')}${p.colors.length > 6 ? `<em>+${p.colors.length - 6}</em>` : ''}</span>` : ''}<p class="sh-price">${priceHtml}</p>
+              <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"${c0?.life ? ` data-life="${esc(c0.life)}"` : ''}><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
+              <p class="sh-name">${esc(p.name)}${tag}</p></a>${(p.showColors ?? p.colors.length > 1) && p.colors.length > 0 ? `<span class="sh-sw" aria-label="${p.colors.length} renk">${p.colors.slice(0, 6).map((k) => `<i${k === c0 ? ' class="is-on"' : ''} style="--c:${esc(k.hex || '#ccc')}" title="${esc(k.name || '')}" data-key="${esc(k.key || '')}" data-img="${esc(k.img || '')}"${k.life ? ` data-life="${esc(k.life)}"` : ''}></i>`).join('')}${p.colors.length > 6 ? `<em>+${p.colors.length - 6}</em>` : ''}</span>` : ''}<p class="sh-price">${priceHtml}</p>
               <button type="button" class="link link-muted add-to-cart" data-name="${esc(p.name)}" data-price="${esc(p.price)}" data-slug="${esc(p.slug)}" data-color="${esc(c0?.key ?? '')}" data-img="${esc(c0?.img ?? p.thumb)}"${choose ? ' data-choose="1"' : ''}>Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
             </article>`;
     })

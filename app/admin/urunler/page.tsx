@@ -68,6 +68,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
   const [slugs, setSlugs] = useState<{ slug: string; name: string }[]>([]);
   useEffect(() => { supabase().from('products').select('slug,name').order('name').then((r) => setSlugs((r.data ?? []) as { slug: string; name: string }[])); }, []);
 
+  const moveColor = (i: number, dir: -1 | 1) => setD((s) => { const j = i + dir; if (j < 0 || j >= s.colors.length) return s; const a = s.colors.slice(); [a[i], a[j]] = [a[j], a[i]]; return { ...s, colors: a }; });
   const setColor = (i: number, patch: Partial<Color>) => setD((s) => ({ ...s, colors: s.colors.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
 
   async function pick(file: File | undefined, target: 'thumb' | number) {
@@ -109,7 +110,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         while (used.has(key)) key = `${base}-${n++}`;
         used.add(key);
       }
-      return { key, name: c.name.trim(), hex: c.hex, img: c.img, ...(c.imgs && c.imgs.length ? { imgs: c.imgs.slice(0, 8) } : {}) };
+      return { key, name: c.name.trim(), hex: c.hex, img: c.img, ...(c.imgs && c.imgs.length ? { imgs: c.imgs.slice(0, 8) } : {}), ...(c.life ? { life: c.life } : {}) };
     });
     const sizes = d.sizes.split(',').map((s) => s.trim()).filter(Boolean);
     if (new Set(sizes).size !== sizes.length) return setErrs(['Beden listesinde aynı değer iki kez yazılmış.']);
@@ -283,9 +284,15 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
               <ImageSlot value={c.img} onChange={(v) => setColor(i, { img: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={84} />
               <input className="inp" placeholder="Renk adı (örn. Krem)" value={c.name} onChange={(e) => setColor(i, { name: e.target.value })} />
               <input className="hex" type="color" value={c.hex} onChange={(e) => setColor(i, { hex: e.target.value })} aria-label="Renk" />
+              <button type="button" className="icon-btn" onClick={() => moveColor(i, -1)} disabled={i === 0} aria-label="Yukarı taşı" title="Yukarı taşı"><ArrowUp size={16} /></button>
+              <button type="button" className="icon-btn" onClick={() => moveColor(i, 1)} disabled={i === d.colors.length - 1} aria-label="Aşağı taşı" title="Aşağı taşı"><ArrowDown size={16} /></button>
               <button type="button" className="icon-btn" onClick={() => set('colors', d.colors.filter((_, j) => j !== i))} disabled={d.colors.length === 1} aria-label="Kaldır">
                 <X size={16} />
               </button>
+            </div>
+            <div className="color-life" style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
+              <ImageSlot value={c.life ?? ''} onChange={(v) => setColor(i, { life: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={64} />
+              <span className="hint" style={{ margin: 0 }}><b>Günlük kullanım görseli</b> (isteğe bağlı). Müşteri fotoğrafın üstüne gelince, tıklamadan bu görsel görünür.</span>
             </div>
             <details className="color-xtra" open={!!(c.imgs && c.imgs.length)}>
               <summary>Bu renge özel ek görseller {c.imgs && c.imgs.length ? <b className="chip-n">+{c.imgs.length}</b> : <span className="muted">(isteğe bağlı)</span>}</summary>
@@ -302,7 +309,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <button type="button" className="btn ghost sm" style={{ marginTop: 10 }} onClick={() => set('colors', [...d.colors, { key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }])}>
           <Plus size={14} /> Renk ekle
         </button>
-        <p className="hint" style={{ marginTop: 8 }}>Tek seçenekli ürünlerde tek satır bırak. Görseller otomatik küçültülüp WebP’ye çevrilir.</p>
+        <p className="hint" style={{ marginTop: 8 }}>Sıralamayı oklarla değiştirebilirsin; ilk renk varsayılan olarak seçili gelir. Tek seçenekli ürünlerde tek satır bırak. Görseller otomatik küçültülüp WebP’ye çevrilir.</p>
         </div>
       </section>
 

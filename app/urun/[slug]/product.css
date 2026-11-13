@@ -58,12 +58,12 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pn-cart{ position:relative; } .pn-cart img{ height:34px; width:auto; } .pn-count{ position:absolute; right:-6px; top:-4px; min-width:18px; height:18px; padding:0 4px; background:var(--ink); color:var(--cream-light); font-size:11px; line-height:18px; text-align:center; opacity:0; transition:opacity 200ms; } .pn-count.on{ opacity:1; }
 .crumb{ margin:var(--s-24) var(--pad) 0; font-size:var(--t-14); color:var(--ink-2); } .crumb a:hover{ color:var(--ink); } .crumb span{ margin:0 8px; }
 .pp{ display:grid; grid-template-columns:minmax(0, 1.08fr) minmax(0, .92fr); gap:clamp(32px, 5vw, 88px); margin:var(--s-24) var(--pad) 0; align-items:start; }
-.pp-main{ position:relative; aspect-ratio:1; background:#EFE8DA; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:8%; overflow:hidden; }
+.pp-main{ transition:background-color 260ms ease; position:relative; aspect-ratio:1; background:#EFE8DA; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:8%; overflow:hidden; }
 .pp-main img{ max-height:100%; width:auto; filter:drop-shadow(0 14px 16px rgba(23,19,15,.14)); transition:opacity 260ms ease; }
 .pp-main img.fade{ opacity:0; }
 .pp-badge{ position:absolute; left:18px; top:16px; font-family:'Caveat', cursive; font-size:24px; color:#DD262C; transform:rotate(-4deg); }
 .pp-thumbs{ display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
-.pp-thumbs button{ width:84px; aspect-ratio:1; background:#EFE8DA; border:1.5px solid transparent; border-radius:8px; padding:8px; cursor:pointer; }
+.pp-thumbs button{ transition:background-color 260ms ease; width:84px; aspect-ratio:1; background:#EFE8DA; border:1.5px solid transparent; border-radius:8px; padding:8px; cursor:pointer; }
 .pp-thumbs button.on{ border-color:var(--ink); } .pp-thumbs img{ width:100%; height:100%; object-fit:contain; }
 .pp-cat{ font-size:var(--t-12); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 var(--s-12); }
 .pp-name{ font-size:clamp(40px, 4.4vw, 72px); }
@@ -144,8 +144,7 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pp-thumbs button{ position:relative; }
 .th-n{ position:absolute; right:4px; bottom:4px; font-style:normal; font-size:10px; font-weight:600; line-height:1; padding:3px 6px; border-radius:99px; background:#17130F; color:#fff; }
 .th-x{ display:contents; }
-.th-x:not(:empty)::before{ content:""; align-self:stretch; width:1px; margin:0 2px; background:rgba(23,19,15,.18); }
-.pp-thumbs .th-c img, .pp-thumbs .th-g img{ object-fit:cover; border-radius:4px; }
+.pp-thumbs .th-c img, .pp-thumbs .th-g img, .pp-thumbs .th-m img, .pp-thumbs .th-l img{ object-fit:cover; border-radius:4px; }
 
 /* Ürün videosu */
 .pv{ max-width:960px; margin:48px auto 0; padding:0 20px; }

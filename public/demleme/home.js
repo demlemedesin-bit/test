@@ -252,6 +252,26 @@
     try{ var kq=new URLSearchParams(location.search).get('kat'); var kb=kq && cats.querySelector('button[data-cat="'+kq.replace(/[^a-z]/g,'')+'"]'); if(kb) kb.click(); }catch(_){}
   })();
 
+  // Mağaza kartları: renk noktasının üstüne gelince o rengin görseli, fotoğrafın üstüne gelince günlük kullanım görseli (tıklamadan)
+  (function(){
+    var track=document.getElementById('shopTrack'); if(!track) return;
+    [].forEach.call(track.querySelectorAll('.sh-card'), function(card){
+      var th=card.querySelector('.sh-thumb'), im=th && th.querySelector('img'); if(!im) return;
+      var sws=[].slice.call(card.querySelectorAll('.sh-sw i')), box=card.querySelector('.sh-sw'), btn=card.querySelector('.add-to-cart'), base=im.getAttribute('src'), sel=0, layer=null, t=0;
+      var lifeOf=function(){ var e=sws[sel]; return e ? e.getAttribute('data-life') : th.getAttribute('data-life'); };
+      var imgOf=function(i){ var e=sws[i]; return (i===0 ? base : (e && e.getAttribute('data-img'))) || base; };
+      var swap=function(u){ clearTimeout(t); if(!u) return; if(im.getAttribute('src')===u){ im.style.opacity=''; return; } im.style.opacity='0'; t=setTimeout(function(){ im.src=u; im.style.opacity=''; },130); };
+      var life=function(on){ var u=lifeOf(); if(on && !u) return; if(!layer){ if(!on) return; layer=document.createElement('img'); layer.className='sh-life'; layer.alt=''; th.appendChild(layer); }
+        if(on){ if(layer.getAttribute('src')!==u) layer.src=u; requestAnimationFrame(function(){ layer.classList.add('on'); }); } else layer.classList.remove('on'); };
+      th.addEventListener('mouseenter', function(){ life(true); }); th.addEventListener('mouseleave', function(){ life(false); });
+      sws.forEach(function(e,i){
+        e.addEventListener('mouseenter', function(){ life(false); swap(imgOf(i)); });
+        e.addEventListener('click', function(){ sel=i; sws.forEach(function(x,j){ x.classList.toggle('is-on', j===i); }); swap(imgOf(i)); if(btn){ btn.setAttribute('data-color', e.getAttribute('data-key')||''); btn.setAttribute('data-img', imgOf(i)); } });
+      });
+      if(box) box.addEventListener('mouseleave', function(){ swap(imgOf(sel)); });
+    });
+  })();
+
   // Konuklar reel: play each scene for its data-dur, then the next; the img is re-inserted so the loop restarts
   (function(){
     var reel=document.getElementById('reel'); if(!reel) return;

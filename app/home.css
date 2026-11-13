@@ -179,10 +179,10 @@ a:active .dbtn, button:not([disabled]):active .dbtn{ transform:translateY(1px); 
 .sh-card{ scroll-snap-align:start; text-align:center; }
 .sh-card[hidden]{ display:none; }
 .sh-link{ display:block; color:inherit; }   /* card photo + name open the product page (demleme-urun.html#slug) */
-.sh-thumb{ aspect-ratio:1/1; background:#EFE8DA; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:10%; border:1.5px solid transparent; transition:border-color 200ms; }
+.sh-thumb{ position:relative; overflow:hidden; aspect-ratio:1/1; background:#EFE8DA; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:10%; border:1.5px solid transparent; transition:border-color 200ms; }
 .sh-card:first-child .sh-thumb{ border-color:#DD262C; }
 .sh-card:hover .sh-thumb{ border-color:var(--ink); }
-.sh-thumb img{ max-width:100%; max-height:100%; width:auto; height:auto; display:block; filter:drop-shadow(0 10px 12px rgba(23,19,15,.14)); }
+.sh-thumb img{ transition:opacity 160ms ease; max-width:100%; max-height:100%; width:auto; height:auto; display:block; filter:drop-shadow(0 10px 12px rgba(23,19,15,.14)); }
 .sh-name{ font-size:var(--t-16); margin:var(--s-12) 0 2px; } .sh-price{ font-size:var(--t-14); color:var(--ink-2); margin:0; }
 .sh-tag{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#DD262C; margin-left:4px; }
 @media (max-width: 1024px){ .shop-top{ grid-template-columns:1fr; padding-right:var(--pad); } .shop-rail{ margin:var(--s-24) 0 0; } .shop-cat{ display:none; } .shop-track{ grid-auto-columns:calc((100% - 2 * var(--s-16)) / 3); } }
@@ -790,3 +790,9 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
   .dm-top--sehpa .dm-title, .dm-top--sehpa .dm-rule, .dm-top--sehpa .dm-sub{ text-align:center; margin-left:auto; margin-right:auto; }
   .dm-top--sehpa .dm-poll{ order:1; width:100%; }
 }
+
+/* Kart: fotoğrafın üstüne gelince günlük kullanım görseli, renk noktasının üstüne gelince o rengin görseli */
+.sh-thumb img.sh-life{ position:absolute; inset:0; width:100%; height:100%; max-width:none; max-height:none; object-fit:cover; filter:none; opacity:0; transition:opacity 260ms ease; pointer-events:none; }
+.sh-thumb img.sh-life.on{ opacity:1; }
+.sh-sw i{ cursor:pointer; }
+.sh-sw i.is-on{ box-shadow:0 0 0 1px rgba(23,19,15,.28), 0 0 0 3px #F8F4EA, 0 0 0 4.5px #17130F; }
