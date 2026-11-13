@@ -11,6 +11,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { OrdersInsight } from '@/components/admin/Insights';
 import { Confirm, Empty, Field, Loading, Panel, STATUS_TONE, TopBar, useToast } from '@/components/admin/ui';
 import { PageHero } from '@/components/admin/PageHero';
+import { HepsiJetBox } from '@/components/admin/HepsiJetBox';
 
 const TABS: [string, string][] = [
   ['hepsi', 'Tümü'],
@@ -71,6 +72,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
   const [busy, setBusy] = useState(false);
   const [ask, setAsk] = useState<null | 'iptal' | 'iade' | 'sil'>(null);
   const [pay, setPay] = useState<Pay | null>(null);
+  const [hjActive, setHjActive] = useState(false);
 
   useEffect(() => {
     if (order.payment_method !== 'kart') return;
@@ -210,6 +212,21 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
         </div>
       )}
 
+      <HepsiJetBox
+        orderNo={order.order_no}
+        status={order.status}
+        payment={order.payment_method}
+        cancelled={cancelled}
+        onActive={setHjActive}
+        onChanged={onChanged}
+        onShip={async (barcode) => {
+          setCarrier('HepsiJet');
+          setTrackNo(barcode);
+          await save({ status: 'kargoda', tracking_carrier: 'HepsiJet', tracking_no: barcode, admin_note: note.trim() || null }, 'HepsiJET gönderisi oluşturuldu, kargoya verildi', 'order_shipped');
+        }}
+        toast={toast}
+      />
+
       {(order.status === 'odeme_bekleniyor' || cancelled) && (
         <div className="sec">
           <p className="sec-t">Siparişi sil</p>
@@ -324,7 +341,7 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
       {ask === 'iptal' && (
         <Confirm
           title="Sipariş iptal edilsin mi?"
-          text={`${order.order_no} iptal edilir, stoklu ürünler stoğa geri eklenir. Bu işlem geri alınamaz.`}
+          text={`${order.order_no} iptal edilir, stoklu ürünler stoğa geri eklenir. Bu işlem geri alınamaz.${hjActive ? ' DİKKAT: HepsiJET gönderisi açık; iptalden önce gönderiyi silmen (ya da geri çağırman) gerekir, yoksa kurye paketi almaya gelir.' : ''}`}
           confirmText="Evet, iptal et"
           busy={busy}
           onCancel={() => setAsk(null)}

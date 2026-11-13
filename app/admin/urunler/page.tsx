@@ -20,6 +20,7 @@ type Draft = {
   shop_cat: AdminProduct['shop_cat'];
   price: string;
   stock: string;
+  desi: string;
   soon: boolean;
   active: boolean;
   badge: string;
@@ -45,13 +46,13 @@ const SHOP_CATS: [AdminProduct['shop_cat'], string][] = [
 const seoOf = (p: AdminProduct) => (p.data ?? {}) as { seo_title?: string; seo_desc?: string };
 
 const blank = (sort: number): Draft => ({
-  isNew: true, slug: '', slugTouched: false, name: '', category: 'Ev & Sofra', shop_cat: 'sofra', price: '', stock: '', soon: false, active: true,
+  isNew: true, slug: '', slugTouched: false, name: '', category: 'Ev & Sofra', shop_cat: 'sofra', price: '', stock: '', desi: '', soon: false, active: true,
   badge: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '', gallery: [],
   details: [{ t: 'Malzeme', v: '' }, { t: 'Kargo & iade', v: 'Siparişin 2–4 iş gününde kargoda. 14 gün içinde koşulsuz iade.' }], data: {}, sort,
 });
 
 const toDraft = (p: AdminProduct): Draft => ({
-  isNew: false, slug: p.slug, slugTouched: true, name: p.name, category: p.category, shop_cat: p.shop_cat, price: String(p.price), stock: p.stock == null ? '' : String(p.stock),
+  isNew: false, slug: p.slug, slugTouched: true, name: p.name, category: p.category, shop_cat: p.shop_cat, price: String(p.price), stock: p.stock == null ? '' : String(p.stock), desi: p.data?.desi == null ? '' : String(p.data.desi),
   soon: p.soon, active: p.active, badge: p.data?.badge ?? '', desc: p.data?.desc ?? '', seoTitle: seoOf(p).seo_title ?? '', seoDesc: seoOf(p).seo_desc ?? '', sizes: (p.sizes ?? []).join(', '),
   colors: (p.colors ?? []).map((c) => ({ ...c, hex: c.hex || '#EDE6D6', img: c.img || '' })), thumb: p.thumb ?? '', gallery: Array.isArray((p.data as { gallery?: unknown })?.gallery) ? ((p.data as { gallery: unknown[] }).gallery.filter((x) => typeof x === 'string') as string[]) : [],
   details: (p.data?.details ?? []).map(([t, v]) => ({ t, v })), data: p.data ?? {}, sort: p.sort,
@@ -94,6 +95,8 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) e.push('Adres (slug) yalnızca küçük harf, rakam ve tire içerebilir.');
     if (d.price.trim() === '' || isNaN(price) || price < 0) e.push('Geçerli bir fiyat gir.');
     if (stock !== null && (!Number.isInteger(stock) || stock < 0)) e.push('Stok boş (sınırsız) ya da 0 veya daha büyük bir tam sayı olmalı.');
+    const desiN = d.desi.trim() === '' ? null : Number(d.desi.replace(',', '.'));
+    if (desiN !== null && (isNaN(desiN) || desiN < 0.1 || desiN > 41)) e.push('Desi boş ya da 0,1 ile 41 arasında bir sayı olmalı.');
     if (!d.colors.length || d.colors.some((c) => !c.name.trim())) e.push('En az bir renk/seçenek ve her birine bir ad gerekli.');
     else if (d.colors.some((c) => !c.img)) e.push('Her renk için bir görsel yükle.');
     if (e.length) return setErrs(e);
@@ -118,6 +121,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
     const data = {
       ...d.data,
       desc: d.desc.trim(),
+      desi: desiN ?? undefined,
       badge: d.badge.trim() || undefined,
       seo_title: d.seoTitle.trim() || undefined,
       seo_desc: d.seoDesc.trim() || undefined,
@@ -199,6 +203,9 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
             <input className="inp" inputMode="numeric" value={d.stock} onChange={(e) => set('stock', e.target.value)} placeholder="Sınırsız" />
           </Field>
         </div>
+        <Field label="Desi (kargo)" hint="Bir adet ürünün desisi. Boş bırakırsan HepsiJET gönderisinde Entegrasyonlar → Kargo'daki sabit desi kullanılır.">
+          <input className="inp" inputMode="decimal" value={d.desi} onChange={(e) => set('desi', e.target.value)} placeholder="Örn. 2,5" />
+        </Field>
         <div className="row2">
           <Field label="Vitrin kategorisi" hint="Ana sayfadaki mağaza sekmesi">
             <select className="inp" value={d.shop_cat} onChange={(e) => set('shop_cat', e.target.value as AdminProduct['shop_cat'])}>

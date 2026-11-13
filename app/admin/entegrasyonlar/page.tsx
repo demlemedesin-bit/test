@@ -389,9 +389,108 @@ function Feeds({ toast }: { toast: Toast }) {
   );
 }
 
-// ── Kargo ────────────────────────────────────────────────────────────
-function Carriers() {
+// ── HepsiJET ─────────────────────────────────────────────────────────
+const HJ_FIELDS: [string, string, string][] = [
+  ['hepsijet_company_name', 'Firma adı (name)', 'HepsiJET\'in size verdiği sabit mağaza adı'],
+  ['hepsijet_company_code', 'Firma kısa kodu (abbreviationCode)', 'HepsiJET\'in verdiği sabit kısa kod'],
+  ['hepsijet_address_id', 'Toplama adresi kimliği (companyAddressId)', 'HepsiJET\'in verdiği sabit UUID'],
+  ['hepsijet_city', 'Toplama adresi · il', 'HepsiJET\'e bildirdiğin il'],
+  ['hepsijet_town', 'Toplama adresi · ilçe', 'HepsiJET\'e bildirdiğin ilçe'],
+  ['hepsijet_district', 'Toplama adresi · mahalle', 'HepsiJET\'e bildirdiğin mahalle'],
+  ['hepsijet_line', 'Toplama adresi · açık adres', 'Eksiksiz açık adres'],
+  ['hepsijet_xdock', 'X-Dock kodu (currentXDock)', 'HepsiJET\'in verdiği aktarma merkezi kodu'],
+  ['hepsijet_prefix', '3 haneli firma kodu', 'Barkodun başına eklenir (örn. DMT → DMTDM1001). Harf/rakam, 3 karakter'],
+];
+type HjState = { ok: boolean; enabled: boolean; env: string; ready: boolean; missing: string[]; creds: { test: boolean; prod: boolean } };
+
+function HepsiJet({ toast }: { toast: Toast }) {
+  const [f, setF] = useState<Record<string, string> | null>(null);
+  const [st, setSt] = useState<HjState | null>(null);
+  const [busy, setBusy] = useState(false);
+  const loadSt = useCallback(async () => {
+    try {
+      const r = await fetch('/api/hepsijet', { headers: { Authorization: 'Bearer ' + (await token()) }, cache: 'no-store' });
+      setSt(r.ok ? ((await r.json()) as HjState) : null);
+    } catch {
+      setSt(null);
+    }
+  }, []);
+  useEffect(() => {
+    const t = setTimeout(async () => {
+      const keys = [...HJ_FIELDS.map((x) => x[0]), 'hepsijet_enabled', 'hepsijet_env', 'hepsijet_use_product_desi', 'hepsijet_default_desi'];
+      const { data } = await supabase().from('shop_settings').select('key,value').in('key', keys);
+      const m = Object.fromEntries((data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
+      setF(Object.fromEntries(keys.map((k) => [k, m[k] ?? (k === 'hepsijet_env' ? 'test' : k === 'hepsijet_default_desi' ? '1' : '')])));
+      loadSt();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [loadSt]);
+  if (!f) return <Loading />;
+  const set = (k: string, v: string) => setF((s) => ({ ...(s as Record<string, string>), [k]: v }));
+  async function save() {
+    if (!f) return;
+    const prefix = f.hepsijet_prefix.trim().toUpperCase();
+    if (prefix && !/^[A-Z0-9]{3}$/.test(prefix)) return toast('Firma kodu tam 3 harf/rakam olmalı.', true);
+    const dd = Number(f.hepsijet_default_desi.replace(',', '.'));
+    if (isNaN(dd) || dd < 1 || dd > 41) return toast('Sabit desi 1 ile 41 arasında olmalı.', true);
+    if (f.hepsijet_address_id.trim() && !/^[0-9a-fA-F-]{16,64}$/.test(f.hepsijet_address_id.trim())) return toast('Adres kimliği UUID biçiminde olmalı.', true);
+    setBusy(true);
+    const rows = Object.keys(f).map((k) => ({
+      key: k,
+      value: k === 'hepsijet_prefix' ? prefix : k === 'hepsijet_default_desi' ? String(dd) : f[k].trim(),
+      is_public: false,
+    }));
+    const { error } = await supabase().from('shop_settings').upsert(rows, { onConflict: 'key' });
+    setBusy(false);
+    if (error) return toast('Kaydedilemedi: ' + error.message, true);
+    toast('HepsiJET ayarları kaydedildi');
+    loadSt();
+  }
   return (
+    <section className="card">
+      <div className="card-h"><h2 className="card-t">HepsiJET</h2><span className="card-m">Siparişten gönderi, etiket, takip, iptal</span></div>
+      <div className="card-b">
+        <p className="hint" style={{ marginTop: 0 }}>
+          Kullanıcı adı ve şifre buraya yazılmaz; Vercel ortam değişkenleridir: <code>HEPSIJET_TEST_USER</code>, <code>HEPSIJET_TEST_PASS</code> (test) ve <code>HEPSIJET_USER</code>, <code>HEPSIJET_PASS</code> (canlı). Canlıya geçmeden önce HepsiJET test sürecini tamamlamak zorunludur.
+        </p>
+        {st && (
+          <div className={`alert ${st.ready ? 'ok' : 'err'}`} style={{ marginBottom: 12 }}>
+            {st.ready ? `Hazır · ${st.env === 'prod' ? 'canlı' : 'test'} ortamı` : st.enabled ? 'Eksik: ' + st.missing.join(', ') : 'Kapalı' + (st.missing.length ? ' · eksik: ' + st.missing.join(', ') : '')}
+          </div>
+        )}
+        <label className="chk" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+          <input type="checkbox" checked={f.hepsijet_enabled === '1'} onChange={(e) => set('hepsijet_enabled', e.target.checked ? '1' : '0')} />
+          <span>HepsiJET entegrasyonu açık (siparişte “HepsiJET ile gönder” butonu görünür)</span>
+        </label>
+        <Field label="Ortam" hint="Önce test; HepsiJET onayından sonra canlı.">
+          <select className="inp" value={f.hepsijet_env} onChange={(e) => set('hepsijet_env', e.target.value)}>
+            <option value="test">Test (UAT)</option>
+            <option value="prod">Canlı</option>
+          </select>
+        </Field>
+        {HJ_FIELDS.map(([k, l, h]) => (
+          <Field key={k} label={l} hint={h}>
+            <input className="inp" value={f[k]} onChange={(e) => set(k, e.target.value)} autoComplete="off" />
+          </Field>
+        ))}
+        <label className="chk" style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '12px 0' }}>
+          <input type="checkbox" checked={f.hepsijet_use_product_desi === '1'} onChange={(e) => set('hepsijet_use_product_desi', e.target.checked ? '1' : '0')} />
+          <span>Desiyi ürünlerden hesapla (ürün sayfasındaki “Desi” × adet). Kapalıysa her gönderiye sabit desi yazılır.</span>
+        </label>
+        <Field label="Sabit desi" hint="Ürün desisi kapalıyken ya da bir üründe desi yoksa kullanılır (1–41). Gönderirken siparişe özel değiştirebilirsin.">
+          <input className="inp" inputMode="decimal" value={f.hepsijet_default_desi} onChange={(e) => set('hepsijet_default_desi', e.target.value)} />
+        </Field>
+        <button className="btn" disabled={busy} onClick={save}><Save size={15} /> Kaydet</button>
+      </div>
+    </section>
+  );
+}
+
+// ── Kargo ────────────────────────────────────────────────────────────
+function Carriers({ toast }: { toast: Toast }) {
+  return (
+    <>
+    <HepsiJet toast={toast} />
     <section className="card">
       <div className="card-h"><h2 className="card-t">Kargo firmaları</h2><span className="card-m">Salt okunur · <code>lib/carriers.ts</code></span></div>
       <div className="tbl">
@@ -405,6 +504,7 @@ function Carriers() {
       </div>
       <div className="card-b"><p className="hint" style={{ marginTop: 0 }}><code>{'{no}'}</code> takip numarasıyla değiştirilir. Liste ve şablonlar kodda tutulur; eklemek için <code>lib/carriers.ts</code> dosyasını düzenle.</p></div>
     </section>
+    </>
   );
 }
 
@@ -545,7 +645,7 @@ export default function Integrations() {
           {tab === 'mesaj' && <Messages toast={show} />}
           {tab === 'webhook' && <Webhook toast={show} />}
           {tab === 'besleme' && <Feeds toast={show} />}
-          {tab === 'kargo' && <Carriers />}
+          {tab === 'kargo' && <Carriers toast={show} />}
           {tab === 'dogrulama' && <Verify toast={show} />}
           {tab === 'gunluk' && <LogTab />}
         </div>
