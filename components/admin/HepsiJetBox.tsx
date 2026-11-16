@@ -164,7 +164,7 @@ export function HepsiJetBox({
   if (!st?.enabled && !ship) return null;
 
   const active = !!ship && ship.status === 'olusturuldu';
-  const canCreate = !active && !cancelled && (status === 'hazirlaniyor' || (status === 'kargoda' && !!ship));
+  const canCreate = !active && !cancelled && (status === 'hazirlaniyor' || status === 'kargoda');
 
   return (
     <div className="sec no-print">
@@ -188,7 +188,7 @@ export function HepsiJetBox({
           </div>
           <div className="actions">
             <button className="btn" disabled={!!busy || !st?.ready} onClick={create}>
-              <Truck size={15} /> {busy === 'gonder' ? 'Gönderiliyor…' : status === 'hazirlaniyor' ? 'HepsiJET ile gönder ve kargoya ver' : 'HepsiJET gönderisini yeniden oluştur'}
+              <Truck size={15} /> {busy === 'gonder' ? 'Gönderiliyor…' : status === 'hazirlaniyor' ? 'HepsiJET ile gönder ve kargoya ver' : ship ? 'HepsiJET gönderisini yeniden oluştur' : 'HepsiJET gönderisi oluştur'}
             </button>
           </div>
         </>
