@@ -43,7 +43,14 @@ const envVar = (k: string) => (process.env[k] || '').trim();
 export function credsFor(env: HjEnv): { user: string; pass: string } | null {
   const user = envVar(env === 'prod' ? 'HEPSIJET_USER' : 'HEPSIJET_TEST_USER');
   const pass = envVar(env === 'prod' ? 'HEPSIJET_PASS' : 'HEPSIJET_TEST_PASS');
-  return user && pass ? { user, pass } : null;
+  if (user && pass) return { user, pass };
+  // Canlı için ayrı değişken yoksa test değişkenleri denenir (kullanıcı adı aynı olabilir; şifre farklıysa HepsiJET girişi reddeder).
+  if (env === 'prod') {
+    const tu = envVar('HEPSIJET_TEST_USER');
+    const tp = envVar('HEPSIJET_TEST_PASS');
+    if (tu && tp) return { user: user || tu, pass: pass || tp };
+  }
+  return null;
 }
 
 export async function loadCfg(sb: SupabaseClient | null = serviceClient()): Promise<HjCfg | null> {
