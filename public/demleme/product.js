@@ -83,9 +83,7 @@
   var hoverCol=function(){ if(!window.matchMedia || !matchMedia('(hover:hover)').matches) return; var sw=document.querySelector('#ppColors .sw'); if(!sw||sw.__hv) return; sw.__hv=1;
     [].forEach.call(sw.querySelectorAll('button'), function(b){ b.addEventListener('mouseenter', function(){ var i=+b.getAttribute('data-i'), x=cur.colors[i]; if(i===col){ swapTo(shown); xtra(col); return; } swapTo(x.img); xtra(i); }); });
     sw.addEventListener('mouseleave', function(){ swapTo(shown); xtra(col); }); };
-  /* Fotoğrafın üstüne gelince (tıklamadan) seçili rengin günlük kullanım görseli */
-  var hoverPhoto=function(){ var m=document.querySelector('.pp-main'); if(!m||m.__hv||!window.matchMedia||!matchMedia('(hover:hover)').matches) return; m.__hv=1;
-    m.addEventListener('mouseenter', function(){ var x=cur.colors[col]||{}; if(x.life) swapTo(x.life); }); m.addEventListener('mouseleave', function(){ swapTo(shown); }); };
+  /* Ürün sayfasında fotoğrafın üstüne gelince günlük kullanım görseli açılmaz; o görsel alt karelerden seçilir. (Liste kartlarındaki hover değişmedi.) */
   var placeColors=function(){ var pc=$('ppColors'), media=document.querySelector('.pp-media'), th=$('ppThumbs'), sz=$('ppSizes'); if(!pc||!media||!th||!sz) return;
     if(window.__ppMq && window.__ppMq.matches){ if(pc.parentNode!==media) media.insertBefore(pc, th.nextSibling); } else if(pc.parentNode===media){ sz.parentNode.insertBefore(pc, sz); } };
   var colLabel=function(x){ var el=$('colName'), sm=$('ppColSum'); if(sm&&x&&cur&&cur.colors) sm.textContent=x.name+' \u00b7 '+cur.colors.length+' renk'; if(!el||!x) return; el.textContent=x.name; var h=String(x.hex||'').replace('#',''); if(h.length===3) h=h.replace(/./g,function(c){ return c+c; });
@@ -148,5 +146,5 @@
     requestAnimationFrame(function(){ t.classList.add('in'); });
     toastT=setTimeout(close, 6500);
   };
-  render(); hoverCol(); hoverPhoto(); tintAll(); countCart();
+  render(); hoverCol(); tintAll(); countCart();
 })();
