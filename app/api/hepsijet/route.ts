@@ -106,9 +106,17 @@ export async function POST(req: Request) {
 
     // ── Takip ──
     if (action === 'takip') {
-      const body = { deliveries: [{ customerDeliveryNo: s.barcode }] };
-      let r = await hj(env, 'POST', '/delivery/getDeliveryTracking', body);
-      if (r.http === 404) r = await hj(env, 'POST', '/getDeliveryTracking', body);
+      // Yol/gövde sürümleri ortama göre değişebildiği için 404/400/405 alınırsa sıradakini dene
+      const tries: Array<[string, unknown]> = [
+        ['/deliveryTransaction/getDeliveryTracking', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
+        ['/deliveryTransaction/getDeliveryTracking', [s.barcode]],
+        ['/deliveryTransaction/getDeliveryTrackingV2', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
+        ['/deliveryTransaction/getDeliveryTrackingV2', [s.barcode]],
+        ['/delivery/getDeliveryTracking', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
+        ['/delivery/integration/track', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
+      ];
+      let r = await hj(env, 'POST', tries[0][0], tries[0][1]);
+      for (let i = 1; i < tries.length && [400, 404, 405].includes(r.http); i++) r = await hj(env, 'POST', tries[i][0], tries[i][1]);
       if (!r.ok) return J({ ok: false, error: 'Takip alınamadı: ' + errMsg(r) }, 502);
       const t = parseTracking(r.json);
       await sb.from('hepsijet_shipments').update({ last_status: t.last || 'OK', last_checked_at: new Date().toISOString() }).eq('order_no', orderNo);
