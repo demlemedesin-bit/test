@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { serviceClient } from '@/lib/notify';
+import { notifyOrder, serviceClient } from '@/lib/notify';
 import { hasAnyPerm } from '@/lib/serverAuth';
 import {
-  buildPayload, CARRIER_NAME, credsFor, errMsg, findFile, findZpl, hj, isOk, loadCfg, missing, parseTracking, productDesis,
+  buildPayload, CARRIER_NAME, isDelivered, trackShipment, credsFor, errMsg, findFile, findZpl, hj, isOk, loadCfg, missing, parseTracking, productDesis,
   type HjEnv, type OrderRec,
 } from '@/lib/hepsijet';
 
@@ -106,21 +106,19 @@ export async function POST(req: Request) {
 
     // ── Takip ──
     if (action === 'takip') {
-      // Yol/gövde sürümleri ortama göre değişebildiği için 404/400/405 alınırsa sıradakini dene
-      const tries: Array<[string, unknown]> = [
-        ['/deliveryTransaction/getDeliveryTracking', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
-        ['/deliveryTransaction/getDeliveryTracking', [s.barcode]],
-        ['/deliveryTransaction/getDeliveryTrackingV2', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
-        ['/deliveryTransaction/getDeliveryTrackingV2', [s.barcode]],
-        ['/delivery/getDeliveryTracking', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
-        ['/delivery/integration/track', { deliveries: [{ customerDeliveryNo: s.barcode }] }],
-      ];
-      let r = await hj(env, 'POST', tries[0][0], tries[0][1]);
-      for (let i = 1; i < tries.length && [400, 404, 405].includes(r.http); i++) r = await hj(env, 'POST', tries[i][0], tries[i][1]);
+      const r = await trackShipment(env, s.barcode);
       if (!r.ok) return J({ ok: false, error: 'Takip alınamadı: ' + errMsg(r) }, 502);
       const t = parseTracking(r.json);
       await sb.from('hepsijet_shipments').update({ last_status: t.last || 'OK', last_checked_at: new Date().toISOString() }).eq('order_no', orderNo);
-      return J({ ok: true, last: t.last, events: t.events, picked: t.events.length > 0, raw: JSON.stringify(r.json ?? r.text).slice(0, 4000) });
+      let delivered = false;
+      if (env === 'prod' && isDelivered(t.last)) {
+        const { data: up } = await sb.from('orders').update({ status: 'teslim_edildi' }).eq('order_no', orderNo).eq('status', 'kargoda').select('order_no');
+        if (up && up.length) {
+          delivered = true;
+          await notifyOrder('order_delivered', orderNo);
+        }
+      }
+      return J({ ok: true, delivered, last: t.last, events: t.events, picked: t.events.length > 0, raw: JSON.stringify(r.json ?? r.text).slice(0, 4000) });
     }
 
     // ── Silme (kurye almadan) / geri çağırma (kurye aldıktan sonra, dağıtıma çıkmadan) ──

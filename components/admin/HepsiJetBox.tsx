@@ -8,7 +8,7 @@ import { Confirm, Field } from './ui';
 type Ship = { order_no: string; barcode: string; env: 'test' | 'prod'; desi: number | null; parcels: number; status: string; last_status: string | null; last_checked_at: string | null };
 type St = { ok: boolean; enabled: boolean; env: string; ready: boolean; missing: string[] };
 type Ev = { status: string; date: string; note: string };
-type Resp = { env?: string; ok?: boolean; error?: string; barcode?: string; zpl?: string[]; last?: string; events?: Ev[]; raw?: string; warn?: string };
+type Resp = { delivered?: boolean; env?: string; ok?: boolean; error?: string; barcode?: string; zpl?: string[]; last?: string; events?: Ev[]; raw?: string; warn?: string };
 
 async function tok(): Promise<string> {
   const { data } = await supabase().auth.getSession();
@@ -137,6 +137,10 @@ export function HepsiJetBox({
     const j = await run('takip', { action: 'takip' });
     if (j) {
       setTrk(j);
+      if (j.delivered) {
+        toast('Teslim edildi: sipariş durumu güncellendi, müşteriye bildirim gitti');
+        onChanged();
+      }
       load();
     }
   }

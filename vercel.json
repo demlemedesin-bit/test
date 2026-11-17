@@ -1,6 +1,16 @@
 {
   "crons": [
-    { "path": "/api/cron/kart-temizle", "schedule": "30 3 * * *" },
-    { "path": "/api/cron/sepet-hatirlat", "schedule": "15 7 * * *" }
+    {
+      "path": "/api/cron/kart-temizle",
+      "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/sepet-hatirlat",
+      "schedule": "15 7 * * *"
+    },
+    {
+      "path": "/api/cron/hepsijet-takip",
+      "schedule": "0 15 * * *"
+    }
   ]
 }

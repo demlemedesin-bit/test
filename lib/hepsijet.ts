@@ -337,3 +337,26 @@ export function parseTracking(j: unknown): { events: Ev[]; last: string } {
   const sorted = evs.every((e) => !isNaN(ts(e))) ? [...evs].sort((a, b) => ts(a) - ts(b)) : evs;
   return { events: sorted.slice(-40), last: sorted.length ? sorted[sorted.length - 1].status : '' };
 }
+
+/** Takip sorgusu: yol/gövde sürümleri ortama göre değişebildiği için 400/404/405 alınırsa sıradakini dener. */
+export async function trackShipment(env: HjEnv, barcode: string) {
+  const obj = { deliveries: [{ customerDeliveryNo: barcode }] };
+  const tries: Array<[string, unknown]> = [
+    ['/deliveryTransaction/getDeliveryTracking', obj],
+    ['/deliveryTransaction/getDeliveryTracking', [barcode]],
+    ['/deliveryTransaction/getDeliveryTrackingV2', obj],
+    ['/deliveryTransaction/getDeliveryTrackingV2', [barcode]],
+    ['/delivery/getDeliveryTracking', obj],
+    ['/delivery/integration/track', obj],
+  ];
+  let r = await hj(env, 'POST', tries[0][0], tries[0][1]);
+  for (let i = 1; i < tries.length && [400, 404, 405].includes(r.http); i++) r = await hj(env, 'POST', tries[i][0], tries[i][1]);
+  return r;
+}
+
+/** Son durum müşteriye teslim edildi anlamına mı geliyor? (kuryeye/şubeye/depoya teslim ya da teslim edilemedi sayılmaz) */
+export function isDelivered(last: string): boolean {
+  const s = last.trim();
+  if (!s || /edilemedi|edilmedi|not\s*deliver|undeliver|iade|return|kurye|courier|şube|sube|branch|depo|xdock|transfer|aktar/i.test(s)) return false;
+  return /^delivered$|^teslim[\s_-]?edildi$|teslim edildi|\bdelivered\b|^DELIVERY_?COMPLETED$/i.test(s);
+}
