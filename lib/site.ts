@@ -7,6 +7,7 @@ import {
   FIELDS,
   type Demleyen,
   type Faq,
+  type FixedReel,
   type Field,
   type FooterData,
   type Guest,
@@ -20,7 +21,7 @@ export type { Announce } from './announce';
 export { toAnnounce } from './announce';
 import type { Announce } from './announce';
 import { toAnnounce as _toAnnounce } from './announce';
-export type Site = { t: Record<string, string>; faq: Faq[]; footer: FooterData; dm: Demleyen; guests: Guest[]; announce: Announce };
+export type Site = { t: Record<string, string>; faq: Faq[]; footer: FooterData; dm: Demleyen; guests: Guest[]; reels: FixedReel[]; announce: Announce };
 
 const arr = <T,>(v: unknown, d: T[]): T[] => (Array.isArray(v) && v.length ? (v as T[]) : d);
 
@@ -38,6 +39,8 @@ export async function getSite(): Promise<Site> {
     footer: { cols: arr(f?.cols, DEFAULT_FOOTER.cols), legal: Array.isArray(f?.legal) ? f.legal : DEFAULT_FOOTER.legal },
     dm: { month: dm?.month || DEFAULT_DM.month, photos: Array.isArray(dm?.photos) ? dm.photos : DEFAULT_DM.photos, sehpa_base: dm?.sehpa_base, sehpa_colors: Array.isArray(dm?.sehpa_colors) ? dm.sehpa_colors.filter((c) => c && c.img) : [] },
     guests: Array.isArray(m.guests) && m.guests.length ? (m.guests as Guest[]) : DEFAULT_GUESTS,
+    // Konuktan bağımsız sabit reels (varsa şerit hep bunları gösterir)
+    reels: Array.isArray(m.kr_reels) ? (m.kr_reels as FixedReel[]).filter((r) => r && typeof r.video === 'string' && /^https:\/\//.test(r.video)) : [],
     announce: _toAnnounce(m.announce),
   };
 }

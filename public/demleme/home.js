@@ -177,7 +177,7 @@
   (function(){
     var rt=document.getElementById('reelTrack'); if(!rt) return;
     var RX=/instagram\.com\/(?:[\w.]+\/)?(reels?|p|tv)\/([\w-]+)/i, box=null;
-    var close=function(){ if(!box) return; var v=box.querySelector('video'); if(v){ try{ v.pause(); }catch(e){} } box.remove(); box=null; document.documentElement.style.overflow=''; };
+    var close=function(){ if(!box) return; [].forEach.call(box.querySelectorAll('video'), function(v){ try{ v.pause(); v.removeAttribute('src'); v.load(); }catch(e){} }); if(box._io) box._io.disconnect(); box.remove(); box=null; document.documentElement.style.overflow=''; };
     var open=function(inner){ close(); box=document.createElement('div'); box.className='rl-modal'; box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button>'+inner+'</div>';
       box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); }); document.body.appendChild(box); document.documentElement.style.overflow='hidden'; };
     var hv=function(card,on){ var v=card.querySelector('.rl-vid'); if(!v) return;
@@ -192,8 +192,25 @@
       var io=new IntersectionObserver(function(es){ es.forEach(function(en){ hv(en.target, en.isIntersecting && en.intersectionRatio>=.6); }); }, {threshold:[0,.6,1]});
       var seen=new WeakSet(), scan=function(){ [].forEach.call(rt.querySelectorAll('a.rl-card.has-v'), function(c){ if(!seen.has(c)){ seen.add(c); io.observe(c); } }); };
       scan(); new MutationObserver(scan).observe(rt,{childList:true}); })();
+    // Sabit reels: tıklayınca site içinde dikey akış açılır; aşağı kaydırınca (ya da ok tuşuyla) sonraki video gelir
+    var feed=function(start){
+      var L=rt._fx||[]; if(!L.length) return; var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+      open('<div class="rl-feed" tabindex="0">'+L.map(function(r){ return '<section class="rl-fi"><video data-src="'+esc(r.v)+'" loop playsinline preload="none"></video>'+(r.n?'<span class="rl-fn">'+esc(r.n)+'</span>':'')+'</section>'; }).join('')+'</div>');
+      box.classList.add('is-feed'); box.querySelector('.rl-m-in').classList.add('is-feed');
+      var fd=box.querySelector('.rl-feed'), vids=[].slice.call(fd.querySelectorAll('video')), cur=-1;
+      var load=function(i){ var v=vids[i]; if(v && !v.getAttribute('src')) v.src=v.getAttribute('data-src'); };
+      var go=function(i){ if(i===cur) return; cur=i; vids.forEach(function(v,k){ if(k!==i){ try{ v.pause(); }catch(e){} } }); load(i); load(i+1);
+        var v=vids[i]; v.muted=false; var pr=v.play(); if(pr && pr.catch) pr.catch(function(){ v.muted=true; var p2=v.play(); if(p2 && p2.catch) p2.catch(function(){}); }); };
+      fd.addEventListener('click', function(ev){ var v=ev.target.closest('.rl-fi') && ev.target.closest('.rl-fi').querySelector('video'); if(!v) return; if(v.paused){ v.play().catch(function(){}); } else v.pause(); });
+      fd.addEventListener('keydown', function(ev){ if(ev.key==='ArrowDown'||ev.key==='PageDown'){ ev.preventDefault(); fd.scrollBy({top:fd.clientHeight, behavior:'smooth'}); } else if(ev.key==='ArrowUp'||ev.key==='PageUp'){ ev.preventDefault(); fd.scrollBy({top:-fd.clientHeight, behavior:'smooth'}); } });
+      fd.scrollTop=start*fd.clientHeight;
+      if(window.IntersectionObserver){ box._io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting && en.intersectionRatio>=.6) go(vids.indexOf(en.target.querySelector('video'))); }); }, {root:fd, threshold:[.6,1]});
+        [].forEach.call(fd.querySelectorAll('.rl-fi'), function(s){ box._io.observe(s); }); }
+      go(start); try{ fd.focus({preventScroll:true}); }catch(e){}
+    };
     rt.addEventListener('click', function(e){
       var a=e.target.closest('a.rl-card'); if(!a) return; var vs=a.getAttribute('data-v'), hr=a.getAttribute('href')||'';
+      if(rt._fx && a.hasAttribute('data-i')){ e.preventDefault(); hv(a,false); feed(+a.getAttribute('data-i')||0); return; }
       if(vs){ e.preventDefault(); hv(a,false); open('<video class="rl-m-v" src="'+vs+'" controls autoplay playsinline loop></video>'); return; }
       if(hr==='#'){ e.preventDefault(); return; }
       var m=RX.exec(hr);
@@ -408,12 +425,21 @@
     // reels under the table follow the guest in the middle
     var track=document.getElementById('reelTrack'), rname=document.getElementById('krReelName'), shown=-1;
     var IG=(D.ig && D.ig.reels && D.ig.reels.length) ? D.ig : null;
+    var FX=(D.fixed && D.fixed.length) ? D.fixed : null;
+    // Sabit mod: şerit konuktan bağımsız, panelde eklenen videolar (sınırsız) hep aynı sırayla gösterilir (bir kez doldurulur)
+    var fxFill=function(){ var lab=rname.previousSibling; if(lab && lab.nodeType===3) lab.nodeValue='Konuklarımızdan'; rname.textContent='';
+      var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+      track._fx=FX;
+      track.innerHTML=FX.map(function(r,i){ var cov=r.c ? '<img class="rl-cover" src="'+esc(r.c)+'" alt="" loading="lazy">' : '<video class="rl-cover rl-still" src="'+esc(r.v)+'#t=0.1" preload="metadata" muted playsinline aria-hidden="true"></video>';
+        return '<a class="rl-card has-v" href="#" role="button" data-i="'+i+'" data-v="'+esc(r.v)+'" aria-label="'+esc(r.n||'Konuk')+' videosunu oynat">'+cov+'<video class="rl-vid" data-src="'+esc(r.v)+'" muted loop playsinline preload="none" aria-hidden="true"></video><img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt="">'+(r.n?'<span class="rl-name">'+esc(r.n)+'</span>':'')+'</a>'; }).join('');
+      track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
     // Instagram modu: şerit konuktan bağımsız, hesabın son reels'lerini gösterir (bir kez doldurulur)
     var igFill=function(){ var lab=rname.previousSibling; if(lab && lab.nodeType===3) lab.nodeValue='Instagram\u2019dan \u00b7 '; rname.textContent=IG.user ? '@'+IG.user : '';
       var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
       track.innerHTML=IG.reels.map(function(r){ return '<a class="rl-card" href="'+esc(r.u)+'" target="_blank" rel="noopener" aria-label="'+esc(r.t||'Instagram reels')+'"><img class="rl-cover" src="'+esc(r.c)+'" alt="" loading="lazy"><img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt=""></a>'; }).join('');
       track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
     var reels=function(){ var mid=((Math.round(rot)%N)+N)%N; if(mid===shown || !track) return; var first=shown<0; shown=mid; var g=G[mid];
+      if(FX){ if(first) fxFill(); return; }
       if(IG){ if(first) igFill(); return; }
       var fill=function(){ rname.textContent=g.name; track.innerHTML=(g.reels||[]).map(function(r){
         var cov=(r.c>=0 && COV[r.c]) ? '<img class="rl-cover" src="'+COV[r.c]+'" alt="" loading="lazy">' : (r.v ? '<video class="rl-cover rl-still" src="'+r.v+'#t=0.1" preload="metadata" muted playsinline aria-hidden="true"></video>' : '');

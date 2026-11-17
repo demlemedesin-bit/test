@@ -18,6 +18,7 @@ import {
   type Demleyen,
   type Faq,
   type FooterData,
+  type FixedReel,
   type Guest,
 } from '@/lib/siteDefaults';
 
@@ -39,6 +40,7 @@ export default function Content() {
   const [t, setT] = useState<Record<string, string> | null>(null);
   const [faq, setFaq] = useState<Faq[]>(DEFAULT_FAQ);
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS);
+  const [fixedReels, setFixedReels] = useState<FixedReel[]>([]);
   const [dm, setDm] = useState<Demleyen>(DEFAULT_DM);
   const [footer, setFooter] = useState<FooterData>(DEFAULT_FOOTER);
   const [busy, setBusy] = useState(false);
@@ -51,6 +53,7 @@ export default function Content() {
     setT((m.texts as Record<string, string>) ?? {});
     if (Array.isArray(m.faq)) setFaq(m.faq as Faq[]);
     if (Array.isArray(m.guests) && m.guests.length) setGuests(m.guests as Guest[]);
+    if (Array.isArray(m.kr_reels)) setFixedReels(m.kr_reels as FixedReel[]);
     const d = m.demleyen as Partial<Demleyen> | undefined;
     if (d) setDm({ month: d.month || DEFAULT_DM.month, photos: Array.isArray(d.photos) ? d.photos : DEFAULT_DM.photos, sehpa_base: d.sehpa_base, sehpa_colors: Array.isArray(d.sehpa_colors) ? d.sehpa_colors : [] });
     const f = m.footer as Partial<FooterData> | undefined;
@@ -75,6 +78,7 @@ export default function Content() {
       { key: 'texts', value: t },
       { key: 'faq', value: faq.filter((x) => x.q.trim()) },
       { key: 'guests', value: guests },
+      { key: 'kr_reels', value: fixedReels.filter((r) => r.video) },
       { key: 'demleyen', value: dm },
       { key: 'footer', value: footer },
     ].map((r) => ({ ...r, updated_at: new Date().toISOString() }));
@@ -205,6 +209,46 @@ export default function Content() {
           {tab === TABS[2] && (
             <>
               <p className="hint" style={{ marginBottom: 12 }}>Sıra, masadaki oturma sırasıdır. İlk konuk ortada başlar. Konuk çizimleri tasarım dosyalarındandır; yeni bir konuk için hazır çizimlerden seçilir.</p>
+              <section className="card" style={{ marginBottom: 14 }}>
+                <div className="card-h"><h2 className="card-t">Sabit videolar (konuklar şeridi)</h2></div>
+                <p className="hint" style={{ marginTop: 0 }}>Masa dönse de bu videolar değişmez; sınır yok, istediğin kadar ekle. Üstüne gelince sessiz önizleme döner, tıklayınca site içinde açılır, mobilde aşağı kaydırınca sonraki videoya geçer. Altında yazan isim konuğun adıdır. Burada en az bir video varsa konuğa özel reels&apos;ler ve Instagram şeridi kullanılmaz.</p>
+                {fixedReels.map((r, ri) => (
+                  <div key={ri} style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+                    <input className="inp" style={{ width: 180 }} placeholder="Konuk adı" value={r.name} onChange={(e) => setFixedReels((a) => setAt(a, ri, { name: e.target.value }))} />
+                    <label className={`btn ghost sm${r.video ? ' on' : ''}`} style={{ position: 'relative' }} title={r.video || 'MP4 / WebM / MOV, en çok 50 MB'}>
+                      {r.video ? 'Video ✓ değiştir' : 'Video yükle'}
+                      <input type="file" accept="video/mp4,video/webm,video/quicktime" style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        e.target.value = '';
+                        if (!f) return;
+                        try {
+                          show('Video yükleniyor…');
+                          const { uploadReelVideo } = await import('@/lib/admin');
+                          const url = await uploadReelVideo(f);
+                          setFixedReels((a) => setAt(a, ri, { video: url }));
+                          show('Video yüklendi. Kaydetmeyi unutma.');
+                        } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
+                      }} />
+                    </label>
+                    <label className={`btn ghost sm${r.cover ? ' on' : ''}`} style={{ position: 'relative' }} title="İsteğe bağlı: boşsa videonun ilk karesi kapak olur">
+                      {r.cover ? 'Kapak ✓ değiştir' : 'Kapak yükle (isteğe bağlı)'}
+                      <input type="file" accept="image/*" style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        e.target.value = '';
+                        if (!f) return;
+                        try {
+                          const { uploadImage } = await import('@/lib/admin');
+                          const url = await uploadImage(f, 'reels');
+                          setFixedReels((a) => setAt(a, ri, { cover: url }));
+                        } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
+                      }} />
+                    </label>
+                    {r.cover && <button type="button" className="btn ghost sm" onClick={() => setFixedReels((a) => setAt(a, ri, { cover: '' }))}>Kapağı kaldır</button>}
+                    <RowTools i={ri} n={fixedReels.length} move={(d) => setFixedReels((a) => moved(a, ri, d))} remove={() => setFixedReels((a) => without(a, ri))} />
+                  </div>
+                ))}
+                <AddBtn onClick={() => setFixedReels((a) => [...a, { name: '', video: '' }])}>Video ekle</AddBtn>
+              </section>
               {guests.map((g, gi) => (
                 <section className="card" key={gi} style={{ marginBottom: 14 }}>
                   <div className="card-h">

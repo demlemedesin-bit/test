@@ -55,6 +55,8 @@ export async function homeHtml(): Promise<string> {
     covers: covers.map((f) => (isUrl(f) ? f : `${KONUK}reel-covers/${f}`)),
     teas: tea,
     // Panelden açıksa ve veri alınabildiyse: şerit konuğa değil Instagram'a bağlı olur
+    // Sabit reels: dolu ise şerit konuğa göre değişmez, hep bu videolar gösterilir
+    fixed: site.reels.map((r) => ({ n: String(r.name || '').slice(0, 60), v: r.video, c: /^https:\/\//.test(r.cover || '') ? r.cover : '' })),
     ig: on(site, 'kr_ig_on') ? await getIgReels(text(site, 'kr_ig_feed')) : null,
   };
   const dm = { month: site.dm.month, photos: site.dm.photos, sehpa_base: site.dm.sehpa_base, sehpa_colors: site.dm.sehpa_colors };
