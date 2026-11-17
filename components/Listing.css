@@ -10,7 +10,7 @@
 .ls-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:32px 20px; }
 .ls-card{ display:grid; gap:6px; text-align:center; }
 .ls-img{ position:relative; display:block; aspect-ratio:1; border-radius:14px; overflow:hidden; background:#EFE7D8; }
-.ls-img img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+.ls-img img{ width:100%; height:100%; object-fit:contain; padding:7%; box-sizing:border-box; display:block; transition:transform .35s ease; }   /* arka planı kaldırılmış ürün görselleri kırpılmadan, tamamı görünsün */
 .ls-card:hover .ls-img img{ transform:scale(1.04); }
 .ls-pct{ position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:99px; background:#DD262C; color:#fff; font-size:12px; font-weight:600; }
 .ls-tag{ position:absolute; left:10px; top:10px; padding:4px 10px; border-radius:99px; background:rgba(255,255,255,.9); font-size:12px; }
