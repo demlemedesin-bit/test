@@ -11,7 +11,7 @@ export type DbProduct = {
   name: string;
   category: string;
   price: number;
-  colors: { key: string; name: string }[];
+  colors: { key: string; name: string; stock?: number }[];
   sizes: string[];
   soon: boolean;
   active: boolean;
@@ -63,6 +63,14 @@ export type Priced = {
   hasProblem: boolean;
 };
 
+/** Seçilen rengin kendi stoğu varsa ona göre uyarı verir (yoksa null: toplam stok kontrolü devreye girer). */
+function colorStockProblem(p: DbProduct, item: CartItem): string | null {
+  const c = p.colors.find((x) => x.key === (item.color || p.colors[0]?.key));
+  if (!c || typeof c.stock !== 'number') return null;
+  if (c.stock <= 0) return `${c.name} rengi tükendi.`;
+  return c.stock < item.qty ? `${c.name} renginde yalnızca ${c.stock} adet var.` : null;
+}
+
 /** Sepeti sunucudaki fiyatlarla hesaplar (create_order da aynı hesabı yapar). */
 export function priceCart(items: CartItem[], products: DbProduct[], s: Settings): Priced {
   const by = new Map(products.map((p) => [p.slug, p]));
@@ -73,6 +81,7 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     else if (p.soon) problem = 'Bu ürün henüz satışta değil.';
     else if (item.color && !p.colors.some((c) => c.key === item.color)) problem = 'Bu renk artık mevcut değil.';
     else if (p.sizes.length && !p.sizes.includes(item.size)) problem = 'Beden seçilmesi gerekiyor.';
+    else if (colorStockProblem(p, item)) problem = colorStockProblem(p, item);
     else if (p.stock != null && p.stock < item.qty) problem = p.stock <= 0 ? 'Bu ürün tükendi.' : `Stokta yalnızca ${p.stock} adet var.`;
     const unit = p ? p.price : 0;
     return { item, key: lineKey(item), unit, was: p?.was, total: problem ? 0 : unit * item.qty, problem };

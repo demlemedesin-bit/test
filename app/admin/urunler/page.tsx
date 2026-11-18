@@ -90,7 +90,10 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
     const e: string[] = [];
     const slug = d.slug.trim();
     const price = Number(d.price.replace(',', '.'));
-    const stock = d.stock.trim() === '' ? null : Number(d.stock);
+    // Renk/varyasyon bazında stok: biri girildiyse hepsi girilmeli; ürünün toplam stoğu bunların toplamıdır
+    const varStock = d.colors.some((c) => typeof c.stock === 'number');
+    const stock = varStock ? d.colors.reduce((n, c) => n + (typeof c.stock === 'number' ? c.stock : 0), 0) : d.stock.trim() === '' ? null : Number(d.stock);
+    if (varStock && d.colors.some((c) => typeof c.stock !== 'number')) e.push('Varyasyon stoğu kullanıyorsan her rengin stok adedini yaz (tükendiyse 0).');
     if (d.name.trim().length < 2) e.push('Ürün adı gerekli.');
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) e.push('Adres (slug) yalnızca küçük harf, rakam ve tire içerebilir.');
     if (d.price.trim() === '' || isNaN(price) || price < 0) e.push('Geçerli bir fiyat gir.');
@@ -113,7 +116,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         while (used.has(key)) key = `${base}-${n++}`;
         used.add(key);
       }
-      return { key, name: c.name.trim(), hex: c.hex, img: c.img, ...(c.imgs && c.imgs.length ? { imgs: c.imgs.slice(0, 8) } : {}), ...(c.life ? { life: c.life } : {}) };
+      return { key, name: c.name.trim(), hex: c.hex, img: c.img, ...(c.imgs && c.imgs.length ? { imgs: c.imgs.slice(0, 8) } : {}), ...(c.life ? { life: c.life } : {}), ...(c.thumb ? { thumb: c.thumb } : {}), ...(typeof c.stock === 'number' ? { stock: c.stock } : {}) };
     });
     const sizes = d.sizes.split(',').map((s) => s.trim()).filter(Boolean);
     if (new Set(sizes).size !== sizes.length) return setErrs(['Beden listesinde aynı değer iki kez yazılmış.']);
@@ -199,8 +202,8 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
           <Field label="Fiyat (₺)">
             <input className="inp" inputMode="decimal" value={d.price} onChange={(e) => set('price', e.target.value)} placeholder="650" />
           </Field>
-          <Field label="Stok" hint="Boş bırakırsan sınırsız. 0 = tükendi.">
-            <input className="inp" inputMode="numeric" value={d.stock} onChange={(e) => set('stock', e.target.value)} placeholder="Sınırsız" />
+          <Field label="Stok" hint={d.colors.some((c) => typeof c.stock === 'number') ? 'Renklerin stoklarının toplamı (otomatik). Değiştirmek için aşağıda her rengin stoğunu düzenle.' : 'Boş bırakırsan sınırsız. 0 = tükendi. Renk/varyasyon bazında stok için aşağıda renklerin altına yaz.'}>
+            <input className="inp" inputMode="numeric" value={d.colors.some((c) => typeof c.stock === 'number') ? String(d.colors.reduce((n, c) => n + (typeof c.stock === 'number' ? c.stock : 0), 0)) : d.stock} disabled={d.colors.some((c) => typeof c.stock === 'number')} onChange={(e) => set('stock', e.target.value)} placeholder="Sınırsız" />
           </Field>
         </div>
         <Field label="Desi (kargo)" hint="Bir adet ürünün desisi. Boş bırakırsan HepsiJET gönderisinde Entegrasyonlar → Kargo'daki sabit desi kullanılır.">
@@ -296,6 +299,16 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
               <button type="button" className="icon-btn" onClick={() => set('colors', d.colors.filter((_, j) => j !== i))} disabled={d.colors.length === 1} aria-label="Kaldır">
                 <X size={16} />
               </button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0 0' }}>
+              <label style={{ fontSize: 13, fontWeight: 600 }} htmlFor={`cstock-${i}`}>Bu rengin stoğu</label>
+              <input id={`cstock-${i}`} className="inp" style={{ width: 110 }} inputMode="numeric" placeholder="Toplamdan" value={typeof c.stock === 'number' ? String(c.stock) : ''}
+                onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0, 6); setColor(i, { stock: v === '' ? undefined : Number(v) }); }} />
+              <span className="hint" style={{ margin: 0 }}>İsteğe bağlı. Doldurursan bu renk kendi stoğunu tutar, sipariş geldikçe yalnızca ondan düşer; 0 yazarsan o renk tükendi görünür.</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
+              <ImageSlot value={c.thumb ?? ''} onChange={(v) => setColor(i, { thumb: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={64} />
+              <span className="hint" style={{ margin: 0 }}><b>Liste kapağı (arka planı kaldırılmış)</b> (isteğe bağlı). Mağaza kartında bu rengin noktasının üstüne gelince bu görsel görünür. Boşsa yukarıdaki ana görsel kullanılır. İlk renk için ürünün kapak görseli kullanılır.</span>
             </div>
             <div className="color-life" style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 4px' }}>
               <ImageSlot value={c.life ?? ''} onChange={(v) => setColor(i, { life: v })} folder={d.slug || slugify(d.name) || 'yeni'} onError={(m) => toast(m, true)} size={64} />

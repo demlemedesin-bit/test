@@ -204,7 +204,7 @@ export function BulkEditor({ list, toast, onBack, onSaved, menu }: { list: Admin
                     <td><input type="checkbox" checked={sel.includes(p.slug)} onChange={(e) => setSel((s) => (e.target.checked ? [...s, p.slug] : s.filter((x) => x !== p.slug)))} aria-label={p.name} /></td>
                     <td><div className="bk-n"><img src={p.thumb || p.colors?.[0]?.img} alt="" /><span><b>{p.name}</b><small>{tl(Number(p.price))} · /urun/{p.slug}</small></span></div></td>
                     <td><input className="inp" inputMode="decimal" value={r.price} onChange={(e) => set(p.slug, { price: e.target.value })} /></td>
-                    <td><input className="inp" inputMode="numeric" placeholder="Sınırsız" value={r.stock} onChange={(e) => set(p.slug, { stock: e.target.value })} /></td>
+                    <td><input className="inp" inputMode="numeric" placeholder="Sınırsız" value={r.stock} disabled={p.colors.some((c) => typeof c.stock === 'number')} title={p.colors.some((c) => typeof c.stock === 'number') ? 'Bu ürünün stoğu renklere göre tutuluyor; ürün sayfasından düzenle.' : undefined} onChange={(e) => set(p.slug, { stock: e.target.value })} /></td>
                     <td><button type="button" className={`bk-sw${r.active ? ' on' : ''}`} aria-pressed={r.active} onClick={() => set(p.slug, { active: !r.active })}><i /></button></td>
                     <td><button type="button" className={`bk-sw${r.soon ? ' on' : ''}`} aria-pressed={r.soon} onClick={() => set(p.slug, { soon: !r.soon })}><i /></button></td>
                   </tr>

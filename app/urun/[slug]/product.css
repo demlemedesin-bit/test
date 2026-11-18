@@ -73,6 +73,8 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .sw{ display:flex; gap:12px; flex-wrap:wrap; }
 .sw button{ width:40px; height:40px; border-radius:50%; border:1px solid var(--line-strong); padding:0; cursor:pointer; box-shadow:inset 0 0 0 3px var(--cream-light); }
 .sw button.on{ outline:1.5px solid var(--ink); outline-offset:3px; }
+.sw button.so{ position:relative; opacity:.45; }   /* tükenen seçenek: soluk ve üstü çizili */
+.sw button.so::after{ content:''; position:absolute; left:50%; top:-3px; bottom:-3px; width:1.5px; background:var(--ink); transform:translateX(-50%) rotate(45deg); }
 .sz{ display:flex; gap:8px; flex-wrap:wrap; }
 .sz a, .sz button{ min-width:56px; height:48px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-strong); background:none; cursor:pointer; font-size:15px; }
 .sz .on{ border-color:var(--ink); background:var(--ink); color:var(--cream-light); } .sz a:hover, .sz button:hover{ border-color:var(--ink); }

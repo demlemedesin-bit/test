@@ -10,7 +10,7 @@ import { saleOf } from './sale';
 
 export const CATALOG_TAG = 'catalog';
 
-export type Color = { key: string; name: string; hex?: string; img?: string; imgs?: string[]; life?: string };
+export type Color = { key: string; name: string; hex?: string; img?: string; imgs?: string[]; life?: string; thumb?: string; out?: boolean; left?: number };
 export type SizeBlock = { label: string; items: string[][]; pick?: boolean };
 export type SiteProduct = {
   slug: string;
@@ -101,7 +101,12 @@ function fromRow(r: Row): SiteProduct {
     soon: !!r.soon,
     out: r.stock != null && r.stock <= 0,
     thumb: r.thumb || r.colors?.[0]?.img || '',
-    colors: r.colors ?? [],
+    // Renk bazında stok: müşteriye kesin adet gitmez; yalnızca tükendi / az kaldı bilgisi
+    colors: (r.colors ?? []).map((c) => {
+      const { stock, ...rest } = c as Color & { stock?: number };
+      if (typeof stock !== 'number') return rest;
+      return stock <= 0 ? { ...rest, out: true } : stock <= crit ? { ...rest, left: stock } : rest;
+    }),
     ...(() => {
       const eps: { title: string; url: string }[] = [];
       if (d.episode_title?.trim() && /^https?:\/\//i.test(d.episode_url ?? '')) eps.push({ title: d.episode_title.trim().slice(0, 140), url: (d.episode_url as string).trim() });

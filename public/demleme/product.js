@@ -44,7 +44,7 @@
     // colours: swatches + one thumbnail per colour (the photo swaps)
     var c=p.colors;
     if(!(p.showColors!=null ? p.showColors : c.length>1)){ $('ppColors').innerHTML='<span id="colName" hidden></span>'; } else
-    $('ppColors').innerHTML='<div class="pp-opt-h"><b id="colName">Renk</b></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+'"></button>'; }).join('')+'</div>' : '');
+    $('ppColors').innerHTML='<div class="pp-opt-h"><b id="colName">Renk</b></div>'+(c.length>1 ? '<div class="sw">'+c.map(function(x,i){ return '<button type="button" data-i="'+i+'" class="'+(x.out ? 'so' : '')+'" style="background:'+x.hex+'" aria-label="'+esc(x.name)+(x.out ? ' (tükendi)' : '')+'"></button>'; }).join('')+'</div>' : '');
     $('ppThumbs').innerHTML='';
     $('ppThumbs').innerHTML+='<span id="ppXtra" class="th-x"></span>';
 
@@ -68,7 +68,7 @@
     [].forEach.call(document.querySelectorAll('#ppSizes button[data-i]'), function(b){ b.addEventListener('click', function(){ size=+b.getAttribute('data-i'); [].forEach.call(document.querySelectorAll('#ppSizes button[data-i]'), function(x){ x.classList.toggle('on', x===b); }); $('ppMsg').textContent=''; $('ppMsg').classList.remove('warn'); }); });
     if($('chartBtn')) $('chartBtn').addEventListener('click', function(){ var t=$('chart'); t.hidden=!t.hidden; });
     $('ppDet').innerHTML=p.details.map(function(d,i){ return '<details'+(i===0?' open':'')+'><summary>'+esc(d[0])+'</summary><p>'+esc(d[1])+'</p></details>'; }).join('');
-    $('qN').textContent=q; $('ppAdd').disabled=!!(p.soon||p.out); $('ppMsg').textContent=p.soon ? 'Çok yakında. Stoklara girince haber vereceğiz.' : p.out ? 'Şu an stokta yok.' : p.left ? 'Son '+p.left+' ürün kaldı!' : ''; $('ppMsg').classList.toggle('is-low', !!(p.left && !p.soon && !p.out)); $('ppMsg').classList.remove('warn');
+    $('qN').textContent=q; stockUI();
     /* "Bunu da beğenebilirsin" kartları artık sunucuda çiziliyor (#more yalnızca eski sayfa kalıplarında olabilir) */
     if($('more')){ var start=P.indexOf(p), pick=[]; for(var k=1;k<=4;k++) pick.push(P[(start+k)%P.length]);
       $('more').innerHTML=pick.map(function(x){ return '<a href="/urun/'+x.slug+'"><div class="th"><img src="'+x.colors[0].img+'" alt="" loading="lazy"></div><p>'+esc(x.name)+'</p><span>'+x.price+'</span></a>'; }).join(''); }
@@ -90,7 +90,12 @@
     var ok=/^[0-9a-f]{6}$/i.test(h); if(!ok){ el.style.color=''; return; } var r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16), l=(0.299*r+0.587*g+0.114*b)/255;
     if(l>0.62){ var k=0.55; r=Math.round(r*(1-k)); g=Math.round(g*(1-k)); b=Math.round(b*(1-k)); } // açık renkleri okunur kalsın diye koyulaştır
     el.style.color='rgb('+r+','+g+','+b+')'; el.style.fontWeight='500'; };
-  var setCol=function(i, now){ col=i; var x=cur.colors[i], im=$('ppImg'); shown=x.img; colLabel(x); xtra();
+  /* Stok durumu: renk bazında stok varsa seçili rengin durumuna göre (tükendi / son N), yoksa ürünün toplamına göre */
+  var stockUI=function(){ var p=cur, x=(p.colors[col]||{}), out=!!(p.out||x.out), left=x.left!=null ? x.left : (x.out ? 0 : p.left), m=$('ppMsg'); if(!m) return;
+    $('ppAdd').disabled=!!(p.soon||out);
+    m.textContent=p.soon ? 'Çok yakında. Stoklara girince haber vereceğiz.' : out ? (p.out ? 'Şu an stokta yok.' : 'Bu seçenek şu an stokta yok.') : left ? 'Son '+left+' ürün kaldı!' : '';
+    m.classList.toggle('is-low', !!(left && !p.soon && !out)); m.classList.remove('warn'); };
+  var setCol=function(i, now){ col=i; stockUI(); var x=cur.colors[i], im=$('ppImg'); shown=x.img; colLabel(x); xtra();
     [].forEach.call(document.querySelectorAll('#ppColors .sw button, #ppThumbs button[data-i]'), function(b){ b.classList.toggle('on', +b.getAttribute('data-i')===i); });
     if(now){ im.src=x.img; im.alt=cur.name+', '+x.name; return; }
     im.alt=cur.name+', '+x.name; swapTo(x.img); };
