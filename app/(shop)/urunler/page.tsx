@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { D } from '@/components/Display';
 import { getProducts, type SiteProduct } from '@/lib/catalog';
+import ListingCard from '@/components/ListingCard';
 import '@/components/Listing.css';
 
 export const metadata: Metadata = {
@@ -12,7 +13,6 @@ export const metadata: Metadata = {
 const CATS: [SiteProduct['shopCat'] | '', string][] = [['', 'Tümü'], ['sofra', 'Ev & Sofra'], ['giyim', 'Giyim'], ['aksesuar', 'Aksesuar']];
 const SORTS: [string, string][] = [['', 'Öne çıkan'], ['artan', 'Fiyat: düşükten yükseğe'], ['azalan', 'Fiyat: yüksekten düşüğe'], ['indirim', 'İndirimdekiler']];
 
-const galOf = (p: SiteProduct) => [...new Set([p.colors[0]?.img || '', ...(p.colors[0]?.imgs ?? []), p.colors[0]?.life || ''].filter(Boolean))].slice(0, 6);
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? '';
 const href = (kat: string, sirala: string) => {
   const q = new URLSearchParams();
@@ -64,21 +64,7 @@ export default async function Urunler({ searchParams }: { searchParams: Promise<
         <ul className="ls-grid">
           {list.map((p) => (
             <li key={p.slug}>
-              <a className="ls-card" href={`/urun/${p.slug}`}>
-                <span className={`ls-img${galOf(p).length ? ' has-gal' : ''}`}>
-                  {p.thumb ? <img className="ls-main" src={p.thumb} alt={p.name} loading="lazy" /> : null}
-                  {galOf(p).length ? <span className="ls-gal">{galOf(p).map((u) => <img key={u} src={u} alt={p.name} loading="lazy" draggable={false} />)}</span> : null}
-                  {p.was && !p.out && !p.soon && p.salePct ? <span className="ls-pct">-%{p.salePct}</span> : null}
-                  {p.out ? <span className="ls-tag">Tükendi</span> : p.soon ? <span className="ls-tag">Yakında</span> : p.badge ? <span className="ls-tag">{p.badge}</span> : null}
-                </span>
-                <span className="ls-name">{p.name}</span>
-                <span className="ls-cat">{p.cat}</span>
-                <span className="ls-price">
-                  {p.was && !p.out && !p.soon ? <s>{p.was}</s> : null}
-                  <b className={p.was && !p.out && !p.soon ? 'sale' : ''}>{p.price}</b>
-                </span>
-                {p.left && !p.out ? <span className="ls-low">Son {p.left} adet</span> : null}
-              </a>
+              <ListingCard p={{ slug: p.slug, name: p.name, thumb: p.thumb, cat: p.cat, price: p.price, was: p.was || undefined, salePct: p.salePct || undefined, left: p.left || undefined, out: !!p.out, soon: !!p.soon, badge: p.badge || undefined, showColors: p.showColors, colors: p.colors.map((c) => ({ key: c.key, name: c.name, hex: c.hex, img: c.img, imgs: c.imgs, life: c.life, thumb: c.thumb })) }} />
             </li>
           ))}
         </ul>

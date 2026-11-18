@@ -9,6 +9,7 @@
 .ls-s.on{ color:var(--ink); border-bottom-color:var(--ink); }
 .ls-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:32px 20px; }
 .ls-card{ display:grid; gap:6px; text-align:center; }
+.ls-lnk{ display:grid; gap:6px; }
 .ls-img{ position:relative; display:block; aspect-ratio:1; border-radius:14px; overflow:hidden; background:#EFE7D8; }
 .ls-img img{ width:100%; height:100%; object-fit:contain; padding:7%; box-sizing:border-box; display:block; transition:transform .35s ease; }   /* arka planı kaldırılmış ürün görselleri kırpılmadan, tamamı görünsün */
 .ls-card:hover .ls-img img{ transform:scale(1.04); }
@@ -32,3 +33,9 @@
   .ls-img.has-gal .ls-gal img{ flex:0 0 100%; width:100%; height:100%; padding:0; object-fit:cover; scroll-snap-align:center; transition:none; }
   .ls-card:hover .ls-img.has-gal .ls-gal img{ transform:none; }
 }
+
+.ls-sw{ display:flex; align-items:center; justify-content:center; gap:8px; min-height:20px; }
+.ls-sw button{ width:16px; height:16px; padding:0; border-radius:50%; background:var(--c); border:1.5px solid #fff; box-shadow:0 0 0 1px rgba(23,19,15,.28); cursor:pointer; }
+.ls-sw button.is-on{ box-shadow:0 0 0 1px rgba(23,19,15,.28), 0 0 0 3px #F8F4EA, 0 0 0 4.5px #17130F; }
+.ls-sw em{ font-style:normal; font-size:12px; color:var(--ink-2); }
+@media (max-width:760px){ .ls-sw button{ width:20px; height:20px; } .ls-sw{ gap:10px; min-height:26px; } }
