@@ -25,6 +25,7 @@ export type SiteProduct = {
   left?: number; // az kalan stok adedi
   desc: string;
   badge?: string;
+  sub?: string; // alt başlık / lakap
   soon: boolean;
   out: boolean; // stok bitti
   thumb: string;
@@ -51,7 +52,7 @@ type Row = {
   sizes: string[] | null;
   soon: boolean;
   active: boolean;
-  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; episodes_extra?: string; video?: string; video_cover?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
+  data?: { gallery?: string[]; episode_title?: string; episode_url?: string; episodes_extra?: string; video?: string; video_cover?: string; seo_title?: string; seo_desc?: string; desc?: string; badge?: string; subtitle?: string; chart?: unknown; details?: string[][]; sizes?: SizeBlock; size_label?: string; show_colors?: boolean };
   shop_cat?: SiteProduct['shopCat'];
   thumb?: string | null;
   stock?: number | null;
@@ -98,6 +99,7 @@ function fromRow(r: Row): SiteProduct {
     ...(r.stock != null && r.stock > 0 && r.stock <= crit ? { left: r.stock } : {}),
     desc: d.desc ?? '',
     badge: d.badge || undefined,
+    sub: d.subtitle || undefined,
     soon: !!r.soon,
     out: r.stock != null && r.stock <= 0,
     thumb: r.thumb || r.colors?.[0]?.img || '',

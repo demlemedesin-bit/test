@@ -5,7 +5,7 @@ import { useState } from 'react';
 type Col = { key?: string; name?: string; hex?: string; img?: string; imgs?: string[]; life?: string; thumb?: string };
 export type LCProduct = {
   slug: string; name: string; thumb: string; cat: string; price: string; was?: string; salePct?: number; left?: number;
-  out?: boolean; soon?: boolean; badge?: string; showColors?: boolean; colors: Col[];
+  out?: boolean; soon?: boolean; badge?: string; sub?: string; showColors?: boolean; colors: Col[];
 };
 
 const photos = (k?: Col) => [...new Set([k?.img || '', ...(k?.imgs ?? []), k?.life || ''].filter(Boolean))].slice(0, 6);
@@ -27,6 +27,7 @@ export default function ListingCard({ p }: { p: LCProduct }) {
           {p.out ? <span className="ls-tag">Tükendi</span> : p.soon ? <span className="ls-tag">Yakında</span> : p.badge ? <span className="ls-tag">{p.badge}</span> : null}
         </span>
         <span className="ls-name">{p.name}</span>
+        {p.sub ? <span className="ls-sub">{p.sub}</span> : null}
       </a>
       {sw ? (
         <span className="ls-sw" role="group" aria-label="Renk seç">

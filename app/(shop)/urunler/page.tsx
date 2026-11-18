@@ -64,7 +64,7 @@ export default async function Urunler({ searchParams }: { searchParams: Promise<
         <ul className="ls-grid">
           {list.map((p) => (
             <li key={p.slug}>
-              <ListingCard p={{ slug: p.slug, name: p.name, thumb: p.thumb, cat: p.cat, price: p.price, was: p.was || undefined, salePct: p.salePct || undefined, left: p.left || undefined, out: !!p.out, soon: !!p.soon, badge: p.badge || undefined, showColors: p.showColors, colors: p.colors.map((c) => ({ key: c.key, name: c.name, hex: c.hex, img: c.img, imgs: c.imgs, life: c.life, thumb: c.thumb })) }} />
+              <ListingCard p={{ slug: p.slug, name: p.name, thumb: p.thumb, cat: p.cat, price: p.price, was: p.was || undefined, salePct: p.salePct || undefined, left: p.left || undefined, out: !!p.out, soon: !!p.soon, badge: p.badge || undefined, sub: p.sub || undefined, showColors: p.showColors, colors: p.colors.map((c) => ({ key: c.key, name: c.name, hex: c.hex, img: c.img, imgs: c.imgs, life: c.life, thumb: c.thumb })) }} />
             </li>
           ))}
         </ul>

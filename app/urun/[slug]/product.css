@@ -178,3 +178,5 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .th-sum{ display:none; flex-basis:100%; font-size:var(--t-14); color:var(--ink-2); margin-top:4px; }
 @media (max-width: 900px){ .pp-thumbs button[data-i]{ display:none; } .th-sum{ display:none; } .pp-media #ppColors{ margin:14px 0 0; } }
 
+
+.pp-sub{ margin:6px 0 0; font-size:clamp(16px, 1.5vw, 22px); font-style:italic; color:var(--ink-2); }
