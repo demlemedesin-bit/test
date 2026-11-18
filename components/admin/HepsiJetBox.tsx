@@ -1,5 +1,6 @@
 'use client';
 
+import { trKargo } from '@/lib/hjStatus';
 import { useCallback, useEffect, useState } from 'react';
 import { FileText, Printer, RefreshCw, Truck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -204,7 +205,7 @@ export function HepsiJetBox({
         <>
           <p style={{ margin: '0 0 10px', fontSize: 13.5 }}>
             Barkod: <b className="mono">{ship.barcode}</b> · {ship.parcels} koli · {ship.desi ?? '—'} desi
-            · Durum: <b>{ship.last_status && ship.last_status !== 'OK' ? ship.last_status : 'Kurye bekleniyor'}</b>
+            · Durum: <b>{trKargo(ship.last_status)}</b>
           </p>
           <div className="actions">
             <button className="btn" disabled={!!busy} onClick={() => label('pdf')}><Printer size={15} /> {busy === 'pdf' ? 'Hazırlanıyor…' : 'Etiket (PDF)'}</button>

@@ -1,5 +1,6 @@
 'use client';
 
+import { trKargo } from '@/lib/hjStatus';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronRight, Download, FileText, Printer, Search, ShoppingBag, Truck, Undo2 } from 'lucide-react';
@@ -383,6 +384,7 @@ function Orders() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [nowTs, setNowTs] = useState(0);
   useEffect(() => { const t = setTimeout(() => setNowTs(Date.now()), 0); return () => clearTimeout(t); }, []);
+  const [kargo, setKargo] = useState<Record<string, string>>({});
   const { show, node } = useToast();
 
   const load = useCallback(async () => {
@@ -393,6 +395,10 @@ function Orders() {
     }
     setErr('');
     setOrders((data ?? []) as AdminOrder[]);
+    const { data: sh } = await supabase().from('hepsijet_shipments').select('order_no,last_status,env');
+    const m: Record<string, string> = {};
+    for (const s of (sh ?? []) as { order_no: string; last_status: string | null; env: string }[]) if (s.env === 'prod') m[s.order_no] = trKargo(s.last_status);
+    setKargo(m);
   }, []);
   useEffect(() => {
     const t = setTimeout(load, 0);
@@ -475,7 +481,7 @@ function Orders() {
                     <span className="cell-muted hide-m">{o.items.reduce((n, i) => n + i.qty, 0)} adet</span>
                     <span className="num">{tl(Number(o.total))}</span>
                     <span className="cell-muted hide-m">{PAY[o.payment_method]}</span>
-                    <span>{unpaidCard(o) ? <span className="badge b-red">Ödeme hatalı</span> : <span className={`badge ${STATUS_TONE[o.status]}`}>{STATUS[o.status]}</span>}</span>
+                    <span>{unpaidCard(o) ? <span className="badge b-red">Ödeme hatalı</span> : <><span className={`badge ${STATUS_TONE[o.status]}`}>{STATUS[o.status]}</span>{o.status === 'kargoda' && kargo[o.order_no] && <span className="cell-muted" style={{ display: 'block', fontSize: 11.5, marginTop: 2 }}>{kargo[o.order_no]}</span>}</>}</span>
                     <ChevronRight size={16} color="var(--tx3)" className="hide-m" />
                   </div>
                 ))}
