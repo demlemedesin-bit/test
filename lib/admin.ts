@@ -212,4 +212,35 @@ export async function uploadReelVideo(file: File): Promise<string> {
   return supabase().storage.from('reels-videos').getPublicUrl(name).data.publicUrl;
 }
 
+/** Videodan bir kare alıp kapak görseli olarak yükler (tarayıcıda; video dosyası ya da adresi). Başarısızsa null. */
+export async function coverFromVideo(src: File | string, folder = 'reels'): Promise<string | null> {
+  const url = typeof src === 'string' ? src : URL.createObjectURL(src);
+  const v = document.createElement('video');
+  try {
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.crossOrigin = 'anonymous';
+    v.src = url;
+    await new Promise<void>((res, rej) => {
+      const t = setTimeout(() => rej(new Error('zaman aşımı')), 60000);
+      v.onloadeddata = () => { clearTimeout(t); res(); };
+      v.onerror = () => { clearTimeout(t); rej(new Error('video açılamadı')); };
+    });
+    const at = Math.min(0.6, (v.duration || 1) / 3);
+    await new Promise<void>((res, rej) => { v.onseeked = () => res(); v.onerror = () => rej(new Error('kare alınamadı')); v.currentTime = at; });
+    const w = v.videoWidth, h = v.videoHeight;
+    if (!w || !h) return null;
+    const k = Math.min(1, 720 / Math.max(w, h));
+    const c = document.createElement('canvas');
+    c.width = Math.round(w * k); c.height = Math.round(h * k);
+    c.getContext('2d')!.drawImage(v, 0, 0, c.width, c.height);
+    const blob = await new Promise<Blob | null>((res) => c.toBlob(res, 'image/jpeg', 0.82));
+    if (!blob) return null;
+    return await uploadImage(new File([blob], 'kapak.jpg', { type: 'image/jpeg' }), folder);
+  } catch {
+    return null;
+  } finally {
+    v.removeAttribute('src'); v.load();
+    if (typeof src !== 'string') URL.revokeObjectURL(url);
+  }
+}
+
 export { uploadImageDetailed };

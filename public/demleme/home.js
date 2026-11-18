@@ -181,6 +181,8 @@
     var open=function(inner){ close(); box=document.createElement('div'); box.className='rl-modal'; box.innerHTML='<div class="rl-m-in"><button class="rl-m-x" type="button" aria-label="Kapat">\u00d7</button>'+inner+'</div>';
       box.addEventListener('click', function(ev){ if(ev.target===box || ev.target.closest('.rl-m-x')) close(); }); document.body.appendChild(box); document.documentElement.style.overflow='hidden'; };
     var hv=function(card,on){ var v=card.querySelector('.rl-vid'); if(!v) return;
+      clearTimeout(card._d); if(!on) card._w=0;
+      if(on && card.hasAttribute('data-i') && !card._w){ card._w=1; card._d=setTimeout(function(){ hv(card,true); card._w=0; }, 350); return; }   // sabit videolar büyük: fare yalnızca üstünden geçerken indirme başlatma
       if(on){ card._h=true; if(!v.getAttribute('src')) v.src=v.getAttribute('data-src'); v.muted=true; v.preload='auto';
         var show=function(){ if(card._h) card.classList.add('is-playing'); }; v.onplaying=show;   // kapak, video gerçekten oynamaya başlayana kadar görünür kalır
         var pr=v.play(); if(pr && pr.then) pr.then(show, function(){}); }
@@ -189,7 +191,7 @@
     rt.addEventListener('mouseout', function(e){ var c=e.target.closest('a.rl-card.has-v'); if(c && !(e.relatedTarget && c.contains(e.relatedTarget))) hv(c,false); });
     // Dokunmatik ekranda fare yok: kart görünür alana yeterince girince sessiz önizleme kendiliğinden oynar, uzaklaşınca durur
     (function(){ if(!window.IntersectionObserver || !matchMedia('(hover: none)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.connection && navigator.connection.saveData)) return;
-      var io=new IntersectionObserver(function(es){ es.forEach(function(en){ hv(en.target, en.isIntersecting && en.intersectionRatio>=.6); }); }, {threshold:[0,.6,1]});
+      var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.target.hasAttribute('data-i')) return; hv(en.target, en.isIntersecting && en.intersectionRatio>=.6); }); }, {threshold:[0,.6,1]});
       var seen=new WeakSet(), scan=function(){ [].forEach.call(rt.querySelectorAll('a.rl-card.has-v'), function(c){ if(!seen.has(c)){ seen.add(c); io.observe(c); } }); };
       scan(); new MutationObserver(scan).observe(rt,{childList:true}); })();
     // Sabit reels: tıklayınca site içinde dikey akış açılır; aşağı kaydırınca (ya da ok tuşuyla) sonraki video gelir
@@ -199,7 +201,7 @@
       box.classList.add('is-feed'); box.querySelector('.rl-m-in').classList.add('is-feed');
       var fd=box.querySelector('.rl-feed'), vids=[].slice.call(fd.querySelectorAll('video')), cur=-1;
       var load=function(i){ var v=vids[i]; if(v && !v.getAttribute('src')) v.src=v.getAttribute('data-src'); };
-      var go=function(i){ if(i===cur) return; cur=i; vids.forEach(function(v,k){ if(k!==i){ try{ v.pause(); }catch(e){} } }); load(i); load(i+1);
+      var go=function(i){ if(i===cur) return; cur=i; vids.forEach(function(v,k){ if(k!==i){ try{ v.pause(); }catch(e){} } }); load(i);
         var v=vids[i]; v.muted=false; var pr=v.play(); if(pr && pr.catch) pr.catch(function(){ v.muted=true; var p2=v.play(); if(p2 && p2.catch) p2.catch(function(){}); }); };
       fd.addEventListener('click', function(ev){ var v=ev.target.closest('.rl-fi') && ev.target.closest('.rl-fi').querySelector('video'); if(!v) return; if(v.paused){ v.play().catch(function(){}); } else v.pause(); });
       fd.addEventListener('keydown', function(ev){ if(ev.key==='ArrowDown'||ev.key==='PageDown'){ ev.preventDefault(); fd.scrollBy({top:fd.clientHeight, behavior:'smooth'}); } else if(ev.key==='ArrowUp'||ev.key==='PageUp'){ ev.preventDefault(); fd.scrollBy({top:-fd.clientHeight, behavior:'smooth'}); } });
@@ -434,7 +436,7 @@
     var fxFill=function(){ var lab=rname.previousSibling; if(lab && lab.nodeType===3) lab.nodeValue='Konuklarımızdan'; rname.textContent='';
       var esc=function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
       track._fx=FX;
-      track.innerHTML=FX.map(function(r,i){ var cov=r.c ? '<img class="rl-cover" src="'+esc(r.c)+'" alt="" loading="lazy">' : '<video class="rl-cover rl-still" src="'+esc(r.v)+'#t=0.1" preload="metadata" muted playsinline aria-hidden="true"></video>';
+      track.innerHTML=FX.map(function(r,i){ var cov=r.c ? '<img class="rl-cover" src="'+esc(r.c)+'" alt="" loading="lazy">' : '<span class="rl-cover rl-ph" aria-hidden="true"></span>';
         return '<a class="rl-card has-v" href="#" role="button" data-i="'+i+'" data-v="'+esc(r.v)+'" aria-label="'+esc(r.n||'Konuk')+' videosunu oynat">'+cov+'<video class="rl-vid" data-src="'+esc(r.v)+'" muted loop playsinline preload="none" aria-hidden="true"></video><img class="rl-play" src="/demleme/04-konuklar/svg/icon-play.svg" alt="">'+(r.n?'<span class="rl-name">'+esc(r.n)+'</span>':'')+'</a>'; }).join('');
       track.scrollLeft=0; track.dispatchEvent(new Event('scroll')); };
     // Instagram modu: şerit konuktan bağımsız, hesabın son reels'lerini gösterir (bir kez doldurulur)

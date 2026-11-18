@@ -41,6 +41,7 @@ export default function Content() {
   const [faq, setFaq] = useState<Faq[]>(DEFAULT_FAQ);
   const [guests, setGuests] = useState<Guest[]>(DEFAULT_GUESTS);
   const [fixedReels, setFixedReels] = useState<FixedReel[]>([]);
+  const [coverBusy, setCoverBusy] = useState(false);
   const [dm, setDm] = useState<Demleyen>(DEFAULT_DM);
   const [footer, setFooter] = useState<FooterData>(DEFAULT_FOOTER);
   const [busy, setBusy] = useState(false);
@@ -223,10 +224,14 @@ export default function Content() {
                         if (!f) return;
                         try {
                           show('Video yükleniyor…');
-                          const { uploadReelVideo } = await import('@/lib/admin');
+                          const { uploadReelVideo, coverFromVideo } = await import('@/lib/admin');
                           const url = await uploadReelVideo(f);
                           setFixedReels((a) => setAt(a, ri, { video: url }));
-                          show('Video yüklendi. Kaydetmeyi unutma.');
+                          const mb = f.size / 1048576;
+                          show(mb > 12 ? `Video yüklendi ama ${mb.toFixed(0)} MB, site yavaşlar. 720p ve en çok ~8 MB'a küçültüp yüklemeni öneririm. Kapak hazırlanıyor…` : 'Video yüklendi, kapak hazırlanıyor…');
+                          const cv = await coverFromVideo(f);
+                          if (cv) setFixedReels((a) => (a[ri] && !a[ri].cover ? setAt(a, ri, { cover: cv }) : a));
+                          show(cv ? 'Video ve kapak hazır. Kaydetmeyi unutma.' : 'Video yüklendi; kapak otomatik alınamadı, elle kapak yükle. Kaydetmeyi unutma.', !cv);
                         } catch (x) { show('Yüklenemedi: ' + (x instanceof Error ? x.message : ''), true); }
                       }} />
                     </label>
@@ -248,6 +253,25 @@ export default function Content() {
                   </div>
                 ))}
                 <AddBtn onClick={() => setFixedReels((a) => [...a, { name: '', video: '' }])}>Video ekle</AddBtn>
+                {fixedReels.some((r) => r.video && !r.cover) && (
+                  <div style={{ marginTop: 12 }}>
+                    <button type="button" className="btn ghost sm" disabled={coverBusy} onClick={async () => {
+                      setCoverBusy(true);
+                      const { coverFromVideo } = await import('@/lib/admin');
+                      let ok = 0, fail = 0;
+                      for (let i = 0; i < fixedReels.length; i++) {
+                        const r = fixedReels[i];
+                        if (!r.video || r.cover) continue;
+                        show(`Kapak hazırlanıyor… (${i + 1}/${fixedReels.length})`);
+                        const cv = await coverFromVideo(r.video);
+                        if (cv) { ok++; setFixedReels((a) => (a[i] && a[i].video === r.video ? setAt(a, i, { cover: cv }) : a)); } else fail++;
+                      }
+                      setCoverBusy(false);
+                      show(fail ? `${ok} kapak hazır, ${fail} video için alınamadı (elle yükle). Kaydetmeyi unutma.` : `${ok} kapak hazır. Kaydetmeyi unutma.`, !!fail);
+                    }}>{coverBusy ? 'Kapaklar hazırlanıyor…' : 'Eksik kapakları otomatik oluştur'}</button>
+                    <p className="hint" style={{ marginTop: 6 }}>Kapağı olmayan videolar sayfa açılırken tüm videoyu indirmeye çalışıp siteyi yavaşlatır. Bu düğme her videodan bir kare alıp kapak yapar (ilk seferde videolar tarayıcıda açıldığı için birkaç dakika sürebilir). Sonra Kaydet'e bas.</p>
+                  </div>
+                )}
               </section>
               {guests.map((g, gi) => (
                 <section className="card" key={gi} style={{ marginBottom: 14 }}>
