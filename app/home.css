@@ -141,9 +141,10 @@ a:active .dbtn, button:not([disabled]):active .dbtn{ transform:translateY(1px); 
 /* sehpa version: the photos lie on the tray of the Demleme sehpa. #dmTray is a square plane over the tray's top surface,
    squashed to the tray's perspective (scaleY = tray depth / width, measured on the product image) */
 .dm-top--sehpa{ grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr); gap:clamp(24px, 4vw, 72px); align-items:center; }
-.dm-sehpa{ position:relative; max-width:720px; width:100%; justify-self:center; }
+.dm-sehpa{ position:relative; max-width:600px; width:100%; justify-self:center; }
 .dm-sehpa-img{ display:block; width:100%; height:auto; }
-.dm-tray{ position:absolute; left:3.545%; top:-8.72%; width:92.73%; aspect-ratio:1; transform:scaleY(0.7); transform-origin:50% 50%; container-type:inline-size; }
+.dm-tray{ position:absolute; left:0.4%; top:0.76%; width:97.3%; aspect-ratio:1; transform:scaleY(0.705);   /* yeni dikey sehpa görseli (997×1578): tepsi elipsi x 4–974, y 155–840 */
+  transform-origin:50% 50%; container-type:inline-size; }
 .dm-tray .dm-pol{ position:absolute; transform-origin:50% 50%; width:22cqw; padding:1.1cqw 1.1cqw 0; box-shadow:0 .5cqw 1cqw rgba(60,24,18,.2); transition:rotate 450ms cubic-bezier(.3,1.4,.5,1); }
 .dm-tray .dm-pol:hover{ rotate:2.5deg; }
 .dm-tray .dm-cap{ height:5.4cqw; font-size:2.5cqw; gap:1cqw; } .dm-tray .dm-cap img{ width:2.4cqw; }

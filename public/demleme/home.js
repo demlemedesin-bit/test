@@ -487,7 +487,7 @@
     var D=JSON.parse(dataEl.textContent), P=D.photos, pols=[], ICON={heart:'/demleme/05-demleyenler/svg/heart-outline.svg', mug:'/demleme/05-demleyenler/svg/icon-mug.svg'};
     var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
     // on the tray: centre of each polaroid in tray units (tray radius = 620, 0,0 = centre; +y = towards the viewer) and its turn
-    var TRAY=[[-300,-240,-10],[300,-250,8],[-380,100,-6],[380,95,9],[0,410,-3]];
+    var TRAY=[[-345,-170,-9],[345,-175,8],[-330,230,-6],[330,235,9],[0,430,-3]];
     var tilt=function(i){ return tray ? (TRAY[i%TRAY.length][2]) : (P[i].tilt||0); };
     var mo=document.getElementById('dmMonth'); if(mo) mo.textContent=D.month;
     P.forEach(function(p,i){ var b=document.createElement('button'); b.type='button'; b.className='dm-pol'; b.setAttribute('aria-label', p.name+' / '+p.city+' — büyüt');
