@@ -285,6 +285,10 @@
         e.addEventListener('mouseenter', function(){ life(false); swap(imgOf(i)); });
         e.addEventListener('click', function(){ sel=i; sws.forEach(function(x,j){ x.classList.toggle('is-on', j===i); }); swap(imgOf(i)); if(btn){ btn.setAttribute('data-color', e.getAttribute('data-key')||''); btn.setAttribute('data-img', imgOf(i)); } });
       });
+      // renk görselleri ilk üzerine gelişte beklemesin: kart görününce ve nokta alanına girince önceden yükle
+      var pre=function(){ if(pre.d) return; pre.d=1; sws.forEach(function(e){ var u=e.getAttribute('data-img'); if(u){ var x=new Image(); x.decoding='async'; x.src=u; } }); };
+      if(box){ box.addEventListener('mouseenter', pre); box.addEventListener('touchstart', pre, {passive:true}); }
+      card.addEventListener('mouseenter', pre);
       if(box) box.addEventListener('mouseleave', function(){ swap(imgOf(sel)); });
     });
   })();
