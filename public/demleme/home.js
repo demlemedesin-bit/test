@@ -282,10 +282,13 @@
       var swap=function(u){ clearTimeout(t); if(!u) return; if(im.getAttribute('src')===u){ im.style.opacity=''; return; } im.style.opacity='0'; t=setTimeout(function(){ im.src=u; im.style.opacity=''; },130); };
       var life=function(on){ var u=lifeOf(); if(on && !u) return; if(!layer){ if(!on) return; layer=document.createElement('img'); layer.className='sh-life'; layer.alt=''; th.appendChild(layer); }
         if(on){ if(layer.getAttribute('src')!==u) layer.src=u; requestAnimationFrame(function(){ layer.classList.add('on'); }); } else layer.classList.remove('on'); };
+      // mobil: kartta ürünün kendi fotoğrafları kaydırılır; renk seçilince o rengin fotoğrafları gelir
+      var gal=function(e){ var g=th.querySelector('.sh-gal'); if(!e||!g) return; var l=[]; try{ l=JSON.parse(e.getAttribute('data-photos')||'[]'); }catch(_){} if(!l.length) return;
+        g.innerHTML=''; l.forEach(function(u){ var m=document.createElement('img'); m.src=u; m.alt=im.alt||''; m.loading='lazy'; m.draggable=false; g.appendChild(m); }); g.scrollLeft=0; };
       th.addEventListener('mouseenter', function(){ life(true); }); th.addEventListener('mouseleave', function(){ life(false); });
       sws.forEach(function(e,i){
         e.addEventListener('mouseenter', function(){ life(false); swap(imgOf(i)); });
-        e.addEventListener('click', function(){ sel=i; sws.forEach(function(x,j){ x.classList.toggle('is-on', j===i); }); swap(imgOf(i)); if(btn){ btn.setAttribute('data-color', e.getAttribute('data-key')||''); btn.setAttribute('data-img', imgOf(i)); } });
+        e.addEventListener('click', function(){ sel=i; sws.forEach(function(x,j){ x.classList.toggle('is-on', j===i); }); swap(imgOf(i)); gal(e); if(btn){ btn.setAttribute('data-color', e.getAttribute('data-key')||''); btn.setAttribute('data-img', imgOf(i)); } });
       });
       // renk görselleri ilk üzerine gelişte beklemesin: kart görününce ve nokta alanına girince önceden yükle
       var pre=function(){ if(pre.d) return; pre.d=1; sws.forEach(function(e){ var u=e.getAttribute('data-img'); if(u){ var x=new Image(); x.decoding='async'; x.src=u; } }); };

@@ -82,9 +82,11 @@ const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 /** Ana sayfadaki mağaza şeridi kartları (ürünler veritabanından). */
 export function shopCards(list: SiteProduct[]): string {
+  const photos = (k?: { img?: string; imgs?: string[]; life?: string }) => [...new Set([k?.img || '', ...(k?.imgs ?? []), k?.life || ''].filter(Boolean))].slice(0, 6);
   return list
     .map((p) => {
       const c0 = p.colors[0];
+      const gal0 = photos(c0);
       const choose = p.colors.length > 1 || p.sizes?.pick || p.soon || p.out;
       const tag = p.soon
         ? ' <span class="sh-tag">Yakında</span>'
@@ -93,8 +95,8 @@ export function shopCards(list: SiteProduct[]): string {
           : (p.was ? ` <span class="sh-sale">-%${p.salePct ?? ''}</span>` : '') + (p.left ? ` <span class="sh-low">Son ${p.left} adet</span>` : '');
       const priceHtml = p.was && !p.out && !p.soon ? `<s>${esc(p.was)}</s> <b class="sh-now">${esc(p.price)}</b>` : esc(p.price);
       return `            <article class="sh-card" data-cat="${esc(p.shopCat)}">
-              <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb"${c0?.life ? ` data-life="${esc(c0.life)}"` : ''}><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy"></div>
-              <p class="sh-name">${esc(p.name)}${tag}</p></a>${(p.showColors ?? p.colors.length > 1) && p.colors.length > 0 ? `<span class="sh-sw" aria-label="${p.colors.length} renk">${p.colors.slice(0, 6).map((k) => `<i${k === c0 ? ' class="is-on"' : ''} style="--c:${esc(k.hex || '#ccc')}" title="${esc(k.name || '')}" data-key="${esc(k.key || '')}" data-img="${esc(k.thumb || k.img || '')}"${k.life ? ` data-life="${esc(k.life)}"` : ''}></i>`).join('')}${p.colors.length > 6 ? `<em>+${p.colors.length - 6}</em>` : ''}</span>` : ''}<p class="sh-price">${priceHtml}</p>
+              <a class="sh-link" href="/urun/${esc(p.slug)}"><div class="sh-thumb${gal0.length ? ' has-gal' : ''}"${c0?.life ? ` data-life="${esc(c0.life)}"` : ''}><img src="${esc(p.thumb)}" alt="${esc(p.name)}" loading="lazy">${gal0.length ? `<div class="sh-gal">${gal0.map((u) => `<img src="${esc(u)}" alt="${esc(p.name)}" loading="lazy" draggable="false">`).join('')}</div>` : ''}</div>
+              <p class="sh-name">${esc(p.name)}${tag}</p></a>${(p.showColors ?? p.colors.length > 1) && p.colors.length > 0 ? `<span class="sh-sw" aria-label="${p.colors.length} renk">${p.colors.slice(0, 6).map((k) => `<i${k === c0 ? ' class="is-on"' : ''} style="--c:${esc(k.hex || '#ccc')}" title="${esc(k.name || '')}" data-key="${esc(k.key || '')}" data-img="${esc(k.thumb || k.img || '')}" data-photos="${esc(JSON.stringify(photos(k)))}"${k.life ? ` data-life="${esc(k.life)}"` : ''}></i>`).join('')}${p.colors.length > 6 ? `<em>+${p.colors.length - 6}</em>` : ''}</span>` : ''}<p class="sh-price">${priceHtml}</p>
               <button type="button" class="link link-muted add-to-cart" data-name="${esc(p.name)}" data-price="${esc(p.price)}" data-slug="${esc(p.slug)}" data-color="${esc(c0?.key ?? '')}" data-img="${esc(c0?.img ?? p.thumb)}"${choose ? ' data-choose="1"' : ''}>Sepete ekle <svg class="icon"><use href="#i-plus"/></svg></button>
             </article>`;
     })

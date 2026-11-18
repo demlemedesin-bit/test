@@ -808,3 +808,14 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 @media (max-width: 768px){ .rl-modal.is-feed{ padding:0; } .rl-modal.is-feed .rl-m-in{ width:100%; height:100vh; height:100dvh; max-height:none; border-radius:0; border:0; } .rl-fi{ height:100vh; height:100dvh; } }
 
 .rl-ph{ background:linear-gradient(160deg,#2a231c,#17130F); }   /* kapağı olmayan video: videoyu indirmeden koyu zemin */
+
+/* Mobil: kartta arka planı kaldırılmış kapak yerine ürünün kendi fotoğrafları, yana kaydırılır */
+.sh-gal{ display:none; }
+@media (max-width:760px){
+  .sh-thumb.has-gal{ padding:0; }
+  .sh-thumb.has-gal > img:not(.sh-life){ display:none; }
+  .sh-thumb.has-gal img.sh-life{ display:none; }
+  .sh-thumb.has-gal .sh-gal{ display:flex; position:absolute; inset:0; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; overscroll-behavior-x:contain; }
+  .sh-thumb.has-gal .sh-gal::-webkit-scrollbar{ display:none; }
+  .sh-thumb.has-gal .sh-gal img{ flex:0 0 100%; width:100%; height:100%; max-width:none; max-height:none; object-fit:cover; scroll-snap-align:center; filter:none; opacity:1; -webkit-user-drag:none; }
+}
