@@ -12,7 +12,7 @@ type Bio = { name: string; slug: string; bio: string[] };
 const BIOS: Bio[] = JSON.parse(readFileSync(join(process.cwd(), 'content/konuk-profilleri.json'), 'utf8'));
 const paras = (t: string) => t.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
 
-/** Profili olan konuklar. Panelde yazılan metin/fotoğraf varsa o, yoksa Garen'in belgesindeki varsayılan metin geçerli. */
+/** Profili olan konuklar (yalnızca panelde kayıtlı olanlar). Panelde metin yazılmışsa o, yoksa aynı adlı konuk için Garen'in belgesindeki varsayılan metin geçerli. */
 export async function getProfiles(): Promise<Profile[]> {
   const site = await getSite();
   const out: Profile[] = [];
@@ -27,7 +27,7 @@ export async function getProfiles(): Promise<Profile[]> {
     seen.add(slug);
     out.push({ name: g.name.trim(), slug, bio, img: DRAWINGS.includes(g.drawing) ? `${KONUK}guests/${g.drawing}-720.webp` : null, photo: (g.photos ?? []).filter(Boolean)[0] ?? null, photos: (g.photos ?? []).filter(Boolean).slice(1), videos: [...new Set((g.videos ?? '').split(/\s+/).map((u) => parseVideo(u)?.yt).filter((x): x is string => !!x))] });
   }
-  for (const b of BIOS) if (!seen.has(b.slug)) out.push({ name: b.name, slug: b.slug, bio: b.bio, img: null, photo: null, photos: [], videos: [] });
+  // Panelde olmayan (silinmiş ya da hiç eklenmemiş) konuklar artık yedekten geri eklenmez: sayfada yalnızca panelde yazılan konuklar görünür.
   return out;
 }
 
