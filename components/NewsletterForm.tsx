@@ -1,7 +1,6 @@
 'use client';
 
 import { useId, useState, type FormEvent } from 'react';
-import { supabase } from '@/lib/supabase';
 import { DEFAULT_CONSENT, markSubscribed } from '@/lib/popups';
 import './Popups.css';
 
@@ -34,6 +33,7 @@ export function NewsletterForm({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [done, setDone] = useState(false);
+  const [already, setAlready] = useState(false);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -48,9 +48,19 @@ export function NewsletterForm({
     }
     setBusy(true);
     try {
-      const { error } = await supabase().rpc('subscribe_newsletter', { p_email: email.trim().toLowerCase(), p_source: source.slice(0, 40) });
-      if (error) throw error;
+      const r = await fetch('/api/bulten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), source: source.slice(0, 40), consent: true }),
+      });
+      const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; already?: boolean };
+      if (!r.ok || !j.ok) {
+        setErr(j.error || 'Kaydın alınamadı. Biraz sonra tekrar dene.');
+        setBusy(false);
+        return;
+      }
       markSubscribed();
+      setAlready(!!j.already);
       setDone(true);
       onSuccess?.();
     } catch {
@@ -62,7 +72,7 @@ export function NewsletterForm({
   if (done) {
     return (
       <p className={`nl-ok nl--${tone}`} role="status">
-        Teşekkürler! Aboneliğin alındı.
+        {already ? 'Bu adres zaten abone.' : 'Teşekkürler! E-postana bir onay bağlantısı gönderdik. Bağlantıya tıkladığında kaydın tamamlanır. Gelmediyse gereksiz klasörüne de bak.'}
       </p>
     );
   }
@@ -94,11 +104,14 @@ export function NewsletterForm({
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>
           {(consentText || '').trim() || DEFAULT_CONSENT}{' '}
-          <a href="/kvkk" target="_blank" rel="noopener">
-            KVKK metni
+          <a href="/acik-riza-ticari-ileti" target="_blank" rel="noopener">
+            İzin metni
           </a>
         </span>
       </label>
+      <p className="nl-note">
+        E-posta adresin bu amaçla <a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a> kapsamında işlenir. İznini istediğin zaman geri alabilirsin.
+      </p>
       {err && (
         <p className="nl-err" id={`${uid}-err`} role="alert">
           {err}

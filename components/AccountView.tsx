@@ -166,7 +166,44 @@ function Profile({ userId, profile, onSaved }: { userId: string; profile: { full
           {busy ? 'Kaydediliyor…' : 'Kaydet'}
         </button>
       </form>
+      <MarketingPref />
       <PasswordForm />
+    </div>
+  );
+}
+
+function MarketingPref() {
+  const [on, setOn] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  useEffect(() => {
+    supabase()
+      .rpc('my_marketing_pref')
+      .then(({ data }) => setOn(data === true));
+  }, []);
+  async function toggle(next: boolean) {
+    setBusy(true);
+    setMsg(null);
+    const { error } = await supabase().rpc('set_marketing_pref', { p_on: next });
+    setBusy(false);
+    if (error) return setMsg({ kind: 'err', text: 'Tercihin kaydedilemedi. Tekrar dene.' });
+    setOn(next);
+    setMsg({ kind: 'ok', text: next ? 'Kampanya e-postaları açıldı.' : 'Kampanya e-postaları kapatıldı.' });
+  }
+  return (
+    <div className="form">
+      <h2 className="section-h">E-posta tercihi</h2>
+      {msg && <Alert kind={msg.kind}>{msg.text}</Alert>}
+      <label className="check">
+        <input type="checkbox" checked={on === true} disabled={on === null || busy} onChange={(e) => toggle(e.target.checked)} />
+        <span>
+          Kampanya ve yeni ürün e-postaları (ticari elektronik ileti) almak istiyorum.{' '}
+          <Link href="/acik-riza-ticari-ileti" target="_blank">
+            İzin metni
+          </Link>
+        </span>
+      </label>
+      <p className="hint" style={{ margin: 0, fontSize: 13 }}>Sipariş, ödeme ve kargo bilgilendirmeleri bu tercihten bağımsız olarak gönderilir.</p>
     </div>
   );
 }

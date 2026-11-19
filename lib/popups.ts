@@ -73,7 +73,7 @@ export const BGS: { key: PopupBg; label: string }[] = [
   { key: 'accent', label: 'Vurgu (kırmızı)' },
 ];
 
-export const DEFAULT_CONSENT = 'Kampanya ve yeni ürün e-postaları almayı kabul ediyorum. KVKK aydınlatma metnini okudum.';
+export const DEFAULT_CONSENT = 'Kampanya ve yeni ürün e-postaları (ticari elektronik ileti) almak istiyorum.';
 
 export const emptyPopup = (): Popup => ({
   id: newId(),

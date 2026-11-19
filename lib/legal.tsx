@@ -75,7 +75,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
             <li>Siparişler, ödemenin onaylanmasından (havale/EFT’de ödemenin hesabımıza geçmesinden) itibaren 2–4 iş gününde kargoya verilir.</li>
             <li>Demleme Sehpası siparişle üretilir; bu ürün 7–10 iş gününde kargoya verilir. Sepette birden fazla ürün varsa, aksini belirtmedikçe siparişin tamamı en uzun süreli ürüne göre gönderilir.</li>
             <li>Her durumda sözleşmedeki teslim süresi, siparişin verildiği tarihten itibaren en geç 30 gündür (Mesafeli Sözleşmeler Yönetmeliği m. 20).</li>
-            <li>Gönderiler UPS Kargo ile Türkiye içindeki adrese teslim edilir. Sipariş kargoya verildiğinde durumu “Kargoda” olarak güncellenir ve takip numarası e-postanla paylaşılır; sipariş takibi sayfasından ya da hesabından da izleyebilirsin.</li>
+            <li>Gönderiler HepsiJET ile Türkiye içindeki adrese teslim edilir. Sipariş kargoya verildiğinde durumu “Kargoda” olarak güncellenir ve takip numarası e-postanla paylaşılır; sipariş takibi sayfasından ya da hesabından da izleyebilirsin.</li>
             <li>
               {freeFrom} ₺ ve üzeri siparişlerde kargo ücretsizdir. Bu tutarın altındaki siparişlerde kargo ücreti sepet ve ödeme sayfasında, sipariş vermeden önce ayrıca gösterilir.
             </li>
@@ -98,7 +98,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
               Cayma bildirimini, sipariş numaranla birlikte <Mail /> adresine yaz (aşağıdaki cayma formunu kullanabilirsin; form kullanmak zorunlu değildir, açık bir bildirim yeterlidir). Bildirim süre dolmadan
               bize ulaşmalıdır.
             </li>
-            <li>Bildirimden sonra 10 gün içinde ürünü bize UPS Kargo ile geri gönder. Gönderim bilgilerini ve iade kodunu yazışmada ayrıca iletiriz.</li>
+            <li>Bildirimden sonra 10 gün içinde ürünü bize kargo ile geri gönder. Gönderim bilgilerini ve iade kodunu yazışmada ayrıca iletiriz.</li>
             <li>Ürünü, kullanılmamış, yeniden satılabilir durumda; etiketi, aksesuarı ve mümkünse orijinal ambalajıyla gönder. Ürünün niteliği ve işleyişini belirlemek için gerekli olandan fazla kullanılmasından doğan değer kaybı, alıcıya yansıtılabilir.</li>
             <li>
               Cayma bildiriminin bize ulaşmasından itibaren en geç 14 gün içinde ürün bedelini ve (standart teslimat dışında bir seçenek istemediysen) ilk teslimat masraflarını, ödemeyi yaptığın yöntemle iade ederiz. Ürün bize
@@ -288,7 +288,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
               </tr>
               <tr>
                 <th>Pazarlama</th>
-                <td>Bülten ve ticari ileti tercihi, çerez ve izleme verileri (yalnızca onay verildiyse)</td>
+                <td>Bülten ve ticari ileti tercihi (onay tarihi, kaynağı ve metni, e-posta doğrulama zamanı), tarayıcı bildirimi anahtarı (yalnızca izin verdiysen), çerez ve izleme verileri (yalnızca onay verildiyse)</td>
               </tr>
               <tr>
                 <th>Finans</th>
@@ -343,13 +343,13 @@ export function legalDocs(config: ShopConfig): Doc[] {
           <p>Kişisel verilerin, yukarıdaki amaçlarla sınırlı olarak ve KVKK’nın 8. ve 9. maddelerine uygun şekilde aşağıdaki alıcı gruplarına aktarılabilir:</p>
           <ul>
             <li>
-              <strong>Kargo ve lojistik:</strong> siparişi teslim eden kargo firması (UPS Kargo); ad soyad, telefon, teslimat adresi ve sipariş bilgisi.
+              <strong>Kargo ve lojistik:</strong> siparişi teslim eden kargo firması (HepsiJET); ad soyad, telefon, teslimat adresi ve sipariş bilgisi.
             </li>
             <li>
-              <strong>Ödeme kuruluşları ve bankalar:</strong> kartla ödemede lisanslı ödeme kuruluşu; ödemenin gerçekleştirilmesi için gerekli veriler.
+              <strong>Ödeme kuruluşları ve bankalar:</strong> kartla ödemede lisanslı ödeme kuruluşu (Paynkolay);  ödemenin gerçekleştirilmesi için gerekli veriler.
             </li>
             <li>
-              <strong>Altyapı ve hizmet sağlayıcılar:</strong> sitenin barındırılması, veritabanı ve üyelik hizmeti, e-posta ve SMS gönderimi, yedekleme ve güvenlik hizmeti aldığımız şirketler (veri işleyen sıfatıyla, talimatlarımız doğrultusunda).
+              <strong>Altyapı ve hizmet sağlayıcılar</strong> (veri işleyen sıfatıyla, talimatlarımız doğrultusunda): site barındırma için Vercel Inc. (ABD); veritabanı, üyelik ve dosya depolama için Supabase (Hindistan, Mumbai bölgesi); e-posta gönderimi için SMTP2GO (Avrupa Birliği sunucuları); yazı tipleri için Adobe Fonts ve Google Fonts; gömülü videolar için YouTube. Tarayıcı bildirimine izin verirsen bildirim, tarayıcının kendi bildirim servisi (Google, Apple veya Mozilla) üzerinden iletilir.
             </li>
             <li>
               <strong>Mali müşavir, avukat, denetçi:</strong> muhasebe ve hukuki süreçlerin yürütülmesi için.
@@ -432,7 +432,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
 
           <h2>4. Üçüncü taraf hizmetler</h2>
           <p>
-            Sitenin çalışması için barındırma, veritabanı ve üyelik, e-posta gönderimi, (etkinleştirildiğinde) SMS ve ödeme altyapısı, kargo ve yazı tipi sağlayıcıları gibi hizmet sağlayıcılarla çalışırız. Bu sağlayıcılar
+            Sitenin çalışması için barındırma, veritabanı ve üyelik, e-posta gönderimi ve ödeme altyapısı, kargo ve yazı tipi sağlayıcıları gibi hizmet sağlayıcılarla çalışırız. Bu sağlayıcılar
             verileri yalnızca bizim adımıza ve belirtilen amaçla işler. Yazı tipleri Google Fonts ve Adobe Fonts’tan yüklenir; bu hizmetler sayfayı açtığında IP adresini görebilir. Çerez onayı verdiysen analiz ve reklam
             ölçüm araçları (Google Analytics, Meta Pixel vb.) da kullanılabilir; ayrıntı için Çerez Politikası’na bak. Sitede bağlantı verilen üçüncü taraf sitelerin gizlilik uygulamalarından sorumlu değiliz.
           </p>
@@ -609,12 +609,15 @@ export function legalDocs(config: ShopConfig): Doc[] {
           <h2>1. Kapsam</h2>
           <p>
             Bültene kaydolarak veya üyelik/sipariş sırasında ilgili kutuyu işaretleyerek; 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun ve Ticari İletişim ve Ticari Elektronik İletiler Hakkında Yönetmelik
-            kapsamında, e-posta adresine (ve ayrıca onay verdiysen telefon numarana SMS ile) {s.name} tarafından yeni bölüm duyuruları, konuk haberleri, yeni ürün ve stok bilgileri, kampanya ve indirim iletileri
-            gönderilmesine onay vermiş olursun.
+            kapsamında, e-posta adresine {s.name} tarafından yeni bölüm duyuruları, konuk haberleri, yeni ürün ve stok bilgileri, kampanya ve indirim iletileri
+            gönderilmesine onay vermiş olursun. Sepetinde ürün unutursan gönderilen hatırlatma e-postası da bu iznin kapsamındadır; izin vermediysen böyle bir e-posta almazsın.
           </p>
 
           <h2>2. İletilerin sıklığı ve içeriği</h2>
-          <p>E-posta bülteni en fazla haftada bir kez gönderilir. İletilerde göndericinin kimliği ve ret bağlantısı yer alır.</p>
+          <p>E-posta bülteni en fazla haftada bir kez gönderilir. İletilerde göndericinin kimliği ve tek tıkla kullanabileceğin ret bağlantısı yer alır. SMS ile ticari ileti gönderilmez.</p>
+
+<h2>2.1. E-posta doğrulaması</h2>
+<p>Bültene kayıt olduğunda e-posta adresine bir onay bağlantısı göndeririz. Bağlantıya tıklayıp adresini doğrulamadığın sürece sana ticari ileti gönderilmez. Üyelikte ticari ileti kutusunu işaretlediysen izin, e-posta adresini doğruladığında geçerli olur. Tercihini hesabım sayfasından da değiştirebilirsin.</p>
 
           <h2>3. İzni geri alma (ret hakkı)</h2>
           <p>
@@ -629,7 +632,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
           </p>
 
           <h2>5. Onay kaydı</h2>
-          <p>Verdiğin onayın ispatı için kaydın tarihi ve kaynağı tutulur. Bu onay, aksini belirtmedikçe geri alınana kadar geçerlidir.</p>
+          <p>Verdiğin onayın ispatı için onay tarihi, kaynağı (örn. altbilgi formu, üyelik formu), onay metni ve e-posta doğrulama zamanı tutulur. Bu onay, aksini belirtmedikçe geri alınana kadar geçerlidir.</p>
           <p className="small">Son güncelleme: {UPDATED}</p>
         </>
       ),

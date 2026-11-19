@@ -84,6 +84,7 @@ export function RegisterForm() {
   const { user, loading } = useAuth();
   const [v, setV] = useState({ full_name: '', email: '', phone: '', password: '', password2: '' });
   const [agree, setAgree] = useState(false);
+  const [marketing, setMarketing] = useState(false);
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -111,7 +112,7 @@ export function RegisterForm() {
     const { data, error } = await supabase().auth.signUp({
       email: v.email.trim(),
       password: v.password,
-      options: { data: { full_name: v.full_name.trim(), phone: v.phone.trim() }, emailRedirectTo: `${location.origin}/giris` },
+      options: { data: { full_name: v.full_name.trim(), phone: v.phone.trim(), ...(marketing ? { marketing: 'true' } : {}) }, emailRedirectTo: `${location.origin}/giris` },
     });
     setBusy(false);
     if (error) {
@@ -158,13 +159,26 @@ export function RegisterForm() {
           <Link href="/kullanim-sartlari" target="_blank">
             Kullanım şartlarını
           </Link>{' '}
-          ve{' '}
-          <Link href="/kvkk" target="_blank">
-            KVKK aydınlatma metnini
-          </Link>{' '}
           okudum, kabul ediyorum.
         </span>
       </label>
+      <label className="check">
+        <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
+        <span>
+          Kampanya ve yeni ürün e-postaları (ticari elektronik ileti) almak istiyorum.{' '}
+          <Link href="/acik-riza-ticari-ileti" target="_blank">
+            İzin metni
+          </Link>{' '}
+          (isteğe bağlı, işaretlemezsen üyeliğin etkilenmez.)
+        </span>
+      </label>
+      <p className="hint" style={{ margin: '0 0 16px', fontSize: 13 }}>
+        Kişisel verilerin{' '}
+        <Link href="/kvkk" target="_blank">
+          KVKK Aydınlatma Metni
+        </Link>{' '}
+        kapsamında işlenir.
+      </p>
       {errs.agree && <p className="fld-err" style={{ marginTop: -8, marginBottom: 16 }}>{errs.agree}</p>}
       <button className="btn btn--solid btn--block" type="submit" disabled={busy}>
         {busy ? 'Hesabın oluşturuluyor…' : 'Üye ol'}

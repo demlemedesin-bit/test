@@ -35,7 +35,7 @@ export function renderTemplate(str: string, vars: Record<string, string>): strin
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e)).slice(0, 300);
 
-export async function sendEmail(p: { to: string; subject: string; text: string }): Promise<SendResult> {
+export async function sendEmail(p: { to: string; subject: string; text: string; headers?: { header: string; value: string }[] }): Promise<SendResult> {
   // SMTP2GO HTTP API: SMTP2GO_API_KEY + MAIL_FROM (SMTP2GO'da doğrulanmış gönderen, ör. "Demleme <garen@demlemedesin.com>")
   const key = process.env.SMTP2GO_API_KEY;
   const from = process.env.MAIL_FROM;
@@ -44,7 +44,7 @@ export async function sendEmail(p: { to: string; subject: string; text: string }
     const r = await fetch('https://eu-api.smtp2go.com/v3/email/send', {
       method: 'POST',
       headers: { 'X-Smtp2go-Api-Key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text }),
+      body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text, ...(p.headers?.length ? { custom_headers: p.headers } : {}) }),
       signal: AbortSignal.timeout(10000),
     });
     const j = (await r.json().catch(() => ({}))) as { data?: { succeeded?: number; error?: string; error_code?: string } };
@@ -251,16 +251,23 @@ export async function notifyCart(email: string): Promise<NotifyOut> {
       return `- ${i.qty ?? 1} × ${i.name ?? 'Ürün'}${v ? ` (${v})` : ''}${i.price != null ? ` · ${money(Number(i.price) * (i.qty ?? 1))}` : ''}`;
     });
     const vars = { name: '', cart_items: lines.join('\n'), cart_url: `${siteUrl()}/sepet`, total: money(Number(c.total ?? 0)) };
-    if (tpl && tpl.email_on) {
+    // Sepet hatırlatması ticari iletidir: yalnızca ticari ileti izni verip e-postasını doğrulamış kişilere gider.
+    const mk = await import('./marketing');
+    const allowed = await mk.canMarket(sb, to);
+    if (tpl && tpl.email_on && !allowed) {
+      results.push({ channel: 'email', to, status: 'skipped', error: 'Ticari ileti izni yok' });
+      await logMsg(sb, { channel: 'email', to_addr: to, template: 'cart_reminder', subject: null, status: 'skipped', error: 'Ticari ileti izni yok' });
+      await sb.from('abandoned_carts').update({ reminded_at: new Date().toISOString() }).eq('email', to);
+    } else if (tpl && tpl.email_on) {
       const subject = renderTemplate(tpl.subject, vars);
-      const r = await sendEmail({ to, subject, text: renderTemplate(tpl.body, vars) });
+      const r = await mk.sendMarketing(sb, { to, subject, text: renderTemplate(tpl.body, vars) });
       results.push({ channel: 'email', to, ...r });
       await logMsg(sb, { channel: 'email', to_addr: to, template: 'cart_reminder', subject, status: r.status, error: r.error });
       if (r.status === 'sent') {
         await sb.from('abandoned_carts').update({ reminded_at: new Date().toISOString(), remind_count: Number(c.remind_count ?? 0) + 1 }).eq('email', to);
       }
     }
-    const w = await postWebhook('cart_reminder', { email: to, items, total: c.total, cart_url: vars.cart_url }, sb);
+    const w = allowed ? await postWebhook('cart_reminder', { email: to, items, total: c.total, cart_url: vars.cart_url }, sb) : ({ status: 'skipped' } as SendResult);
     if (w.status !== 'skipped') {
       results.push({ channel: 'webhook', ...w });
       await logMsg(sb, { channel: 'webhook', template: 'cart_reminder', status: w.status, error: w.error });

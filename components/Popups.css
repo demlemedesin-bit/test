@@ -70,3 +70,4 @@
   .dpop-ov, .dpop{ animation:none; }
   .nl-btn, .dpop-cta{ transition:none; }
 }
+.nl-note{ margin:8px 0 0; color:var(--nl-mute); font-size:11.5px; line-height:1.45; } .nl-note a{ text-decoration:underline; }
