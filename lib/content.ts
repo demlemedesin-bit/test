@@ -159,7 +159,7 @@ function relatedHtml(items: SiteProduct[], title: string): string {
   if (!items.length) return '';
   const cards = items
     .map((x) => {
-      const img = x.colors[0]?.img || x.thumb;
+      const img = x.thumb || x.colors[0]?.thumb || x.colors[0]?.img;
       return `<a href="/urun/${esc(x.slug)}" data-rec="related"><div class="th">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ''}</div><p>${esc(x.name)}</p><span>${x.was && !x.out ? `<s style="opacity:.55">${esc(x.was)}</s> ` : ''}${esc(x.price)}${x.out ? ' · Tükendi' : ''}</span></a>`;
     })
     .join('');

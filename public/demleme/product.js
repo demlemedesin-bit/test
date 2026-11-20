@@ -71,7 +71,7 @@
     $('qN').textContent=q; stockUI();
     /* "Bunu da beğenebilirsin" kartları artık sunucuda çiziliyor (#more yalnızca eski sayfa kalıplarında olabilir) */
     if($('more')){ var start=P.indexOf(p), pick=[]; for(var k=1;k<=4;k++) pick.push(P[(start+k)%P.length]);
-      $('more').innerHTML=pick.map(function(x){ return '<a href="/urun/'+x.slug+'"><div class="th"><img src="'+x.colors[0].img+'" alt="" loading="lazy"></div><p>'+esc(x.name)+'</p><span>'+x.price+'</span></a>'; }).join(''); }
+      $('more').innerHTML=pick.map(function(x){ return '<a href="/urun/'+x.slug+'"><div class="th"><img src="'+(x.thumb||x.colors[0].thumb||x.colors[0].img)+'" alt="" loading="lazy"></div><p>'+esc(x.name)+'</p><span>'+x.price+'</span></a>'; }).join(''); }
     setCol(0, true); glyph(); scrollTo(0,0); };
   /* Alt kareler: yalnızca seçili (ya da üstüne gelinen) rengin görselleri; fotoğraf, ek görseller, günlük kullanım ve ürün galerisi */
   var swapTo=function(u){ var im=$('ppImg'); if(!u || !im) return; var tk=++swTk; if(im.getAttribute('src')===u){ im.classList.remove('fade'); return; } im.classList.add('fade'); setTimeout(function(){ if(tk!==swTk) return; im.src=u; im.classList.remove('fade'); }, 150); };
