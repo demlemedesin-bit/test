@@ -241,7 +241,7 @@
       opts.innerHTML=P.map(function(p,i){ var k=key(p), n=results?(results[k]||0):0, pc=total?Math.round(n*100/total):0, on=(mine===k);
         if(voted) return '<div class="dm-po is-res'+(on?' is-mine':'')+'"><span class="dm-po-t">'+esc(k)+(on?' \u2713':'')+'</span><span class="dm-po-bar"><i style="width:'+pc+'%"></i></span><span class="dm-po-n">%'+pc+'</span></div>';
         return '<label class="dm-po"><input type="radio" name="dmv" value="'+i+'"'+(on?' checked':'')+'><span class="dm-po-dot"></span><span class="dm-po-t">'+esc(k)+'</span></label>'; }).join('');
-      btn.hidden=!!voted; msg.innerHTML=voted?('Te\u015fekk\u00fcrler, oyun kaydedildi. <button type="button" class="dm-poll-chg">Oyumu de\u011fi\u015ftir</button>'+(total?' <span class="dm-poll-tot">'+total+' oy</span>':'')):'';
+      btn.hidden=!!voted; msg.innerHTML=voted?('Te\u015fekk\u00fcrler, oyun kaydedildi. <button type="button" class="dm-poll-chg">Oyumu de\u011fi\u015ftir</button>'):'';
     };
     form.hidden=false; draw();
     fetch('/api/anket?month='+encodeURIComponent(month),{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(r){ results=r; draw(); }).catch(function(){});
