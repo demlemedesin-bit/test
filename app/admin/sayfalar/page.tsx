@@ -497,7 +497,7 @@ function AnnounceTab({ toast }: { toast: Toast }) {
       <div className="card-b">
         <label className="chk"><input type="checkbox" checked={a.on} onChange={(e) => set('on', e.target.checked)} /> Sitede göster</label>
         <Field label="Metin" hint={`${a.text.length}/140 · Ziyaretçi şeridi kapatabilir (o oturum için)`}>
-          <input className="inp" value={a.text} maxLength={140} onChange={(e) => set('text', e.target.value)} placeholder="Örn. 750 ₺ üzeri siparişlerde kargo bedava" />
+          <input className="inp" value={a.text} maxLength={140} onChange={(e) => set('text', e.target.value)} placeholder="Örn. 2.000 ₺ üzeri siparişlerde kargo bedava" />
         </Field>
         <div className="row2">
           <Field label="Bağlantı (isteğe bağlı)" hint="Örn. /#magaza ya da https://…"><input className="inp" value={a.url} onChange={(e) => set('url', e.target.value)} autoCapitalize="none" spellCheck={false} /></Field>

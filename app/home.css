@@ -821,3 +821,5 @@ label.dm-po:hover{ background:rgba(221,38,44,.07); }
 }
 
 .sh-sub{ font-size:var(--t-14); font-style:italic; color:var(--ink-2); margin:0 0 2px; }
+
+.sh-free{ position:absolute; z-index:3; left:10px; bottom:10px; padding:5px 10px; border:2px solid #1F6B3A; border-radius:6px; color:#1F6B3A; background:rgba(255,255,255,.88); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; transform:rotate(-6deg); pointer-events:none; }

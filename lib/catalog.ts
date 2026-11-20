@@ -26,6 +26,7 @@ export type SiteProduct = {
   desc: string;
   badge?: string;
   sub?: string; // alt başlık / lakap
+  freeShip?: boolean; // fiyat ücretsiz kargo eşiğine ulaşıyor
   soon: boolean;
   out: boolean; // stok bitti
   thumb: string;
@@ -142,8 +143,9 @@ function fromFiles(): SiteProduct[] {
 /** Satıştaki (aktif) ürünler, sıraya göre. */
 export async function getProducts(): Promise<SiteProduct[]> {
   const rows = await rest<Row[]>('products?select=*&active=eq.true&order=sort.asc');
-  if (rows && rows.length) return rows.map(fromRow);
-  return fromFiles();
+  const list = rows && rows.length ? rows.map(fromRow) : fromFiles();
+  const from = (await getConfig()).freeFrom;
+  return from > 0 ? list.map((p) => (p.priceNum >= from && !p.soon ? { ...p, freeShip: true } : p)) : list;
 }
 
 export async function getProduct(slug: string): Promise<SiteProduct | null> {
@@ -178,7 +180,7 @@ export function configFromMap(m: Record<string, string | number | null | undefin
       phone: s('seller_phone', f.seller.phone),
     },
     bank: { holder: s('bank_holder', f.bank.holder), bankName: s('bank_name', f.bank.bankName), iban: s('bank_iban', f.bank.iban) },
-    freeFrom: n('free_shipping_threshold', 750),
+    freeFrom: n('free_shipping_threshold', 2000),
     fee: n('shipping_fee', 59.9),
   };
 }

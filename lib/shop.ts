@@ -31,7 +31,7 @@ export async function fetchSettings(): Promise<Settings> {
   if (error) throw error;
   const map = Object.fromEntries((data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
   const num = (k: string, d: number) => (map[k] !== undefined && map[k] !== '' && !isNaN(Number(map[k])) ? Number(map[k]) : d);
-  return { freeFrom: num('free_shipping_threshold', 750), fee: num('shipping_fee', 0), map };
+  return { freeFrom: num('free_shipping_threshold', 2000), fee: num('shipping_fee', 0), map };
 }
 
 export async function fetchProducts(slugs: string[]): Promise<DbProduct[]> {
