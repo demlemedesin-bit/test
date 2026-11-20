@@ -182,3 +182,4 @@ h1, h2, h3{ font-family:var(--font-display); font-weight:400; letter-spacing:-.0
 .pp-sub{ margin:6px 0 0; font-size:clamp(16px, 1.5vw, 22px); font-style:italic; color:var(--ink-2); }
 
 .pp-free{ display:inline-block; margin:8px 0 0; padding:4px 12px; border:2px solid #111; border-radius:6px; color:#111; background:#F4EEE1; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.pp-free[hidden]{ display:none; }
