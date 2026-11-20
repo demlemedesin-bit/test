@@ -60,8 +60,9 @@
 .kp-ctl{ display:flex; align-items:center; justify-content:center; gap:var(--s-16); }
 .kp-ctl > button{ width:40px; height:40px; border:1px solid var(--line-strong); font-size:18px; }
 .kp-ctl > button:disabled{ opacity:.35; cursor:default; }
-.kp-dots{ display:flex; gap:10px; }
-.kp-dots button{ width:10px; height:10px; border-radius:50%; border:1px solid var(--ink); }
+.kp-dots{ display:flex; align-items:center; gap:12px; }
+.kp-dots button{ position:relative; flex:none; box-sizing:border-box; display:block; width:10px; height:10px; min-width:10px; min-height:10px; max-width:10px; max-height:10px; padding:0; margin:0; aspect-ratio:1/1; border-radius:50%; border:1.5px solid var(--ink); background:transparent; appearance:none; -webkit-appearance:none; line-height:0; font-size:0; cursor:pointer; }
+.kp-dots button::after{ content:''; position:absolute; inset:-12px; }
 .kp-dots button[aria-current="true"]{ background:var(--ink); }
 .kp-img--photo img{ height:100%; width:100%; object-fit:cover; }
 .kp-photo{ height:clamp(150px,26vw,230px); width:clamp(120px,21vw,184px); object-fit:cover; border-radius:6px; border:1px solid var(--line); background:var(--cream); }

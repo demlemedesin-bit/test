@@ -19,9 +19,11 @@ export default function PopupAdmin() {
   const [sel, setSel] = useState(0);
   const [busy, setBusy] = useState(false);
   const [dk, setDk] = useState(0);
+  const [cps, setCps] = useState<{ code: string | null; kind: string; value: number; active: boolean; ends_at: string | null; min_total: number }[]>([]);
 
   useEffect(() => {
     supabase().from('site_content').select('value').eq('key', 'popups').maybeSingle().then(({ data }) => setList(parsePopupsLoose(data?.value)));
+    supabase().from('coupons').select('code,kind,value,active,ends_at,min_total').then(({ data }) => setCps((data as typeof cps) ?? []));
   }, []);
 
   async function save() {
@@ -30,7 +32,7 @@ export default function PopupAdmin() {
     const { error } = await supabase().from('site_content').upsert({ key: 'popups', value: list, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     if (!error) await refreshSite();
     setBusy(false);
-    show(error ? 'Kaydedilemedi: ' + error.message : 'Kaydedildi, popuplar yayında', !!error);
+    show(error ? 'Kaydedilemedi: ' + error.message : list.some((x) => x.on) ? 'Kaydedildi. Yayındaki popup sayısı: ' + list.filter((x) => x.on).length : 'Kaydedildi ama hiçbir popup AÇIK değil, sitede görünmez', !!error);
   }
   if (!list) return (<><TopBar title="Popuplar" onMenu={menu} /><div className="adm-scroll"><Loading /></div></>);
   const p = list[sel];
@@ -87,6 +89,19 @@ export default function PopupAdmin() {
                     </div></div>
                     <div className="card-b">
                       <button type="button" className={`pu-power${p.on ? ' on' : ''}`} aria-pressed={p.on} onClick={() => up({ on: !p.on })}><Power size={16} /> {p.on ? 'Yayında' : 'Kapalı, yayına almak için dokun'}</button>
+                      {(() => {
+                        const code = p.coupon_code.trim();
+                        const c = code ? cps.find((x) => x.code === code) : undefined;
+                        const bad = !!code && (!c || !c.active || (!!c.ends_at && new Date(c.ends_at) < new Date()));
+                        const what = c ? (c.kind === 'percent' ? `%${c.value} indirim` : c.kind === 'fixed' ? `${c.value} ₺ indirim` : 'ücretsiz kargo') : '';
+                        return (
+                          <div className="card-m" style={{ margin: '0 0 12px', padding: '10px 12px', borderRadius: 8, background: p.on && !bad ? 'rgba(31,107,58,.12)' : 'rgba(221,38,44,.1)', lineHeight: 1.5 }}>
+                            <b>{p.on ? 'Durum: yayında' : 'Durum: KAPALI, sitede görünmez'}</b><br />
+                            {p.on ? 'Kaydet’e bastıktan sonra sitede görünür.' : 'Yukarıdaki düğmeye dokunup Kaydet’e basmadan açılmaz.'}
+                            {code ? <><br />{c ? (bad ? `Kupon ${code} kapalı ya da süresi dolmuş, müşteri kodu girince çalışmaz. Kampanyalar sayfasından açın.` : `Kupon ${code}: ${what}${c.min_total > 0 ? `, en az ${c.min_total} ₺ sepette` : ''}. Çalışıyor.`) : `Kupon ${code} Kampanyalar sayfasında yok. Popup kodu gösterir ama sepette geçersiz olur. Önce orada %5’lik kuponu bu koda oluşturun.`}</> : null}
+                          </div>
+                        );
+                      })()}
                       <Field label="İç ad"><input className="inp" value={p.name} onChange={(e) => up({ name: e.target.value })} /></Field>
                       <Field label="Tür">{sl(p.kind, KINDS, (v) => up({ kind: v }))}</Field>
                       <Field label="Başlık"><input className="inp" value={p.title} onChange={(e) => up({ title: e.target.value })} /></Field>
