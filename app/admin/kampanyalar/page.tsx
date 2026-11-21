@@ -10,7 +10,7 @@ import { Donut, HBars } from '@/components/admin/Charts';
 import { Confirm, Empty, Field, Kpi, Loading, Panel, TopBar, useToast } from '@/components/admin/ui';
 import { PageHero } from '@/components/admin/PageHero';
 
-type Kind = 'percent' | 'fixed' | 'free_shipping';
+type Kind = 'percent' | 'fixed' | 'free_shipping' | 'second_half';
 type Coupon = {
   id: string;
   code: string | null;
@@ -48,7 +48,7 @@ type Form = {
   active: boolean;
 };
 
-const KINDS: Record<Kind, string> = { percent: 'Yüzde indirim', fixed: 'Sabit tutar', free_shipping: 'Ücretsiz kargo' };
+const KINDS: Record<Kind, string> = { percent: 'Yüzde indirim', fixed: 'Sabit tutar', free_shipping: 'Ücretsiz kargo', second_half: '2. ürüne indirim' };
 const TABS = [
   ['kupon', 'Kupon kodları'],
   ['otomatik', 'Otomatik kampanyalar'],
@@ -96,7 +96,7 @@ function status(c: Coupon): { label: string; tone: string } {
   return { label: 'Aktif', tone: 'b-green' };
 }
 
-const valueText = (c: Coupon) => (c.kind === 'percent' ? `%${Number(c.value)}` : c.kind === 'fixed' ? tl(Number(c.value)) : 'Ücretsiz kargo');
+const valueText = (c: Coupon) => (c.kind === 'percent' ? `%${Number(c.value)}` : c.kind === 'fixed' ? tl(Number(c.value)) : c.kind === 'second_half' ? `2. ürüne %${Number(c.value)}` : 'Ücretsiz kargo');
 
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -111,7 +111,7 @@ function validate(f: Form): string | null {
   if (f.kind !== 'free_shipping') {
     const v = Number(f.value);
     if (f.value === '' || !Number.isFinite(v) || v <= 0) return 'İndirim değeri 0’dan büyük olmalı.';
-    if (f.kind === 'percent' && v > 100) return 'Yüzde indirim 0-100 arasında olmalı.';
+    if ((f.kind === 'percent' || f.kind === 'second_half') && v > 100) return 'Yüzde indirim 0-100 arasında olmalı.';
   }
   if (Number(f.min_total || 0) < 0) return 'Alt sepet tutarı negatif olamaz.';
   if (f.max_discount !== '' && Number(f.max_discount) < 0) return 'Üst indirim sınırı negatif olamaz.';
@@ -367,8 +367,8 @@ export default function Campaigns() {
                 </select>
               </Field>
               {edit.kind !== 'free_shipping' && (
-                <Field label={edit.kind === 'percent' ? 'Yüzde (0-100)' : 'Tutar (₺)'}>
-                  <input className="inp" type="number" min={0} max={edit.kind === 'percent' ? 100 : undefined} step="any" value={edit.value} onChange={(e) => set('value', e.target.value)} />
+                <Field label={edit.kind === 'percent' ? 'Yüzde (0-100)' : edit.kind === 'second_half' ? '2. ürüne yüzde (0-100)' : 'Tutar (₺)'} hint={edit.kind === 'second_half' ? 'Sepetteki ürünler fiyata göre sıralanır; her ikinci (ucuz olan) ürüne uygulanır. Ürün seçmezseniz tüm ürünlerde geçerli.' : undefined}>
+                  <input className="inp" type="number" min={0} max={edit.kind === 'percent' || edit.kind === 'second_half' ? 100 : undefined} step="any" value={edit.value} onChange={(e) => set('value', e.target.value)} />
                 </Field>
               )}
             </div>
