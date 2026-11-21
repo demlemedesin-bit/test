@@ -127,7 +127,9 @@ export function PopupCard({ p, onClose, preview = false, titleId }: { p: Popup; 
       <div className="dpop-body">
         {p.title && (
           <h2 className="dpop-title" id={titleId}>
-            {p.title}
+            {p.title.split(' ').map((w, i) => (
+              <span key={i} style={{ whiteSpace: 'nowrap' }}>{i ? ' ' : ''}{w}</span>
+            ))}
           </h2>
         )}
         {p.text && <p className="dpop-text">{p.text}</p>}
