@@ -172,7 +172,7 @@ export function parsePopup(raw: unknown): Popup | null {
 
 /** site_content.popups değerinden ({list:[…]}) geçerli popup listesi. */
 export function parsePopups(v: unknown): Popup[] {
-  const list = v && typeof v === 'object' ? (v as { list?: unknown }).list : null;
+  const list = Array.isArray(v) ? v : v && typeof v === 'object' ? (v as { list?: unknown }).list : null; // panel diziyi doğrudan kaydeder; eski biçim { list } de okunur
   if (!Array.isArray(list)) return [];
   const seen = new Set<string>();
   const out: Popup[] = [];
@@ -188,7 +188,7 @@ export function parsePopups(v: unknown): Popup[] {
 
 /** Panel için: bozuk kayıtları atmadan, eksik alanları tamamlayarak okur (düzenlenebilsin). */
 export function parsePopupsLoose(v: unknown): Popup[] {
-  const list = v && typeof v === 'object' ? (v as { list?: unknown }).list : null;
+  const list = Array.isArray(v) ? v : v && typeof v === 'object' ? (v as { list?: unknown }).list : null; // panel diziyi doğrudan kaydeder; eski biçim { list } de okunur
   if (!Array.isArray(list)) return [];
   const out: Popup[] = [];
   for (const it of list) {
