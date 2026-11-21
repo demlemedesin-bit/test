@@ -29,10 +29,10 @@ const relatedOf = (p: P): string[] => (Array.isArray(p.data?.related) ? (p.data.
 const needsChoice = (p: P) => (p.colors?.length ?? 0) > 1 || (p.sizes?.length ?? 0) > 0;
 
 /** Sepet sayfası çapraz satış: sepette olmayan, satıştaki, stoktaki ürünler; kategori ve "ilgili ürün" eşleşmesi önce gelir. */
-export function Upsell({ items }: { items: CartItem[] }) {
+export function Upsell({ items, force, title, count }: { items: CartItem[]; force?: boolean; title?: string; count?: number }) {
   const sf = useStorefront();
   const [all, setAll] = useState<P[] | null>(null);
-  const on = !!sf?.upsell_cart_on;
+  const on = !!force || !!sf?.upsell_cart_on;
 
   useEffect(() => {
     if (!on) return;
@@ -52,7 +52,7 @@ export function Upsell({ items }: { items: CartItem[] }) {
 
   const slugKey = items.map((i) => i.slug).sort().join(',');
   const picks = useMemo(() => {
-    if (!all || !sf) return [];
+    if (!all) return [];
     const inCart = new Set(slugKey ? slugKey.split(',') : []);
     const mine = all.filter((p) => inCart.has(p.slug));
     const cats = new Set(mine.map((p) => p.shop_cat).filter(Boolean));
@@ -62,9 +62,9 @@ export function Upsell({ items }: { items: CartItem[] }) {
       .filter((p) => p.active && !p.soon && (p.stock == null || p.stock > 0) && !inCart.has(p.slug))
       .map((p) => ({ p, score: (rel.has(p.slug) ? 4 : 0) + (p.shop_cat && cats.has(p.shop_cat) ? 2 : 0) + (names.has(p.category) ? 1 : 0) }))
       .sort((a, b) => b.score - a.score || (a.p.sort ?? 0) - (b.p.sort ?? 0))
-      .slice(0, sf.upsell_count)
+      .slice(0, count ?? sf?.upsell_count ?? 3)
       .map((x) => x.p);
-  }, [all, sf, slugKey]);
+  }, [all, sf, slugKey, count]);
 
   function add(p: P) {
     const c = p.colors?.[0];
@@ -80,10 +80,11 @@ export function Upsell({ items }: { items: CartItem[] }) {
     writeCart([...readCart(), line]);
   }
 
-  if (!on || !sf || !picks.length) return null;
+  if (!on || !picks.length) return null;
+  const heading = title ?? sf?.upsell_title ?? '';
   return (
-    <section className="px px-upsell" aria-label={sf.upsell_title}>
-      <h2 className="px-h">{sf.upsell_title}</h2>
+    <section className="px px-upsell" aria-label={heading}>
+      <h2 className="px-h">{heading}</h2>
       <div className="px-row px-row-up">
         {picks.map((p) => {
           const img = p.thumb || p.colors?.[0]?.img;

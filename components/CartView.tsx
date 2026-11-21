@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useCart, lineKey, MAX_QTY } from '@/lib/cart';
 import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { CouponBox } from './CouponBox';
 import { Alert } from './ui';
 import { RecentlyViewed, useStorefront } from './RecentlyViewed';
@@ -15,6 +17,13 @@ export function CartView() {
   const [code, setCode] = useCouponCode();
   const { quote, busy } = useQuote(items, code, '', ready && !!priced && !priced.hasProblem);
   const sf = useStorefront();
+  // "N ürüne kargo bedava" kampanyası varsa sepette teşvik göster (kampanya Kampanyalar sayfasından yönetilir)
+  const [offer, setOffer] = useState(0);
+  useEffect(() => {
+    let off = false;
+    supabase().rpc('free_ship_offer').then(({ data }) => { if (!off && typeof data === 'number') setOffer(data); }, () => {});
+    return () => { off = true; };
+  }, []);
 
   if (!ready) return <p className="loading">Sepetin yükleniyor…</p>;
 
@@ -74,7 +83,21 @@ export function CartView() {
             ← Alışverişe devam et
           </a>
         </p>
-        <Upsell items={items} />
+        {(() => {
+          const qty = items.reduce((n, i) => n + i.qty, 0);
+          const shipNow = quote ? quote.shipping : priced?.shipping ?? 0;
+          if (offer > 0 && qty < offer && shipNow > 0) {
+            return (
+              <>
+                <div className="px px-ship" role="status">
+                  <p className="px-ship-t"><b>{offer - qty} ürün daha ekle, kargo bedava!</b> Sepetinde {offer} ürün olunca kargo ücretini biz üstleniyoruz.</p>
+                </div>
+                <Upsell items={items} force count={3} title="Kargo bedava için bir ürün daha ekle" />
+              </>
+            );
+          }
+          return <Upsell items={items} />;
+        })()}
         <RecentlyViewed exclude={items.map((i) => i.slug)} />
       </div>
 
