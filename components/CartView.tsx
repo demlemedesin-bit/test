@@ -91,7 +91,7 @@ export function CartView() {
           </div>
         )}
         <div className="sum-row">
-          <span>Kargo</span>
+          <span>Kargo{priced.subtotal > 0 && priced.desi > 0 ? ` (${Math.round(priced.desi * 10) / 10} desi)` : ''}</span>
           <span>{priced.subtotal === 0 ? '—' : (quote ? quote.shipping : priced.shipping) === 0 ? 'Ücretsiz' : tl(quote ? quote.shipping : priced.shipping)}</span>
         </div>
         <CouponBox code={code} setCode={setCode} quote={quote} busy={busy} />

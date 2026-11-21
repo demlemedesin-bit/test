@@ -10,7 +10,7 @@ import { PageHero } from '@/components/admin/PageHero';
 import { PushSettings } from '@/components/admin/PushSettings';
 
 const KEYS = [
-  'free_shipping_threshold', 'shipping_fee', 'contact_email',
+  'free_shipping_threshold', 'shipping_fee', 'shipping_desi_tiers', 'contact_email',
   'seller_name', 'seller_address', 'seller_tax_office', 'seller_tax_no', 'seller_mersis', 'seller_phone',
   'bank_holder', 'bank_name', 'bank_iban',
 ] as const;
@@ -57,12 +57,14 @@ export default function Settings() {
     const free = Number(f!.free_shipping_threshold.replace(',', '.'));
     if (isNaN(fee) || fee < 0 || isNaN(free) || free < 0 || f!.shipping_fee.trim() === '' || f!.free_shipping_threshold.trim() === '') return show('Kargo ücreti ve ücretsiz kargo eşiği geçerli sayılar olmalı.', true);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f!.contact_email.trim())) return show('Geçerli bir iletişim e-postası gir.', true);
+    const tiers = f!.shipping_desi_tiers.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (tiers.some((l) => !/^\d+([.,]\d+)?\s*=\s*\d+([.,]\d+)?$/.test(l))) return show('Desi tablosunda her satır “üst_desi=ücret” biçiminde olmalı. Örn. 4=96,80', true);
     const iban = f!.bank_iban.replace(/\s+/g, '').toUpperCase();
     if (iban && !/^TR\d{24}$/.test(iban)) return show('IBAN “TR” ile başlayan 26 karakter olmalı.', true);
     setBusy(true);
     const rows = KEYS.map((k) => ({
       key: k,
-      value: k === 'bank_iban' ? iban.replace(/(.{4})/g, '$1 ').trim() : k === 'free_shipping_threshold' ? String(free) : k === 'shipping_fee' ? String(fee) : f![k].trim(),
+      value: k === 'bank_iban' ? iban.replace(/(.{4})/g, '$1 ').trim() : k === 'free_shipping_threshold' ? String(free) : k === 'shipping_fee' ? String(fee) : k === 'shipping_desi_tiers' ? tiers.map((l) => l.replace(/\s+/g, '').replace(/,/g, '.')).join('\n') : f![k].trim(),
       is_public: true,
     }));
     const { error } = await supabase().from('shop_settings').upsert(rows, { onConflict: 'key' });
@@ -127,6 +129,9 @@ export default function Settings() {
             <div className="card-b row2">
               <Field label="Ücretsiz kargo eşiği (₺)" hint="Sepet bu tutara ulaşınca kargo ücretsiz olur.">{inp('free_shipping_threshold', { inputMode: 'decimal' })}</Field>
               <Field label="Kargo ücreti (₺)" hint="Eşiğin altındaki siparişlere eklenir.">{inp('shipping_fee', { inputMode: 'decimal' })}</Field>
+              <Field label="Desi kargo tablosu (₺, KDV dahil)" hint="Her satır “üst_desi=ücret”. Sepet toplam desisine göre ücret bulunur; tablo doluysa yukarıdaki sabit ücret kullanılmaz. 40 desiyi aşan sepet 40’lık parçalara bölünür. Ürün desisi Ürünler sayfasında, boşsa 1 sayılır.">
+                <textarea className="inp" rows={6} value={f.shipping_desi_tiers} onChange={(e) => set('shipping_desi_tiers', e.target.value)} placeholder={'4=96,80\n10=126,13'} />
+              </Field>
             </div>
           </section>
 

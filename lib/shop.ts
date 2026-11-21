@@ -16,12 +16,25 @@ export type DbProduct = {
   soon: boolean;
   active: boolean;
   stock?: number | null;
-  data?: { sale?: unknown } | null;
+  data?: { sale?: unknown; desi?: number | string } | null;
   /** Süreli kampanyadaki eski fiyat (price indirimli fiyattır) */
   was?: number;
 };
 
 export type Settings = { freeFrom: number; fee: number; map: Record<string, string> };
+
+/** Desi kademe tablosu: her satır "üst_desi=ücret". Sunucudaki ship_fee ile aynı mantık (yalnızca yerel yedek hesap). */
+export function shipFee(desi: number, tiersText: string | undefined, fallback: number): number {
+  const t = (tiersText ?? '').split(/[\r\n]+/).map((l) => l.match(/^\s*(\d+(?:[.,]\d+)?)\s*=\s*(\d+(?:[.,]\d+)?)\s*$/)).filter((m): m is RegExpMatchArray => !!m)
+    .map((m) => ({ mx: Number(m[1].replace(',', '.')), pr: Number(m[2].replace(',', '.')) })).sort((a, b) => a.mx - b.mx);
+  if (!t.length || desi <= 0) return fallback;
+  const top = t[t.length - 1], n = Math.ceil(desi / top.mx), rest = desi - (n - 1) * top.mx;
+  return Math.round(((n - 1) * top.pr + (t.find((x) => x.mx >= rest) ?? top).pr) * 100) / 100;
+}
+export function cartDesi(items: { slug: string; qty: number }[], products: { slug: string; data?: { desi?: number | string } | null }[]): number {
+  const by = new Map(products.map((p) => [p.slug, p]));
+  return items.reduce((n, i) => { const d = Number(String(by.get(i.slug)?.data?.desi ?? '').replace(',', '.')); return n + (Number.isFinite(d) && d > 0 ? d : 1) * i.qty; }, 0);
+}
 
 export const tl = (n: number) =>
   '₺' + n.toLocaleString('tr-TR', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
@@ -58,6 +71,7 @@ export type Priced = {
   lines: PricedLine[];
   subtotal: number;
   shipping: number;
+  desi: number;
   total: number;
   remainingForFree: number;
   hasProblem: boolean;
@@ -87,11 +101,12 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     return { item, key: lineKey(item), unit, was: p?.was, total: problem ? 0 : unit * item.qty, problem };
   });
   const subtotal = lines.reduce((n, l) => n + l.total, 0);
-  const shipping = subtotal === 0 || subtotal >= s.freeFrom ? 0 : s.fee;
+  const shipping = subtotal === 0 || subtotal >= s.freeFrom ? 0 : shipFee(cartDesi(items, products), s.map.shipping_desi_tiers, s.fee);
   return {
     lines,
     subtotal,
     shipping,
+    desi: cartDesi(items, products),
     total: subtotal + shipping,
     remainingForFree: subtotal > 0 && subtotal < s.freeFrom ? s.freeFrom - subtotal : 0,
     hasProblem: lines.some((l) => l.problem),
