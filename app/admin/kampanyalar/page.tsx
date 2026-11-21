@@ -18,6 +18,7 @@ type Coupon = {
   kind: Kind;
   value: number;
   min_total: number;
+  min_items?: number;
   max_discount: number | null;
   auto: boolean;
   starts_at: string | null;
@@ -38,6 +39,7 @@ type Form = {
   kind: Kind;
   value: string;
   min_total: string;
+  min_items: string;
   max_discount: string;
   auto: boolean;
   starts_at: string;
@@ -65,7 +67,7 @@ const toLocal = (iso: string | null) => {
 const fromLocal = (s: string) => (s ? new Date(s).toISOString() : null);
 
 const blank = (auto: boolean): Form => ({
-  code: '', name: '', kind: 'percent', value: '', min_total: '0', max_discount: '', auto, starts_at: '', ends_at: '', usage_limit: '', per_email_limit: '', product_slugs: [], active: true,
+  code: '', name: '', kind: 'percent', value: '', min_total: '0', min_items: '0', max_discount: '', auto, starts_at: '', ends_at: '', usage_limit: '', per_email_limit: '', product_slugs: [], active: true,
 });
 
 function toForm(c: Coupon): Form {
@@ -76,6 +78,7 @@ function toForm(c: Coupon): Form {
     kind: c.kind,
     value: String(c.value),
     min_total: String(c.min_total),
+    min_items: String(c.min_items ?? 0),
     max_discount: c.max_discount == null ? '' : String(c.max_discount),
     auto: c.auto,
     starts_at: toLocal(c.starts_at),
@@ -114,6 +117,7 @@ function validate(f: Form): string | null {
     if ((f.kind === 'percent' || f.kind === 'second_half') && v > 100) return 'Yüzde indirim 0-100 arasında olmalı.';
   }
   if (Number(f.min_total || 0) < 0) return 'Alt sepet tutarı negatif olamaz.';
+  if (f.min_items !== '' && (!Number.isInteger(Number(f.min_items)) || Number(f.min_items) < 0)) return 'En az ürün adedi 0 ya da pozitif tam sayı olmalı.';
   if (f.max_discount !== '' && Number(f.max_discount) < 0) return 'Üst indirim sınırı negatif olamaz.';
   if (f.usage_limit !== '' && (!Number.isInteger(Number(f.usage_limit)) || Number(f.usage_limit) < 0)) return 'Toplam kullanım limiti geçersiz.';
   if (f.per_email_limit !== '' && (!Number.isInteger(Number(f.per_email_limit)) || Number(f.per_email_limit) < 1)) return 'Kişi başı limit en az 1 olmalı.';
@@ -182,6 +186,7 @@ export default function Campaigns() {
       kind: edit.kind,
       value: edit.kind === 'free_shipping' ? 0 : Number(edit.value),
       min_total: Number(edit.min_total || 0),
+      min_items: Number(edit.min_items || 0),
       max_discount: edit.kind === 'percent' && edit.max_discount !== '' ? Number(edit.max_discount) : null,
       auto: edit.auto,
       starts_at: fromLocal(edit.starts_at),
@@ -375,6 +380,9 @@ export default function Campaigns() {
             <div className="row2">
               <Field label="Alt sepet tutarı (₺)" hint="0 = koşul yok">
                 <input className="inp" type="number" min={0} step="any" value={edit.min_total} onChange={(e) => set('min_total', e.target.value)} />
+              </Field>
+              <Field label="En az ürün adedi" hint="0 = koşul yok. Örn. 2: sepette en az 2 ürün olunca geçerli (ücretsiz kargo için ideal).">
+                <input className="inp" type="number" min={0} step={1} value={edit.min_items} onChange={(e) => set('min_items', e.target.value)} />
               </Field>
               {edit.kind === 'percent' && (
                 <Field label="En çok indirim (₺)" hint="Boş = sınırsız">
