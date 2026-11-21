@@ -288,7 +288,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
               </tr>
               <tr>
                 <th>Pazarlama</th>
-                <td>Bülten ve ticari ileti tercihi (onay tarihi, kaynağı ve metni, e-posta doğrulama zamanı), tarayıcı bildirimi anahtarı (yalnızca izin verdiysen), çerez ve izleme verileri (yalnızca onay verildiyse)</td>
+                <td>Bülten ve ticari ileti tercihi (onay tarihi, kaynağı ve metni), tarayıcı bildirimi anahtarı (yalnızca izin verdiysen), çerez ve izleme verileri (yalnızca onay verildiyse)</td>
               </tr>
               <tr>
                 <th>Finans</th>
@@ -616,8 +616,8 @@ export function legalDocs(config: ShopConfig): Doc[] {
           <h2>2. İletilerin sıklığı ve içeriği</h2>
           <p>E-posta bülteni en fazla haftada bir kez gönderilir. İletilerde göndericinin kimliği ve tek tıkla kullanabileceğin ret bağlantısı yer alır. SMS ile ticari ileti gönderilmez.</p>
 
-<h2>2.1. E-posta doğrulaması</h2>
-<p>Bültene kayıt olduğunda e-posta adresine bir onay bağlantısı göndeririz. Bağlantıya tıklayıp adresini doğrulamadığın sürece sana ticari ileti gönderilmez. Üyelikte ticari ileti kutusunu işaretlediysen izin, e-posta adresini doğruladığında geçerli olur. Tercihini hesabım sayfasından da değiştirebilirsin.</p>
+<h2>2.1. Kayıt ve izin</h2>
+<p>Bültene kayıt formundaki ticari ileti kutusunu işaretleyip kaydolduğunda izin o anda geçerli olur. Üyelikte ticari ileti kutusunu işaretlediysen izin, üyeliğin başladığında geçerli olur. Tercihini hesabım sayfasından ya da her e-postadaki ayrılma bağlantısından değiştirebilirsin.</p>
 
           <h2>3. İzni geri alma (ret hakkı)</h2>
           <p>
@@ -632,7 +632,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
           </p>
 
           <h2>5. Onay kaydı</h2>
-          <p>Verdiğin onayın ispatı için onay tarihi, kaynağı (örn. altbilgi formu, üyelik formu), onay metni ve e-posta doğrulama zamanı tutulur. Bu onay, aksini belirtmedikçe geri alınana kadar geçerlidir.</p>
+          <p>Verdiğin onayın ispatı için onay tarihi, kaynağı (örn. altbilgi formu, üyelik formu), onay metni tutulur. Bu onay, aksini belirtmedikçe geri alınana kadar geçerlidir.</p>
           <p className="small">Son güncelleme: {UPDATED}</p>
         </>
       ),

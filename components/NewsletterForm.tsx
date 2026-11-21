@@ -72,7 +72,7 @@ export function NewsletterForm({
   if (done) {
     return (
       <p className={`nl-ok nl--${tone}`} role="status">
-        {already ? 'Bu adres zaten abone.' : 'Teşekkürler! E-postana bir onay bağlantısı gönderdik. Bağlantıya tıkladığında kaydın tamamlanır. Gelmediyse gereksiz klasörüne de bak.'}
+        {already ? 'Bu adres zaten abone.' : 'Teşekkürler! Kaydın alındı.'}
       </p>
     );
   }
