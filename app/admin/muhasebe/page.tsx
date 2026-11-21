@@ -17,10 +17,11 @@ const PAY: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda �
 export default function Muhasebe() {
   const menu = useMenu();
   const [days, setDays] = useState(30);
-  const [kdv, setKdv] = useState(10);
+  const [kdv, setKdv] = useState(20);
   const [os, setOs] = useState<AdminOrder[] | null>(null);
   const [ps, setPs] = useState<Pay[]>([]);
   const [rs, setRs] = useState<Ret[]>([]);
+  const [vats, setVats] = useState<Record<string, number>>({});
   useEffect(() => {
     const sb = supabase();
     const from = new Date(startOfDay() - 120 * DAY).toISOString();
@@ -28,7 +29,8 @@ export default function Muhasebe() {
       sb.from('orders').select('*').gte('created_at', from).order('created_at', { ascending: false }).limit(5000),
       sb.from('payments').select('order_no,status,paid_price,created_at').gte('created_at', from).limit(5000),
       sb.from('returns').select('*').gte('created_at', from).limit(5000),
-    ]).then(([o, p, r]) => { setOs((o.data ?? []) as AdminOrder[]); setPs((p.data ?? []) as Pay[]); setRs((r.data ?? []) as Ret[]); });
+      sb.from('products').select('slug,data'),
+    ]).then(([o, p, r, pr]) => { setVats(Object.fromEntries(((pr.data ?? []) as { slug: string; data?: { vat?: number } }[]).filter((x) => x.data?.vat != null).map((x) => [x.slug, Number(x.data!.vat)]))); setOs((o.data ?? []) as AdminOrder[]); setPs((p.data ?? []) as Pay[]); setRs((r.data ?? []) as Ret[]); });
   }, []);
 
   const m = useMemo(() => {
@@ -52,23 +54,33 @@ export default function Muhasebe() {
   }, [os, ps, rs, days]);
   if (!os) return (<><TopBar title="Muhasebe" onMenu={menu} /><div className="adm-scroll"><Loading /></div></>);
 
-  const tax = m.revenue - m.revenue / (1 + kdv / 100);
+  // KDV: ürün bazlı oran (ürün formundaki KDV alanı); oranı olmayan kalem ve kargo, sağdaki kutudaki orandan hesaplanır
+  const byRate = new Map<number, { gross: number; tax: number }>();
+  const addRate = (rate: number, gross: number) => { const c = byRate.get(rate) ?? { gross: 0, tax: 0 }; c.gross += gross; c.tax += gross - gross / (1 + rate / 100); byRate.set(rate, c); };
+  m.live.forEach((o) => {
+    const sub = Number(o.subtotal) || 0, f = sub > 0 ? Math.max(0, 1 - Number(o.discount ?? 0) / sub) : 1;
+    ((o.items ?? []) as { slug?: string; line_total: number }[]).forEach((it) => addRate(it.slug && vats[it.slug] != null ? vats[it.slug] : kdv, Number(it.line_total) * f));
+    if (Number(o.shipping) > 0) addRate(kdv, Number(o.shipping));
+  });
+  const tax = [...byRate.values()].reduce((n, c) => n + c.tax, 0);
+  const noRate = m.live.some((o) => ((o.items ?? []) as { slug?: string; line_total: number }[]).some((it) => !it.slug || vats[it.slug] == null));
   function csv() {
     const rows = [['tarih', 'sipariş', 'ciro', 'indirim', 'kargo'], ...m.byDay.map(([d, c]) => [d, c.n, c.t, c.d, c.s])];
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['﻿' + rows.map((r) => r.join(';')).join('\n')], { type: 'text/csv;charset=utf-8' }));
     a.download = 'muhasebe.csv'; a.click();
   }
-  const kp: [string, string][] = [['Ciro (KDV dahil)', tl(m.revenue)], ['Sipariş', String(m.live.length)], ['İade tutarı', tl(m.ret)], ['İndirim', tl(m.discount)], ['Kargo geliri', tl(m.shipping)], [`Vergi (KDV %${kdv})`, tl(tax)], ['Başarılı ödeme', String(m.ok.length)], ['Başarısız ödeme', String(m.failed.length)], ['İptal sipariş', String(m.cancelled.length)], ['Para iadesi (kart)', String(m.refunded.length)]];
+  const kp: [string, string][] = [['Ciro (KDV dahil)', tl(m.revenue)], ['Sipariş', String(m.live.length)], ['İade tutarı', tl(m.ret)], ['İndirim', tl(m.discount)], ['Kargo geliri', tl(m.shipping)], ['Hesaplanan KDV', tl(tax)], ['Başarılı ödeme', String(m.ok.length)], ['Başarısız ödeme', String(m.failed.length)], ['İptal sipariş', String(m.cancelled.length)], ['Para iadesi (kart)', String(m.refunded.length)]];
   return (
     <>
       <TopBar title="Muhasebe" sub="Ciro, vergi, ödemeler, iade ve fatura durumu" onMenu={menu}>
         <select className="inp" style={{ width: 'auto' }} value={days} onChange={(e) => setDays(+e.target.value)}>{[7, 30, 90].map((d) => <option key={d} value={d}>Son {d} gün</option>)}</select>
-        <label className="fld" style={{ margin: 0, width: 90 }}><input className="inp" type="number" min={0} max={30} value={kdv} onChange={(e) => setKdv(+e.target.value || 0)} title="KDV oranı %" /></label>
+        <label className="fld" style={{ margin: 0, width: 90 }}><input className="inp" type="number" min={0} max={30} value={kdv} onChange={(e) => setKdv(+e.target.value || 0)} title="Oranı tanımsız ürün ve kargo için KDV %" /></label>
         <button className="btn ghost" onClick={csv}><Download size={15} /> CSV</button>
       </TopBar>
       <div className="adm-scroll"><div className="adm-inner"><PageHero />
         <div className="kpis">{kp.map(([l, v]) => <div className="kpi" key={l}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}</div>
+        <p className="small muted" style={{ margin: '10px 0 0' }}>KDV dökümü: {[...byRate.entries()].sort((x, y) => x[0] - y[0]).map(([r, c]) => `%${r}: ${tl(c.tax)} (satış ${tl(c.gross)})`).join(' · ') || 'sipariş yok'}{noRate ? ` · Oranı tanımsız ürün %${kdv} ile hesaplandı` : ''}</p>
         <div className="grid2 even">
           <Card title="Ödeme yöntemleri"><Tbl min={0} cols={[['Yöntem', 'minmax(0,1fr)'], ['Sipariş', '70px'], ['Tutar', '110px']]} rows={m.byPay.map(([k, v]) => [PAY[k] ?? k, v.n, tl(v.t)])} empty="Veri yok" /></Card>
           <Card title="Fatura durumu" meta="Kargoda / teslim edilen siparişler"><Tbl min={0} cols={[['Sipariş', '100px'], ['Tarih', '110px'], ['', '100px']]} rows={m.toInvoice.slice(0, 15).map((o) => [o.order_no, dt(o.created_at), <Link key="l" href={`/admin/siparisler/fatura?no=${o.order_no}`} style={{ color: 'var(--ac)' }}>Fatura</Link>])} empty="Fatura bekleyen yok" /></Card>

@@ -25,6 +25,7 @@ type Draft = {
   active: boolean;
   badge: string;
   subtitle: string;
+  vat: string;
   desc: string;
   seoTitle: string;
   seoDesc: string;
@@ -48,13 +49,13 @@ const seoOf = (p: AdminProduct) => (p.data ?? {}) as { seo_title?: string; seo_d
 
 const blank = (sort: number): Draft => ({
   isNew: true, slug: '', slugTouched: false, name: '', category: 'Ev & Sofra', shop_cat: 'sofra', price: '', stock: '', desi: '', soon: false, active: true,
-  badge: '', subtitle: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '', gallery: [],
+  badge: '', subtitle: '', vat: '', desc: '', seoTitle: '', seoDesc: '', sizes: '', colors: [{ key: '', name: '', hex: '#EDE6D6', img: '', isNew: true }], thumb: '', gallery: [],
   details: [{ t: 'Malzeme', v: '' }, { t: 'Kargo & iade', v: 'Siparişin 2–4 iş gününde kargoda. 14 gün içinde koşulsuz iade.' }], data: {}, sort,
 });
 
 const toDraft = (p: AdminProduct): Draft => ({
   isNew: false, slug: p.slug, slugTouched: true, name: p.name, category: p.category, shop_cat: p.shop_cat, price: String(p.price), stock: p.stock == null ? '' : String(p.stock), desi: p.data?.desi == null ? '' : String(p.data.desi),
-  soon: p.soon, active: p.active, badge: p.data?.badge ?? '', subtitle: p.data?.subtitle ?? '', desc: p.data?.desc ?? '', seoTitle: seoOf(p).seo_title ?? '', seoDesc: seoOf(p).seo_desc ?? '', sizes: (p.sizes ?? []).join(', '),
+  soon: p.soon, active: p.active, badge: p.data?.badge ?? '', subtitle: p.data?.subtitle ?? '', vat: p.data?.vat != null ? String(p.data.vat) : '', desc: p.data?.desc ?? '', seoTitle: seoOf(p).seo_title ?? '', seoDesc: seoOf(p).seo_desc ?? '', sizes: (p.sizes ?? []).join(', '),
   colors: (p.colors ?? []).map((c) => ({ ...c, hex: c.hex || '#EDE6D6', img: c.img || '' })), thumb: p.thumb ?? '', gallery: Array.isArray((p.data as { gallery?: unknown })?.gallery) ? ((p.data as { gallery: unknown[] }).gallery.filter((x) => typeof x === 'string') as string[]) : [],
   details: (p.data?.details ?? []).map(([t, v]) => ({ t, v })), data: p.data ?? {}, sort: p.sort,
 });
@@ -128,6 +129,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
       desi: desiN ?? undefined,
       badge: d.badge.trim() || undefined,
       subtitle: d.subtitle.trim() || undefined,
+      vat: d.vat.trim() !== '' && Number.isFinite(Number(d.vat)) ? Math.min(100, Math.max(0, Number(d.vat))) : undefined,
       seo_title: d.seoTitle.trim() || undefined,
       seo_desc: d.seoDesc.trim() || undefined,
       gallery: d.gallery.length ? d.gallery : undefined,
@@ -229,6 +231,7 @@ function Editor({ init, onClose, onSaved, toast }: { init: Draft; onClose: () =>
         <div className="card-b">
         <Field label="Kısa açıklama"><textarea className="inp" value={d.desc} onChange={(e) => set('desc', e.target.value)} /></Field>
         <Field label="Alt başlık / lakap (isteğe bağlı)" hint="Başlıkla fiyat arasında italik, küçük yazılır. Örn. “Çay Tırkyakisi”"><input className="inp" value={d.subtitle} onChange={(e) => set('subtitle', e.target.value)} maxLength={80} /></Field>
+        <Field label="KDV oranı (%)" hint="Fiyata dahildir. Muhasebe raporunda ürün bazlı vergi bu orandan hesaplanır. Örn. 10 ya da 20"><input className="inp" type="number" min={0} max={100} step={1} value={d.vat} onChange={(e) => set('vat', e.target.value)} style={{ maxWidth: 140 }} /></Field>
         <Field label="Rozet (isteğe bağlı)" hint="Örn. “Atölyede üretilir”"><input className="inp" value={d.badge} onChange={(e) => set('badge', e.target.value)} /></Field>
         </div>
       </section>
