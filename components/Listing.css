@@ -30,7 +30,7 @@
   .ls-img.has-gal .ls-main{ display:none; }
   .ls-img.has-gal .ls-gal{ display:flex; position:absolute; inset:0; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain; }
   .ls-img.has-gal .ls-gal::-webkit-scrollbar{ display:none; }
-  .ls-img.has-gal .ls-gal img{ flex:0 0 100%; width:100%; height:100%; padding:0; object-fit:cover; scroll-snap-align:center; transition:none; }
+  .ls-img.has-gal .ls-gal img{ flex:0 0 100%; width:100%; height:100%; padding:0; object-fit:contain; scroll-snap-align:center; transition:none; }
   .ls-card:hover .ls-img.has-gal .ls-gal img{ transform:none; }
 }
 
