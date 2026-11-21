@@ -90,7 +90,7 @@ export function CartView() {
             return (
               <>
                 <div className="px px-ship" role="status">
-                  <p className="px-ship-t"><b>{offer - qty} ürün daha ekle, kargo bedava!</b> Sepetinde {offer} ürün olunca kargo ücretini biz üstleniyoruz.</p>
+                  <p className="px-ship-t"><b>{offer - qty} ürün daha ekle, kargo bedava!</b> Sepetinde {offer} ürün olunca kargo bizden.</p>
                 </div>
                 <Upsell items={items} force count={3} title="Kargo bedava için bir ürün daha ekle" />
               </>
