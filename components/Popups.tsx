@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   allowedOnPath,
@@ -128,7 +128,10 @@ export function PopupCard({ p, onClose, preview = false, titleId }: { p: Popup; 
         {p.title && (
           <h2 className="dpop-title" id={titleId}>
             {p.title.split(' ').map((w, i) => (
-              <span key={i} style={{ whiteSpace: 'nowrap' }}>{i ? ' ' : ''}{w}</span>
+              <Fragment key={i}>
+                {i ? ' ' : ''}
+                <span style={{ whiteSpace: 'nowrap' }}>{w}</span>
+              </Fragment>
             ))}
           </h2>
         )}
