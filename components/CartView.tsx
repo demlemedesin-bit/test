@@ -47,7 +47,7 @@ export function CartView() {
   return (
     <div className="shop-grid">
       <div>
-        {sf?.ship_bar_on && priced.subtotal > 0 && <ShipBar subtotal={priced.subtotal} remaining={priced.remainingForFree} />}
+        {sf?.ship_bar_on && priced.freeOn && priced.subtotal > 0 && <ShipBar subtotal={priced.subtotal} remaining={priced.remainingForFree} />}
         {priced.hasProblem && <Alert kind="err">Sepetinde satın alınamayan ürünler var. Devam etmek için onları kaldır.</Alert>}
         <ul className="lines">
           {priced.lines.map((l) => (

@@ -44,7 +44,7 @@ export async function fetchSettings(): Promise<Settings> {
   if (error) throw error;
   const map = Object.fromEntries((data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
   const num = (k: string, d: number) => (map[k] !== undefined && map[k] !== '' && !isNaN(Number(map[k])) ? Number(map[k]) : d);
-  return { freeFrom: num('free_shipping_threshold', 2000), fee: num('shipping_fee', 0), map };
+  return { freeFrom: map.free_shipping_threshold_on === '0' ? 0 : num('free_shipping_threshold', 2000), fee: num('shipping_fee', 0), map };
 }
 
 export async function fetchProducts(slugs: string[]): Promise<DbProduct[]> {
@@ -72,6 +72,7 @@ export type Priced = {
   subtotal: number;
   shipping: number;
   desi: number;
+  freeOn: boolean;
   total: number;
   remainingForFree: number;
   hasProblem: boolean;
@@ -101,14 +102,15 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     return { item, key: lineKey(item), unit, was: p?.was, total: problem ? 0 : unit * item.qty, problem };
   });
   const subtotal = lines.reduce((n, l) => n + l.total, 0);
-  const shipping = subtotal === 0 || subtotal >= s.freeFrom ? 0 : shipFee(cartDesi(items, products), s.map.shipping_desi_tiers, s.fee);
+  const shipping = subtotal === 0 || (s.freeFrom > 0 && subtotal >= s.freeFrom) ? 0 : shipFee(cartDesi(items, products), s.map.shipping_desi_tiers, s.fee);
   return {
     lines,
     subtotal,
     shipping,
     desi: cartDesi(items, products),
     total: subtotal + shipping,
-    remainingForFree: subtotal > 0 && subtotal < s.freeFrom ? s.freeFrom - subtotal : 0,
+    freeOn: s.freeFrom > 0,
+    remainingForFree: subtotal > 0 && s.freeFrom > 0 && subtotal < s.freeFrom ? s.freeFrom - subtotal : 0,
     hasProblem: lines.some((l) => l.problem),
   };
 }

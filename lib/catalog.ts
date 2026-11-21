@@ -180,7 +180,7 @@ export function configFromMap(m: Record<string, string | number | null | undefin
       phone: s('seller_phone', f.seller.phone),
     },
     bank: { holder: s('bank_holder', f.bank.holder), bankName: s('bank_name', f.bank.bankName), iban: s('bank_iban', f.bank.iban) },
-    freeFrom: n('free_shipping_threshold', 2000),
+    freeFrom: String(m.free_shipping_threshold_on ?? '1') === '0' ? 0 : n('free_shipping_threshold', 2000), // 0 = genel eşik kapalı (kargo kuralları Kampanyalar'da)
     fee: n('shipping_fee', 59.9),
   };
 }

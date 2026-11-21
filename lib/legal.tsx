@@ -77,7 +77,7 @@ export function legalDocs(config: ShopConfig): Doc[] {
             <li>Her durumda sözleşmedeki teslim süresi, siparişin verildiği tarihten itibaren en geç 30 gündür (Mesafeli Sözleşmeler Yönetmeliği m. 20).</li>
             <li>Gönderiler HepsiJET ile Türkiye içindeki adrese teslim edilir. Sipariş kargoya verildiğinde durumu “Kargoda” olarak güncellenir ve takip numarası e-postanla paylaşılır; sipariş takibi sayfasından ya da hesabından da izleyebilirsin.</li>
             <li>
-              {freeFrom} ₺ ve üzeri siparişlerde kargo ücretsizdir. Bu tutarın altındaki siparişlerde kargo ücreti sepet ve ödeme sayfasında, sipariş vermeden önce ayrıca gösterilir.
+              {config.freeFrom > 0 ? `${freeFrom} ₺ ve üzeri siparişlerde kargo ücretsizdir. Bu tutarın altındaki siparişlerde` : 'Kampanya dönemlerinde belirli koşullarda (ör. ürün adedi) kargo ücretsiz olabilir. Aksi halde'} kargo ücreti sepet ve ödeme sayfasında, sipariş vermeden önce ayrıca gösterilir.
             </li>
             <li>Teslimat adresinin ve telefonun doğru, eksiksiz verilmesi alıcının sorumluluğundadır. Hatalı adres nedeniyle teslim edilemeyen gönderilerde yeniden gönderim masrafı alıcıya yansıtılabilir.</li>
           </ul>

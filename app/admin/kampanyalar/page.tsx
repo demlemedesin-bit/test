@@ -319,7 +319,7 @@ export default function Campaigns() {
                           <span className="cell-muted">{c.code ? <span className="mono">{c.code}</span> : 'Kodsuz'}{c.product_slugs.length > 0 && ` · ${c.product_slugs.length} ürün`}</span>
                         </span>
                         <span>{valueText(c)}</span>
-                        <span className="cell-muted hide-m">{Number(c.min_total) > 0 ? tl(Number(c.min_total)) : '—'}</span>
+                        <span className="cell-muted hide-m">{[Number(c.min_total) > 0 ? tl(Number(c.min_total)) : '', Number(c.min_items) > 0 ? `${c.min_items}+ ürün` : ''].filter(Boolean).join(' · ') || '—'}</span>
                         <span className="cell-muted hide-m">{c.starts_at || c.ends_at ? `${dt(c.starts_at)} – ${dt(c.ends_at)}` : 'Süresiz'}</span>
                         <span className="num hide-m">{c.used_count}{c.usage_limit != null && ` / ${c.usage_limit}`}</span>
                         <span style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

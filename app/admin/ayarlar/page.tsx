@@ -10,7 +10,7 @@ import { PageHero } from '@/components/admin/PageHero';
 import { PushSettings } from '@/components/admin/PushSettings';
 
 const KEYS = [
-  'free_shipping_threshold', 'shipping_fee', 'shipping_desi_tiers', 'contact_email',
+  'free_shipping_threshold', 'free_shipping_threshold_on', 'shipping_fee', 'shipping_desi_tiers', 'contact_email',
   'seller_name', 'seller_address', 'seller_tax_office', 'seller_tax_no', 'seller_mersis', 'seller_phone',
   'bank_holder', 'bank_name', 'bank_iban',
 ] as const;
@@ -64,7 +64,7 @@ export default function Settings() {
     setBusy(true);
     const rows = KEYS.map((k) => ({
       key: k,
-      value: k === 'bank_iban' ? iban.replace(/(.{4})/g, '$1 ').trim() : k === 'free_shipping_threshold' ? String(free) : k === 'shipping_fee' ? String(fee) : k === 'shipping_desi_tiers' ? tiers.map((l) => l.replace(/\s+/g, '').replace(/,/g, '.')).join('\n') : f![k].trim(),
+      value: k === 'bank_iban' ? iban.replace(/(.{4})/g, '$1 ').trim() : k === 'free_shipping_threshold' ? String(free) : k === 'free_shipping_threshold_on' ? (f![k] === '0' ? '0' : '1') : k === 'shipping_fee' ? String(fee) : k === 'shipping_desi_tiers' ? tiers.map((l) => l.replace(/\s+/g, '').replace(/,/g, '.')).join('\n') : f![k].trim(),
       is_public: true,
     }));
     const { error } = await supabase().from('shop_settings').upsert(rows, { onConflict: 'key' });
@@ -128,6 +128,10 @@ export default function Settings() {
             <div className="card-h"><h2 className="card-t">Kargo</h2></div>
             <div className="card-b row2">
               <Field label="Ücretsiz kargo eşiği (₺)" hint="Sepet bu tutara ulaşınca kargo ücretsiz olur.">{inp('free_shipping_threshold', { inputMode: 'decimal' })}</Field>
+              <div className="fld" style={{ gridColumn: '1 / -1' }}>
+                <label className="chk"><input type="checkbox" checked={f.free_shipping_threshold_on !== '0'} onChange={(e) => set('free_shipping_threshold_on', e.target.checked ? '1' : '0')} /> Genel ücretsiz kargo eşiği açık</label>
+                <small className="muted">Kapatırsan yukarıdaki tutar uygulanmaz. Diğer ücretsiz kargo kuralları (2 ürün, belirli ürünler, tarih aralığı vb.) Kampanyalar sayfasında “Ücretsiz kargo” türüyle yönetilir; istediğin kadar kural ekleyebilirsin.</small>
+              </div>
               <Field label="Kargo ücreti (₺)" hint="Eşiğin altındaki siparişlere eklenir.">{inp('shipping_fee', { inputMode: 'decimal' })}</Field>
               <Field label="Desi kargo tablosu (₺, KDV dahil)" hint="Her satır “üst_desi=ücret”. Sepet toplam desisine göre ücret bulunur; tablo doluysa yukarıdaki sabit ücret kullanılmaz. 40 desiyi aşan sepet 40’lık parçalara bölünür. Ürün desisi Ürünler sayfasında, boşsa 1 sayılır.">
                 <textarea className="inp" rows={6} value={f.shipping_desi_tiers} onChange={(e) => set('shipping_desi_tiers', e.target.value)} placeholder={'4=96,80\n10=126,13'} />
