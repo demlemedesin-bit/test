@@ -39,12 +39,15 @@ export async function marketingFooter(sb: SupabaseClient, email: string): Promis
 }
 
 /** Ticari e-posta gönderir: ret bağlantılı alt bilgi + List-Unsubscribe başlıkları ekler. */
-export async function sendMarketing(sb: SupabaseClient, p: { to: string; subject: string; text: string }): Promise<SendResult> {
+export async function sendMarketing(sb: SupabaseClient, p: { to: string; subject: string; text: string; html?: (f: { who: string; unsubUrl: string; reason: string }) => string }): Promise<SendResult> {
   const footer = await marketingFooter(sb, p.to);
+  const { data: st } = await sb.from('shop_settings').select('key,value');
+  const sel = configFromMap(Object.fromEntries((st ?? []).map((r) => [r.key as string, String(r.value ?? '')]))).seller;
   return sendEmail({
     to: p.to,
     subject: p.subject,
     text: p.text.trim() + footer,
+    ...(p.html ? { html: p.html({ who: [sel.name, sel.address].filter(Boolean).join(' · '), unsubUrl: unsubUrl(p.to), reason: 'Bu e-postayı, ticari elektronik ileti izni verdiğin için aldın.' }) } : {}),
     headers: [
       { header: 'List-Unsubscribe', value: `<${unsubPostUrl(p.to)}>` },
       { header: 'List-Unsubscribe-Post', value: 'List-Unsubscribe=One-Click' },

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { hasAnyPerm } from '@/lib/serverAuth';
 import { renderTemplate, sendEmail, serviceClient } from '@/lib/notify';
+import { renderEmailHtml, tokenVars } from '@/lib/emailHtml';
 import { siteUrl } from '@/lib/siteUrl';
 
 const json = (b: { ok: boolean; skipped?: boolean; error?: string }, status = 200) => NextResponse.json(b, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -36,7 +37,13 @@ export async function POST(req: Request) {
     cart_url: `${base}/sepet`,
   };
   const subject = '[TEST] ' + renderTemplate(String(t.subject), vars);
-  const r = await sendEmail({ to, subject, text: renderTemplate(String(t.body), vars) });
+  const sample = key === 'order_created' || key === 'order_paid';
+  const html = renderEmailHtml(renderTemplate(String(t.body), tokenVars(vars)), vars, {
+    preheader: '[TEST] ' + subject,
+    reason: 'Bu bir test e-postasıdır.',
+    ...(sample ? { lines: [{ name: 'Çay Tiryakisi', sub: 'Siyah', qty: 1, total: '₺899' }, { name: 'Demleme Bez Çanta', qty: 2, total: '₺700' }], totals: { subtotal: '₺1.599', shipping: '₺96,80', total: '₺1.695,80' } } : {}),
+  });
+  const r = await sendEmail({ to, subject, text: renderTemplate(String(t.body), vars), html });
   try {
     await sb.from('message_log').insert({ channel: 'email', to_addr: to, template: `${key} (test)`, subject, status: r.status, error: r.error ?? null });
   } catch {

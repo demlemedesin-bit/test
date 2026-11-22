@@ -158,7 +158,7 @@ function Payment() {
 // ── E-posta ve SMS ───────────────────────────────────────────────────
 type Tpl = { key: string; name: string; subject: string; body: string; email_on: boolean; sms_on: boolean };
 const ORDER_VARS = ['name', 'order_no', 'total', 'track_url', 'carrier', 'tracking_no', 'carrier_url', 'payment_info'];
-const VARS: Record<string, string[]> = { cart_reminder: ['cart_items', 'cart_url'] };
+const VARS: Record<string, string[]> = { cart_reminder: ['cart_items', 'cart_url'], welcome: [] };
 
 function Messages({ toast }: { toast: Toast }) {
   const { checks, err } = useChecks();
@@ -221,7 +221,7 @@ function Messages({ toast }: { toast: Toast }) {
     setBusy(false);
   }
 
-  const vars = f ? [...(f.key === 'cart_reminder' ? [] : ORDER_VARS), ...(VARS[f.key] ?? [])] : [];
+  const vars = f ? [...(f.key === 'cart_reminder' || f.key === 'welcome' ? [] : ORDER_VARS), ...(VARS[f.key] ?? [])] : [];
 
   return (
     <div className="int-stack">

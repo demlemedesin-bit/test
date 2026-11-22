@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { carrierUrl } from './carriers';
 import { configFromMap } from './catalog';
 import { siteUrl } from './siteUrl';
+import { renderEmailHtml, tokenVars, type MailLine } from './emailHtml';
 
 /**
  * Bildirimler: e-posta (SMTP2GO), SMS (NetGSM), giden webhook (n8n). Yalnızca sunucu rotalarından çağrılır.
@@ -35,7 +36,7 @@ export function renderTemplate(str: string, vars: Record<string, string>): strin
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e)).slice(0, 300);
 
-export async function sendEmail(p: { to: string; subject: string; text: string; headers?: { header: string; value: string }[] }): Promise<SendResult> {
+export async function sendEmail(p: { to: string; subject: string; text: string; html?: string; headers?: { header: string; value: string }[] }): Promise<SendResult> {
   // SMTP2GO HTTP API: SMTP2GO_API_KEY + MAIL_FROM (SMTP2GO'da doğrulanmış gönderen, ör. "Demleme <garen@demlemedesin.com>")
   const key = process.env.SMTP2GO_API_KEY;
   const from = process.env.MAIL_FROM;
@@ -44,7 +45,7 @@ export async function sendEmail(p: { to: string; subject: string; text: string; 
     const r = await fetch('https://eu-api.smtp2go.com/v3/email/send', {
       method: 'POST',
       headers: { 'X-Smtp2go-Api-Key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text, ...(p.headers?.length ? { custom_headers: p.headers } : {}) }),
+      body: JSON.stringify({ sender: from, to: [p.to], subject: p.subject, text_body: p.text, ...(p.html ? { html_body: p.html } : {}), ...(p.headers?.length ? { custom_headers: p.headers } : {}) }),
       signal: AbortSignal.timeout(10000),
     });
     const j = (await r.json().catch(() => ({}))) as { data?: { succeeded?: number; error?: string; error_code?: string } };
@@ -175,6 +176,25 @@ function orderVars(o: OrderRec, m: Record<string, string>): Record<string, strin
   };
 }
 
+/** Sipariş e-postasının HTML sürümü: panel metni + (alındı/ödeme alındı) sipariş özeti tablosu. */
+function orderHtml(event: OrderEvent, body: string, vars: Record<string, string>, o: OrderRec): string {
+  const lines: MailLine[] = ((o.items as OrderLine[] | null) ?? []).map((i) => ({
+    name: i.name ?? 'Ürün',
+    sub: [i.color_name, i.size].filter(Boolean).join(' · ') || undefined,
+    qty: i.qty ?? 1,
+    total: i.line_total != null ? money(i.line_total) : '',
+  }));
+  const withSummary = event === 'order_created' || event === 'order_paid';
+  const disc = Number(o.discount ?? 0);
+  return renderEmailHtml(renderTemplate(body, tokenVars(vars)), vars, {
+    preheader: renderTemplate(body, vars).split('\n').find((l) => l.trim())?.slice(0, 110),
+    reason: 'Bu e-posta, Demleme\'den sipariş verdiğin için gönderildi.',
+    ...(withSummary
+      ? { lines, totals: { subtotal: money(o.subtotal), shipping: Number(o.shipping) === 0 ? 'Ücretsiz' : money(o.shipping), discount: disc > 0 ? '−' + money(disc) : undefined, coupon: o.coupon_code ?? undefined, total: money(o.total) } }
+      : {}),
+  });
+}
+
 /** Sipariş olayı için e-posta / SMS / webhook gönderir ve her denemeyi message_log'a yazar. Asla fırlatmaz. */
 export async function notifyOrder(event: OrderEvent, orderNo: string): Promise<NotifyOut> {
   const results: NotifyResult[] = [];
@@ -193,7 +213,8 @@ export async function notifyOrder(event: OrderEvent, orderNo: string): Promise<N
       const subject = renderTemplate(tpl.subject, vars);
       const text = renderTemplate(tpl.body, vars);
       if (tpl.email_on && order.email) {
-        const r = await sendEmail({ to: order.email, subject, text });
+        const html = orderHtml(event, tpl.body, vars, order);
+        const r = await sendEmail({ to: order.email, subject, text, html });
         results.push({ channel: 'email', to: order.email, ...r });
         await logMsg(sb, { channel: 'email', to_addr: order.email, template: event, subject, status: r.status, error: r.error, order_no: orderNo });
       }
@@ -260,7 +281,7 @@ export async function notifyCart(email: string): Promise<NotifyOut> {
       await sb.from('abandoned_carts').update({ reminded_at: new Date().toISOString() }).eq('email', to);
     } else if (tpl && tpl.email_on) {
       const subject = renderTemplate(tpl.subject, vars);
-      const r = await mk.sendMarketing(sb, { to, subject, text: renderTemplate(tpl.body, vars) });
+      const r = await mk.sendMarketing(sb, { to, subject, text: renderTemplate(tpl.body, vars), html: (f) => renderEmailHtml(renderTemplate(tpl.body, tokenVars(vars)), vars, { preheader: 'Sepetinde ürünler kaldı.', ...f }) });
       results.push({ channel: 'email', to, ...r });
       await logMsg(sb, { channel: 'email', to_addr: to, template: 'cart_reminder', subject, status: r.status, error: r.error });
       if (r.status === 'sent') {
