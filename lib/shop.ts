@@ -31,6 +31,11 @@ export function shipFee(desi: number, tiersText: string | undefined, fallback: n
   const top = t[t.length - 1], n = Math.ceil(desi / top.mx), rest = desi - (n - 1) * top.mx;
   return Math.round(((n - 1) * top.pr + (t.find((x) => x.mx >= rest) ?? top).pr) * 100) / 100;
 }
+/** Sepet kargosu: 'max' modunda 2+ kalemde en yüksek kalemin ücreti, aksi halde toplam desi. Sunucudaki cart_ship ile aynı. */
+export function shipCart(items: { slug: string; qty: number }[], products: { slug: string; data?: { desi?: number | string } | null }[], tiers: string | undefined, fallback: number, mode?: string): number {
+  if (mode === 'max' && items.length >= 2) return Math.max(...items.map((i) => shipFee(cartDesi([i], products), tiers, fallback)));
+  return shipFee(cartDesi(items, products), tiers, fallback);
+}
 export function cartDesi(items: { slug: string; qty: number }[], products: { slug: string; data?: { desi?: number | string } | null }[]): number {
   const by = new Map(products.map((p) => [p.slug, p]));
   return items.reduce((n, i) => { const d = Number(String(by.get(i.slug)?.data?.desi ?? '').replace(',', '.')); return n + (Number.isFinite(d) && d > 0 ? d : 1) * i.qty; }, 0);
@@ -102,7 +107,7 @@ export function priceCart(items: CartItem[], products: DbProduct[], s: Settings)
     return { item, key: lineKey(item), unit, was: p?.was, total: problem ? 0 : unit * item.qty, problem };
   });
   const subtotal = lines.reduce((n, l) => n + l.total, 0);
-  const shipping = subtotal === 0 || (s.freeFrom > 0 && subtotal >= s.freeFrom) ? 0 : shipFee(cartDesi(items, products), s.map.shipping_desi_tiers, s.fee);
+  const shipping = subtotal === 0 || (s.freeFrom > 0 && subtotal >= s.freeFrom) ? 0 : shipCart(items, products, s.map.shipping_desi_tiers, s.fee, s.map.shipping_calc);
   return {
     lines,
     subtotal,
