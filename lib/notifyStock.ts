@@ -34,7 +34,7 @@ export async function notifyStock(slug: string): Promise<StockNotifyResult> {
     const name = String(prod.name || 'Ürün');
     const subject = `${name} yeniden stokta`;
     const url = `${siteUrl()}/urun/${encodeURIComponent(slug)}`;
-    const text = `Merhaba,\n\nBeklediğin “${name}” yeniden stokta. Tükenmeden göz atmak için:\n${url}\n\nBu e-postayı, ürün stoğa girince haber verilmesini istediğin için aldın.\n\nDemleme`;
+    const text = `Merhaba,\n\nBeklediğin “${name}” yeniden stokta. Tükenmeden göz atmak için:\n${url}\n\nBu e-postayı, ürün stoğa girince haber verilmesini istediğin için aldın.\n\nDemleme\n\n`;
 
     let sent = 0;
     let skipped = 0;
