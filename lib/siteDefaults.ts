@@ -354,7 +354,7 @@ export const FIELDS: Field[] = [
   "group": "Ana sayfa · Konuklar",
   "label": "Başlık",
   "kind": "text",
-  "def": "Demlemedeki konuklar"
+  "def": "Demleme’deki konuklar"
  },
  {
   "id": "konuk_meta",
