@@ -98,9 +98,18 @@ export function renderEmailHtml(bodyTokenized: string, vars: Record<string, stri
       return;
     }
     if (p.includes(TOK.carrier)) {
-      const lead = p.replace(TOK.carrier, '').trim();
+      // "Etiket: değer" satırları kutuda; bağlantı satırı (etiketi kalan) düğmeye dönüşür
+      const rows = p
+        .split('\n')
+        .filter((ln) => !ln.includes(TOK.carrier) && ln.trim())
+        .map((ln) => {
+          const m = ln.match(/^([^:]{1,30}):\s*(.*)$/);
+          return m ? `<span style="color:${INK2}">${esc(m[1])}:</span> <strong>${esc(m[2])}</strong>` : esc(ln);
+        })
+        .join('<br>');
+      const label = (p.split('\n').find((ln) => ln.includes(TOK.carrier)) || '').replace(TOK.carrier, '').replace(/[:\s]+$/, '').trim();
       const url = vars.carrier_url || '';
-      out += box(nl2br(lead)) + (url ? btn(url, 'Kargom nerede?') : '');
+      out += (rows ? box(rows) : '') + (url ? btn(url, label || 'Kargom nerede?') : '');
       return;
     }
     if (p.includes(TOK.track)) {
