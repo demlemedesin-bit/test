@@ -81,6 +81,17 @@ export default function Tracking() {
     const code = (edit.code || slugify(edit.name)).slice(0, 40);
     if (!edit.name.trim()) return show('Link için bir ad yaz.', true);
     if (!/^[a-z0-9-]{2,40}$/.test(code)) return show('Kod 2-40 karakter; küçük harf, rakam ve tire olabilir.', true);
+    // Tam adres ya da "/https://…" yazıldıysa yalnızca yola indir (örn. https://site.com/urun/x → /urun/x)
+    const raw = edit.dest.trim().replace(/^\/+(?=https?:)/i, '');
+    if (/^https?:\/\//i.test(raw)) {
+      try {
+        const u = new URL(raw);
+        if (u.hostname.replace(/^www\./, '') !== window.location.hostname.replace(/^www\./, '')) return show('Hedef bu sitenin bir sayfası olmalı (örn. /, /urun/…).', true);
+        edit.dest = (u.pathname || '/') + u.search + u.hash;
+      } catch {
+        return show('Hedef adres geçersiz.', true);
+      }
+    } else edit.dest = raw;
     if (!edit.dest.startsWith('/') || edit.dest.startsWith('//')) return show('Hedef “/” ile başlayan bir site içi adres olmalı (örn. /, /#magaza, /urun/…).', true);
     if (!edit.utm_source.trim()) return show('Kaynak (utm_source) gerekli; örn. instagram.', true);
     setBusy(true);
