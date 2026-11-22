@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { CONSENT_TEXT } from '@/lib/marketing';
-import { renderTemplate, serviceClient } from '@/lib/notify';
-import { renderEmailHtml, tokenVars } from '@/lib/emailHtml';
-import { sendMarketing } from '@/lib/marketing';
+import { serviceClient } from '@/lib/notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,22 +35,5 @@ export async function POST(req: Request) {
     ? await sb.from('subscribers').update({ ...row, unsubscribed: false, unsubscribed_at: null }).eq('email', email)
     : await sb.from('subscribers').insert({ ...row, unsubscribed: false });
   if (error) return json({ ok: false, error: 'Kaydın alınamadı. Biraz sonra tekrar dene.' }, 500);
-  // Hoş geldin e-postası (panel → Mesaj şablonları → welcome). Gönderilemese de kayıt başarılıdır.
-  try {
-    const { data: t } = await sb.from('message_templates').select('subject,body,email_on').eq('key', 'welcome').maybeSingle();
-    if (t && t.email_on) {
-      const vars: Record<string, string> = {};
-      const subject = renderTemplate(String(t.subject), vars);
-      const r = await sendMarketing(sb, {
-        to: email,
-        subject,
-        text: renderTemplate(String(t.body), vars),
-        html: (f) => renderEmailHtml(renderTemplate(String(t.body), tokenVars(vars)), vars, { preheader: 'Demleme ailesine hoş geldin.', ...f }),
-      });
-      await sb.from('message_log').insert({ channel: 'email', to_addr: email, template: 'welcome', subject, status: r.status, error: r.error ?? null, order_no: null });
-    }
-  } catch {
-    /* hoş geldin e-postası kaydı engellemez */
-  }
   return json({ ok: true });
 }
