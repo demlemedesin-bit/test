@@ -201,6 +201,11 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
                 <Truck size={15} /> Kargoya ver
               </button>
             )}
+            {order.status === 'hazirlaniyor' && (
+              <button className="btn ghost" disabled={busy} title="Kargo kullanmadan elden teslim edilen sipariş. Müşteriye e-posta gitmez." onClick={() => save({ status: 'teslim_edildi', tracking_carrier: 'Elden teslim', tracking_no: null, admin_note: note.trim() || null }, 'Elden teslim edildi olarak işaretlendi (müşteriye e-posta gitmedi)')}>
+                Elden teslim edildi
+              </button>
+            )}
             {order.status === 'kargoda' && (
               <button className="btn" disabled={busy} onClick={() => save({ status: 'teslim_edildi', ...meta }, 'Teslim edildi', 'order_delivered')}>
                 Teslim edildi
