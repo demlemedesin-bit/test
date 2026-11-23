@@ -49,3 +49,4 @@
 .sheet.of .of-kdv { width: 62%; margin-left: auto; margin-top: 16px; font-size: 12px; }
 .sheet.of .tot { margin-bottom: 4px; }
 @media print { .sheet.of .of-img { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .sheet.of tr, .sheet.of .tot { break-inside: avoid; } }
+.sheet.of .of-ship { width: 100%; margin-top: 12px; }

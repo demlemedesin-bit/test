@@ -295,24 +295,32 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
               </tr>
             );
           })}
-          <tr>
-            <td />
-            <td><b>Kargo bedeli</b>{o.tracking_carrier ? <div style={{ color: '#666' }}>{o.tracking_carrier}</div> : null}</td>
-            <td className="r">1</td>
-            <td className="r">{ship === 0 ? 'Ücretsiz' : tl(ship)}</td>
-            <td className="r">%{DEFAULT_VAT}</td>
-            <td className="r">{tl(ship / (1 + DEFAULT_VAT / 100))}</td>
-            <td className="r">{tl(ship - ship / (1 + DEFAULT_VAT / 100))}</td>
-            <td className="r">{tl(ship)}</td>
-          </tr>
         </tbody>
       </table>
 
       <div className="tot">
         <div><span>Ürünler toplamı (KDV dahil)</span><span>{tl(sub)}</span></div>
         {disc > 0 && <div><span>İndirim{o.coupon_code ? ` (${o.coupon_code})` : ''}</span><span>−{tl(disc)}</span></div>}
-        <div><span>Kargo</span><span>{ship === 0 ? 'Ücretsiz' : tl(ship)}</span></div>
-        <div className="g"><span>Genel toplam</span><span>{tl(Number(o.total))}</span></div>
+        <div><span><b>Mal bedeli toplamı</b></span><span><b>{tl(Math.max(0, sub - disc))}</b></span></div>
+      </div>
+
+      <table className="of-kdv of-ship">
+        <thead>
+          <tr><th>Kargo bedeli</th><th className="r">Oran</th><th className="r">Matrah</th><th className="r">KDV tutarı</th><th className="r">KDV dahil</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{o.tracking_carrier || 'Kargo'}</td>
+            <td className="r">%{DEFAULT_VAT}</td>
+            <td className="r">{tl(ship / (1 + DEFAULT_VAT / 100))}</td>
+            <td className="r">{tl(ship - ship / (1 + DEFAULT_VAT / 100))}</td>
+            <td className="r">{ship === 0 ? 'Ücretsiz' : tl(ship)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="tot">
+        <div className="g"><span>Genel toplam (mal + kargo)</span><span>{tl(Number(o.total))}</span></div>
       </div>
 
       <table className="of-kdv">
