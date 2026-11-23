@@ -18,6 +18,7 @@ function FullDashboard() {
   const [orders, setOrders] = useState<AdminOrder[] | null>(null);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [err, setErr] = useState('');
+  const [openTop, setOpenTop] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -59,15 +60,17 @@ function FullDashboard() {
       const list = live.filter((o) => dayKey(new Date(o.created_at)) === k);
       return { label: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }), total: list.reduce((n, o) => n + Number(o.total), 0), count: list.length };
     });
-    const sold = new Map<string, { name: string; qty: number; sum: number }>();
+    const sold = new Map<string, { name: string; qty: number; sum: number; vars: Map<string, number> }>();
     const since = now.getTime() - 30 * 86400000;
     live
       .filter((o) => new Date(o.created_at).getTime() >= since)
       .forEach((o) =>
         o.items.forEach((i) => {
           const k = i.name;
-          const r = sold.get(k) ?? { name: k, qty: 0, sum: 0 };
+          const r = sold.get(k) ?? { name: k, qty: 0, sum: 0, vars: new Map<string, number>() };
           r.qty += i.qty;
+          const vk = [i.color_name, i.size].filter(Boolean).join(' · ') || 'Tek seçenek';
+          r.vars.set(vk, (r.vars.get(vk) ?? 0) + i.qty);
           r.sum += Number(i.line_total);
           sold.set(k, r);
         }),
@@ -94,7 +97,7 @@ function FullDashboard() {
       statusSegs,
       payRows,
       trend,
-      top: [...sold.values()].sort((a, b) => b.qty - a.qty).slice(0, 5),
+      top: [...sold.values()].sort((a, b) => b.qty - a.qty).slice(0, 5).map((t) => ({ ...t, vars: [...t.vars.entries()].sort((a, b) => b[1] - a[1]) })),
       lowStock,
       avg: month.length ? month.reduce((n, o) => n + Number(o.total), 0) / month.length : 0,
     };
@@ -215,17 +218,29 @@ function FullDashboard() {
                 <section className="card">
                   <div className="card-h">
                     <h2 className="card-t">Çok satanlar</h2>
-                    <span className="card-m">son 30 gün</span>
+                    <span className="card-m">son 30 gün · varyasyon için ürüne dokun</span>
                   </div>
                   {s.top.length === 0 ? (
                     <Empty title="Veri yok" text="Satış oldukça burada sıralanır." />
                   ) : (
                     <div className="card-b rank">
                       {s.top.map((t) => (
-                        <div className="rank-r" key={t.name}>
-                          <span className="cell-clip">{t.name}</span>
-                          <b className="num">{t.qty} adet</b>
-                          <div className="rank-bar"><i style={{ width: `${(t.qty / topMax) * 100}%` }} /></div>
+                        <div key={t.name}>
+                          <div className="rank-r" role="button" tabIndex={0} style={{ cursor: 'pointer' }} onClick={() => setOpenTop(openTop === t.name ? null : t.name)} onKeyDown={(e) => { if (e.key === 'Enter') setOpenTop(openTop === t.name ? null : t.name); }}>
+                            <span className="cell-clip">{openTop === t.name ? '▾' : '▸'} {t.name}</span>
+                            <b className="num">{t.qty} adet</b>
+                            <div className="rank-bar"><i style={{ width: `${(t.qty / topMax) * 100}%` }} /></div>
+                          </div>
+                          {openTop === t.name && (
+                            <div style={{ padding: '2px 0 10px 16px', display: 'grid', gap: 4 }}>
+                              {t.vars.map(([v, q]) => (
+                                <div key={v} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                                  <span className="cell-muted">{v}</span>
+                                  <b className="num">{q} adet</b>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -11,7 +11,7 @@ import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
 import { PageHero } from '@/components/admin/PageHero';
 
 type O = AdminOrder & { packed_at?: string | null };
-const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['topla', 'Ürün toplama'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
+const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['topla', 'Hazırlık özeti'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
 
 const label = (o: O) => {
   const a = window.open('', '_blank', 'width=420,height=560');
@@ -49,6 +49,20 @@ export default function Depo() {
     return [...m.values()].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
   }, [prep]);
 
+  const groups = useMemo(() => {
+    const m = new Map<string, { name: string; qty: number; rows: { opt: string; qty: number }[] }>();
+    pick.forEach((x) => { const g = m.get(x.slug || x.name) ?? { name: x.name, qty: 0, rows: [] }; g.qty += x.qty; g.rows.push({ opt: x.opt || 'Tek seçenek', qty: x.qty }); m.set(x.slug || x.name, g); });
+    return [...m.values()].sort((a, b) => b.qty - a.qty);
+  }, [pick]);
+  function printPrep() {
+    const a = window.open('', '_blank', 'width=720,height=900');
+    if (!a) return;
+    const e = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const total = groups.reduce((n, g) => n + g.qty, 0);
+    a.document.write(`<title>Hazırlık özeti</title><body style="font:14px system-ui;padding:24px"><h2 style="margin:0 0 4px">Hazırlık özeti</h2><div style="color:#666;margin-bottom:14px">${prep.length} sipariş · ${total} adet · ${new Date().toLocaleDateString('tr-TR')}</div>${groups.map((g) => `<div style="margin:0 0 14px;break-inside:avoid"><div style="display:flex;justify-content:space-between;border-bottom:2px solid #000;font-weight:700;padding:4px 0"><span>${e(g.name)}</span><span>${g.qty} adet</span></div>${g.rows.map((r) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ddd"><span>☐ ${e(r.opt)}</span><b>${r.qty}</b></div>`).join('')}</div>`).join('')}</body>`);
+    a.document.close(); a.print();
+  }
+
   async function pack(o: O) {
     const { error } = await supabase().from('orders').update({ packed_at: new Date().toISOString() }).eq('id', o.id);
     if (error) show(error.message, true); else load();
@@ -83,9 +97,23 @@ export default function Depo() {
             <select key="c" className="inp" value={track[o.id]?.c ?? CARRIER_NAMES[0]} onChange={(e) => setTrack((t) => ({ ...t, [o.id]: { c: e.target.value, n: t[o.id]?.n ?? '' } }))}>{CARRIER_NAMES.map((c) => <option key={c}>{c}</option>)}</select>,
             <input key="n" className="inp" value={track[o.id]?.n ?? ''} onChange={(e) => setTrack((t) => ({ ...t, [o.id]: { c: t[o.id]?.c ?? CARRIER_NAMES[0], n: e.target.value } }))} />,
             <button key="s" className="btn" onClick={() => ship(o)}>Kargoya ver</button>])} empty="Paketlenmiş sipariş yok" /></Card>}
-        {tab === 'topla' && <Card title="Toplama listesi" meta={`${prep.length} sipariş`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1.4fr)'], ['Seçenek', 'minmax(0,1fr)'], ['Adet', '70px']]} rows={pick.map((x) => [x.name, x.opt || '—', <b key="q">{x.qty}</b>])} empty="Toplanacak ürün yok" /></Card>}
+        {tab === 'topla' && (
+          <>
+            <div className="kpis">{[['Sipariş', prep.length], ['Toplam adet', groups.reduce((n, g) => n + g.qty, 0)], ['Ürün çeşidi', groups.length]].map(([l, v]) => <div className="kpi" key={String(l)}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}</div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '0 0 8px' }}><button className="btn ghost" onClick={printPrep} disabled={!groups.length}>Yazdır</button></div>
+            {groups.length === 0 ? <Card title="Hazırlık özeti"><Tbl min={0} cols={[['Ürün', '1fr']]} rows={[]} empty="Hazırlanacak ürün yok" /></Card> : groups.map((g) => (
+              <Card key={g.name} title={g.name} meta={`${g.qty} adet`}><Tbl min={0} cols={[['Varyasyon', 'minmax(0,1fr)'], ['Adet', '70px']]} rows={g.rows.map((r) => [r.opt, <b key="q">{r.qty}</b>])} empty="" /></Card>
+            ))}
+          </>
+        )}
         {tab === 'stok' && (
           <>
+            <Card title="Varyasyon stokları" meta="Ürün ve renk bazında"><Tbl min={0} cols={[['Ürün', 'minmax(0,1.2fr)'], ['Varyasyon', 'minmax(0,1fr)'], ['Stok', '80px']]}
+              rows={ps.filter((p) => p.active).flatMap((p): React.ReactNode[][] => {
+                const cs = (p.colors ?? []).filter((c) => typeof c.stock === 'number');
+                if (!cs.length) return [[p.name, '—', p.stock ?? '∞']];
+                return cs.map((c, k) => [k === 0 ? p.name : '', c.name, <b key={c.key} style={{ color: (c.stock as number) <= 0 ? 'var(--red, #d33)' : undefined }}>{c.stock}</b>]);
+              })} empty="Ürün yok" /></Card>
             <Card title="Kritik stok" meta={`${crit.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['Stok', '80px']]} rows={crit.map((p) => [p.name, p.stock])} empty="Kritik stok yok" /></Card>
             <Card title="Barkodu girilmemiş" meta={`${noBar.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['', '90px']]} rows={noBar.map((p) => [p.name, <a key="a" style={{ color: 'var(--ac)' }} href={`/admin/urunler?edit=${p.slug}`}>Düzenle</a>])} empty="Hepsi tamam" /></Card>
           </>
