@@ -258,7 +258,7 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
           <h3>Ödeme ve kargo</h3>
           <div>Ödeme: {payLabel}{o.paid_at ? ` · ${dt(o.paid_at, true)}` : ' · ödenmedi'}</div>
           <div>Kupon: {o.coupon_code || '—'}</div>
-          <div>Kargo: {o.tracking_carrier || '—'}{o.tracking_no ? ` · ${o.tracking_no}` : ''}</div>
+          <div>Kargo firması: {o.tracking_carrier || '—'}{o.tracking_no ? ` · ${o.tracking_no}` : ''}</div>
           {o.note ? <div>Not: {o.note}</div> : null}
         </div>
       </div>
@@ -291,11 +291,19 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
               </tr>
             );
           })}
+          <tr>
+            <td />
+            <td><b>Kargo bedeli</b>{o.tracking_carrier ? <div style={{ color: '#666' }}>{o.tracking_carrier}</div> : null}</td>
+            <td className="r">1</td>
+            <td className="r">{ship === 0 ? 'Ücretsiz' : tl(ship)}</td>
+            <td className="r">%{DEFAULT_VAT}</td>
+            <td className="r">{ship === 0 ? tl(0) : tl(ship)}</td>
+          </tr>
         </tbody>
       </table>
 
       <div className="tot">
-        <div><span>Ara toplam (KDV dahil)</span><span>{tl(sub)}</span></div>
+        <div><span>Ürünler toplamı (KDV dahil)</span><span>{tl(sub)}</span></div>
         {disc > 0 && <div><span>İndirim{o.coupon_code ? ` (${o.coupon_code})` : ''}</span><span>−{tl(disc)}</span></div>}
         <div><span>Kargo</span><span>{ship === 0 ? 'Ücretsiz' : tl(ship)}</span></div>
         <div className="g"><span>Genel toplam</span><span>{tl(Number(o.total))}</span></div>
