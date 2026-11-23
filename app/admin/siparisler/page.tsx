@@ -162,9 +162,9 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
       }
       footer={
         <>
-          <button className="btn ghost" onClick={() => window.print()}>
+          <a className="btn ghost" href={`/admin/siparisler/fatura?no=${encodeURIComponent(order.order_no)}&mode=form&print=1`} target="_blank" rel="noopener noreferrer">
             <Printer size={15} /> Yazdır
-          </button>
+          </a>
           <a className="btn ghost" href={`/admin/siparisler/fatura?no=${encodeURIComponent(order.order_no)}`} target="_blank" rel="noopener noreferrer">
             <FileText size={15} /> Fatura / irsaliye / kargo etiketi
           </a>

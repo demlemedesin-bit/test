@@ -14,7 +14,7 @@ export const STATUS: Record<string, string> = {
 
 export const PAY: Record<string, string> = { havale: 'Havale / EFT', kapida: 'Kapıda ödeme', kart: 'Kredi/banka kartı' };
 
-export type OrderItem = { name: string; color_name?: string | null; size?: string | null; qty: number; unit_price: number; line_total: number };
+export type OrderItem = { name: string; slug?: string; color?: string | null; color_name?: string | null; size?: string | null; qty: number; unit_price: number; line_total: number };
 export type OrderRow = {
   order_no: string;
   status: string;

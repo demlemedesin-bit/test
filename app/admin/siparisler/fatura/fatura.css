@@ -42,3 +42,10 @@
 .lbl-items span { margin-top: 1mm; }
 @page label { size: 100mm 150mm; margin: 0; }
 @media print { .lbl { border: none; margin: 0; width: 100mm; min-height: 150mm; } }
+
+/* Sipariş formu */
+.sheet.of .of-img { width: 52px; height: 52px; object-fit: contain; background: #f4eee1; border-radius: 4px; display: block; }
+.sheet.of .of-tbl td { vertical-align: middle; }
+.sheet.of .of-kdv { width: 62%; margin-left: auto; margin-top: 16px; font-size: 12px; }
+.sheet.of .tot { margin-bottom: 4px; }
+@media print { .sheet.of .of-img { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .sheet.of tr, .sheet.of .tot { break-inside: avoid; } }

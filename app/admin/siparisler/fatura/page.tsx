@@ -10,24 +10,32 @@ import { useMenu } from '@/components/admin/Shell';
 import { Empty, Loading, TopBar } from '@/components/admin/ui';
 import './fatura.css';
 
-type Mode = 'fatura' | 'irsaliye' | 'etiket';
+type Mode = 'form' | 'fatura' | 'irsaliye' | 'etiket';
+type Prod = { slug: string; thumb?: string | null; colors?: { key: string; name?: string; thumb?: string; img?: string }[] | null; data?: { vat?: number } | null };
 type Seller = { name: string; address: string; taxOffice: string; taxNo: string; mersis: string; phone: string; email: string };
 
 function Doc() {
   const menu = useMenu();
-  const no = useSearchParams().get('no') ?? '';
+  const sp = useSearchParams();
+  const no = sp.get('no') ?? '';
+  const autoPrint = sp.get('print') === '1';
+  const [prods, setProds] = useState<Record<string, Prod>>({});
   const [order, setOrder] = useState<AdminOrder | null | 'yok'>(null);
   const [seller, setSeller] = useState<Seller>({ name: '', address: '', taxOffice: '', taxNo: '', mersis: '', phone: '', email: '' });
-  const [mode, setMode] = useState<Mode>('fatura');
+  const [mode, setMode] = useState<Mode>(sp.get('mode') === 'form' ? 'form' : 'fatura');
 
   useEffect(() => {
     let off = false;
     (async () => {
-      const [o, s] = await Promise.all([
+      const [o, s, pr, ds] = await Promise.all([
         no ? supabase().from('orders').select('*').eq('order_no', no).maybeSingle() : Promise.resolve({ data: null }),
         supabase().from('shop_settings').select('key,value'),
+        supabase().from('products').select('slug,thumb,colors,data'),
+        supabase().from('shop_settings').select('key,value').eq('key', 'default_vat').maybeSingle(),
       ]);
       if (off) return;
+      setProds(Object.fromEntries(((pr.data ?? []) as Prod[]).map((x) => [x.slug, x])));
+      void ds;
       const m = Object.fromEntries((s.data ?? []).map((r) => [r.key as string, String(r.value ?? '').trim()]));
       setSeller({ name: m.seller_name ?? '', address: m.seller_address ?? '', taxOffice: m.seller_tax_office ?? '', taxNo: m.seller_tax_no ?? '', mersis: m.seller_mersis ?? '', phone: m.seller_phone ?? '', email: m.contact_email ?? '' });
       setOrder((o.data as AdminOrder | null) ?? 'yok');
@@ -47,7 +55,7 @@ function Doc() {
           ) : order === 'yok' ? (
             <Empty title="Sipariş bulunamadı" text="Sipariş numarasını kontrol et." />
           ) : (
-            <Sheet order={order} seller={seller} mode={mode} setMode={setMode} />
+            <Sheet order={order} seller={seller} mode={mode} setMode={setMode} prods={prods} autoPrint={autoPrint} />
           )}
         </div>
       </div>
@@ -55,7 +63,12 @@ function Doc() {
   );
 }
 
-function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; seller: Seller; mode: Mode; setMode: (m: Mode) => void }) {
+function Sheet({ order: o, seller: s, mode, setMode, prods, autoPrint }: { order: AdminOrder; seller: Seller; mode: Mode; setMode: (m: Mode) => void; prods: Record<string, Prod>; autoPrint: boolean }) {
+  useEffect(() => {
+    if (!autoPrint || mode !== 'form') return;
+    const t = setTimeout(() => window.print(), 900); // görseller yüklensin
+    return () => clearTimeout(t);
+  }, [autoPrint, mode]);
   const a = o.address ?? {};
   const addr = [a.address, [a.zip, a.district].filter(Boolean).join(' '), a.city].filter(Boolean).join('\n');
   const disc = Number(o.discount ?? 0);
@@ -64,6 +77,7 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
     <>
       <div className="fatura-bar no-print">
         <div className="tabs">
+          <button className={`tab${mode === 'form' ? ' on' : ''}`} onClick={() => setMode('form')}>Sipariş formu</button>
           <button className={`tab${mode === 'fatura' ? ' on' : ''}`} onClick={() => setMode('fatura')}>Fatura bilgi formu</button>
           <button className={`tab${mode === 'irsaliye' ? ' on' : ''}`} onClick={() => setMode('irsaliye')}>Sevk irsaliyesi</button>
           <button className={`tab${mode === 'etiket' ? ' on' : ''}`} onClick={() => setMode('etiket')}>Kargo etiketi (10×15)</button>
@@ -83,7 +97,8 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
           <div className="lbl-items"><small>İÇERİK</small>{o.items.map((i, k) => <span key={k}>{i.qty} × {i.name}{[i.color_name, i.size].filter(Boolean).length ? ` (${[i.color_name, i.size].filter(Boolean).join(' · ')})` : ''}</span>)}</div>
         </article>
       )}
-      {mode !== 'etiket' && <article className="sheet">
+      {mode === 'form' && <OrderForm o={o} s={s} prods={prods} />}
+      {mode !== 'etiket' && mode !== 'form' && <article className="sheet">
         <div className="sh-head">
           <div>
             <h2>{mode === 'fatura' ? 'Fatura bilgi formu' : 'Sevk irsaliyesi'}</h2>
@@ -182,6 +197,127 @@ function Sheet({ order: o, seller: s, mode, setMode }: { order: AdminOrder; sell
         </p>
       </article>}
     </>
+  );
+}
+
+const DEFAULT_VAT = 20;
+const STATUS_TR: Record<string, string> = { odeme_bekleniyor: 'Ödeme bekleniyor', hazirlaniyor: 'Hazırlanıyor', kargoda: 'Kargoda', teslim_edildi: 'Teslim edildi', iptal: 'İptal', iade: 'İade' };
+
+function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<string, Prod> }) {
+  const a = o.address ?? {};
+  const addr = [a.address, [a.zip, a.district].filter(Boolean).join(' '), a.city].filter(Boolean).join('\n');
+  const sub = Number(o.subtotal) || o.items.reduce((n, i) => n + Number(i.line_total), 0);
+  const disc = Number(o.discount ?? 0);
+  const ship = Number(o.shipping ?? 0);
+  const f = sub > 0 ? Math.max(0, 1 - disc / sub) : 1; // indirimi kalemlere orantılı dağıt
+  const rows = o.items.map((i) => {
+    const p = i.slug ? prods[i.slug] : undefined;
+    const col = p?.colors?.find((c) => c.key === i.color);
+    const img = col?.thumb || col?.img || p?.thumb || '';
+    const rate = p?.data?.vat != null ? Number(p.data.vat) : DEFAULT_VAT;
+    const gross = Number(i.line_total);
+    const net = gross * f;
+    return { i, img, rate, gross, vatAmt: net - net / (1 + rate / 100), known: p?.data?.vat != null };
+  });
+  const byRate = new Map<number, { gross: number; tax: number }>();
+  const add = (r: number, g: number) => { const c = byRate.get(r) ?? { gross: 0, tax: 0 }; c.gross += g; c.tax += g - g / (1 + r / 100); byRate.set(r, c); };
+  rows.forEach((r) => add(r.rate, r.gross * f));
+  if (ship > 0) add(DEFAULT_VAT, ship);
+  const totalVat = [...byRate.values()].reduce((n, c) => n + c.tax, 0);
+  const unknown = rows.some((r) => !r.known);
+  const sellerLines = [s.address, s.taxOffice || s.taxNo ? `V.D.: ${s.taxOffice || '—'} · V.No: ${s.taxNo || '—'}` : '', s.mersis && `Mersis: ${s.mersis}`, s.phone, s.email].filter(Boolean).join('\n');
+  const payLabel = PAY[o.payment_method] ?? o.payment_method;
+  return (
+    <article className="sheet of">
+      <div className="sh-head">
+        <div>
+          <h2>Sipariş formu</h2>
+          <div style={{ marginTop: 6 }}>
+            Sipariş no: <b>{o.order_no}</b>
+            <br />
+            Tarih: {dt(o.created_at, true)}
+            <br />
+            Durum: {STATUS_TR[o.status] ?? o.status}
+          </div>
+        </div>
+        <div className="sh-seller">
+          <b>{s.name || 'Demleme'}</b>
+          {sellerLines}
+        </div>
+      </div>
+
+      <div className="sh-grid">
+        <div className="sh-box">
+          <h3>Müşteri / teslimat adresi</h3>
+          <b>{o.full_name}</b>
+          <div style={{ whiteSpace: 'pre-line' }}>{addr}</div>
+          <div>{o.phone}</div>
+          <div>{o.email}</div>
+        </div>
+        <div className="sh-box">
+          <h3>Ödeme ve kargo</h3>
+          <div>Ödeme: {payLabel}{o.paid_at ? ` · ${dt(o.paid_at, true)}` : ' · ödenmedi'}</div>
+          <div>Kupon: {o.coupon_code || '—'}</div>
+          <div>Kargo: {o.tracking_carrier || '—'}{o.tracking_no ? ` · ${o.tracking_no}` : ''}</div>
+          {o.note ? <div>Not: {o.note}</div> : null}
+        </div>
+      </div>
+
+      <table className="of-tbl">
+        <thead>
+          <tr>
+            <th style={{ width: 64 }} />
+            <th>Ürün</th>
+            <th className="r">Adet</th>
+            <th className="r">Birim (KDV dahil)</th>
+            <th className="r">KDV %</th>
+            <th className="r">Tutar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(({ i, img, rate, gross }, k) => {
+            const v = [i.color_name, i.size].filter(Boolean).join(' · ');
+            return (
+              <tr key={k}>
+                <td>{img ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={img} alt="" className="of-img" /> : null}</td>
+                <td>
+                  <b>{i.name}</b>
+                  {v ? <div style={{ color: '#666' }}>{v}</div> : null}
+                </td>
+                <td className="r">{i.qty}</td>
+                <td className="r">{tl(Number(i.unit_price))}</td>
+                <td className="r">%{rate}</td>
+                <td className="r">{tl(gross)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div className="tot">
+        <div><span>Ara toplam (KDV dahil)</span><span>{tl(sub)}</span></div>
+        {disc > 0 && <div><span>İndirim{o.coupon_code ? ` (${o.coupon_code})` : ''}</span><span>−{tl(disc)}</span></div>}
+        <div><span>Kargo</span><span>{ship === 0 ? 'Ücretsiz' : tl(ship)}</span></div>
+        <div className="g"><span>Genel toplam</span><span>{tl(Number(o.total))}</span></div>
+      </div>
+
+      <table className="of-kdv">
+        <thead>
+          <tr><th>KDV oranı</th><th className="r">Matrah</th><th className="r">KDV tutarı</th><th className="r">KDV dahil</th></tr>
+        </thead>
+        <tbody>
+          {[...byRate.entries()].sort((x, y) => x[0] - y[0]).map(([r, c]) => (
+            <tr key={r}><td>%{r}</td><td className="r">{tl(c.gross - c.tax)}</td><td className="r">{tl(c.tax)}</td><td className="r">{tl(c.gross)}</td></tr>
+          ))}
+          <tr><td><b>Toplam</b></td><td className="r"><b>{tl(Number(o.total) - totalVat)}</b></td><td className="r"><b>{tl(totalVat)}</b></td><td className="r"><b>{tl(Number(o.total))}</b></td></tr>
+        </tbody>
+      </table>
+
+      <p className="note">
+        Bu form resmî fatura yerine geçmez; sipariş içeriğini, uygulanan indirimi ve KDV dökümünü gösteren iç bilgi çıktısıdır.
+        {unknown ? ` KDV oranı tanımlı olmayan ürünler %${DEFAULT_VAT} ile hesaplanmıştır.` : ''} Kargo ücreti %{DEFAULT_VAT} KDV ile hesaplanmıştır.
+      </p>
+    </article>
   );
 }
 
