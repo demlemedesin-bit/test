@@ -27,7 +27,7 @@ export function CustomScripts({ cfg }: { cfg: Scripts }) {
       if (cfg.need_consent) {
         try {
           const c = JSON.parse(localStorage.getItem('dm-consent') || 'null');
-          if (!c?.marketing) return;
+          if (!c?.marketing || !c.ts || Date.now() - Number(c.ts) > 365 * 864e5) return;
         } catch { return; }
       }
       done = true;

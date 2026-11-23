@@ -12,10 +12,15 @@ import './consent.css';
  */
 export type ConsentState = { analytics: boolean; marketing: boolean; ts: number };
 const KEY = 'dm-consent';
+const MAX_AGE = 365 * 864e5; // tercih 1 yıl sonra yeniden sorulur
 
 export function readConsent(): ConsentState | null {
   try {
     const j = JSON.parse(localStorage.getItem(KEY) || 'null') as Partial<ConsentState> | null;
+    if (j && typeof j === 'object') {
+      const ts = Number(j.ts) || 0;
+      if (!ts || Date.now() - ts > MAX_AGE) return null;
+    }
     if (j && typeof j === 'object') return { analytics: j.analytics === true, marketing: j.marketing === true, ts: Number(j.ts) || 0 };
   } catch {
     /* depolama kapalı olabilir */
