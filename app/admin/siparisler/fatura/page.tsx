@@ -271,6 +271,8 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
             <th className="r">Adet</th>
             <th className="r">Birim (KDV dahil)</th>
             <th className="r">KDV %</th>
+            <th className="r">Matrah</th>
+            <th className="r">KDV tutarı</th>
             <th className="r">Tutar</th>
           </tr>
         </thead>
@@ -287,6 +289,8 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
                 <td className="r">{i.qty}</td>
                 <td className="r">{tl(Number(i.unit_price))}</td>
                 <td className="r">%{rate}</td>
+                <td className="r">{tl(gross * f - gross * f / (1 + rate / 100))}</td>
+                <td className="r">{tl(gross * f / (1 + rate / 100) * (rate / 100))}</td>
                 <td className="r">{tl(gross)}</td>
               </tr>
             );
@@ -297,7 +301,9 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
             <td className="r">1</td>
             <td className="r">{ship === 0 ? 'Ücretsiz' : tl(ship)}</td>
             <td className="r">%{DEFAULT_VAT}</td>
-            <td className="r">{ship === 0 ? tl(0) : tl(ship)}</td>
+            <td className="r">{tl(ship / (1 + DEFAULT_VAT / 100))}</td>
+            <td className="r">{tl(ship - ship / (1 + DEFAULT_VAT / 100))}</td>
+            <td className="r">{tl(ship)}</td>
           </tr>
         </tbody>
       </table>
@@ -322,7 +328,7 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
       </table>
 
       <p className="note">
-        Bu form resmî fatura yerine geçmez; sipariş içeriğini, uygulanan indirimi ve KDV dökümünü gösteren iç bilgi çıktısıdır.
+        {disc > 0 ? 'Matrah ve KDV sütunları indirim düşüldükten sonraki tutardan hesaplanmıştır. ' : ''}Bu form resmî fatura yerine geçmez; sipariş içeriğini, uygulanan indirimi ve KDV dökümünü gösteren iç bilgi çıktısıdır.
         {unknown ? ` KDV oranı tanımlı olmayan ürünler %${DEFAULT_VAT} ile hesaplanmıştır.` : ''} Kargo ücreti %{DEFAULT_VAT} KDV ile hesaplanmıştır.
       </p>
     </article>
