@@ -287,7 +287,7 @@ select.inp { appearance: auto; }
 }
 @media print {
   .adm { background: #fff; }
-  .sb, .topbar, .pf, .ph button, .no-print { display: none !important; }
+  .sb, .topbar, .bnav, .pf, .ph button, .no-print { display: none !important; }
   .overlay { position: static; background: none; backdrop-filter: none; }
   .panel { width: 100%; box-shadow: none; height: auto; animation: none; }
   .adm-wrap { height: auto; overflow: visible; }

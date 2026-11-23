@@ -27,6 +27,8 @@
   .adm-main:has(.fatura-page) { display: block; overflow: visible; }
   .adm-scroll:has(.fatura-page) { overflow: visible; padding: 0; }
   .fatura-page { max-width: none; }
+  .bnav, .adm .sb, .adm .topbar { display: none !important; }
+  .adm-scroll:has(.fatura-page) { height: auto; padding-bottom: 0; }
   .fatura-page .sheet { border: none; box-shadow: none; padding: 0; border-radius: 0; }
 }
 
