@@ -175,6 +175,13 @@ const upTR = (s: string) => s.trim().toLocaleUpperCase('tr-TR');
 const todayTR = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' }).format(new Date());
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/** HepsiJET sku alanı en fazla 30 karakter kabul eder: uzun ürün adı kısaltılır, renk/beden son eki korunur (kalemler ayrışsın). */
+export function skuFor(slug: string, variant: string): string {
+  const suf = variant ? '-' + variant : '';
+  const room = Math.max(6, 30 - suf.length);
+  return (slug.slice(0, room) + suf).slice(0, 30);
+}
+
 export function barcodeFor(prefix: string, orderNo: string): string {
   return prefix + orderNo.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 }
@@ -227,7 +234,7 @@ export function buildPayload(c: HjCfg, o: OrderRec, productDesi: Map<string, num
   const content = items.map((i) => {
     const unit = c.useProductDesi && i.slug && productDesi.has(i.slug) && opt.desi === undefined ? (productDesi.get(i.slug) as number) : round2(total / qtyTotal);
     return {
-      sku: [i.slug || 'urun', i.color, i.size].filter(Boolean).join('-').slice(0, 60),
+      sku: skuFor(i.slug || 'urun', [i.color, i.size].filter(Boolean).join('-')),
       description: [i.name, i.color_name, i.size].filter(Boolean).join(' ').slice(0, 120),
       desi: Math.max(0.1, round2(unit)),
       quantity: i.qty,
