@@ -10,9 +10,10 @@ import { Loading, TopBar, useToast } from '@/components/admin/ui';
 import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
 import { PageHero } from '@/components/admin/PageHero';
 import { DepoHazir } from '@/components/admin/DepoHazir';
+import { DepoEtiket } from '@/components/admin/DepoEtiket';
 
 type O = AdminOrder & { packed_at?: string | null };
-const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['topla', 'Hazırlık özeti'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
+const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['etiket', 'Etiketler'], ['topla', 'Hazırlık özeti'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
 
 const label = (o: O) => {
   const a = window.open('', '_blank', 'width=420,height=560');
@@ -91,6 +92,7 @@ export default function Depo() {
         </div>
         <Tabs items={TABS} value={tab} onChange={setTab} />
         {tab === 'hazir' && <DepoHazir orders={prep} products={ps} onChanged={load} show={show} onPack={pack} onAddrLabel={label} />}
+        {tab === 'etiket' && <DepoEtiket show={show} />}
         {tab === 'paket' && <Card title="Kargoya verilecek" meta="Takip numarasını gir, kargoya ver"><Tbl min={900} cols={[['Sipariş', '90px'], ['Müşteri', 'minmax(0,1fr)'], ['Kargo', '150px'], ['Takip no', '170px'], ['', '110px']]}
           rows={packed.map((o) => [o.order_no, o.full_name,
             <select key="c" className="inp" value={track[o.id]?.c ?? CARRIER_NAMES[0]} onChange={(e) => setTrack((t) => ({ ...t, [o.id]: { c: e.target.value, n: t[o.id]?.n ?? '' } }))}>{CARRIER_NAMES.map((c) => <option key={c}>{c}</option>)}</select>,
