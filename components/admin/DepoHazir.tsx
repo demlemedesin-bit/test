@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { dt, tl, type AdminOrder, type AdminProduct } from '@/lib/admin';
-import { Confirm } from './ui';
 import { Card } from './Tbl';
 
 type O = AdminOrder & { packed_at?: string | null };
@@ -36,6 +35,8 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
   const [sel, setSel] = useState<string[]>([]);
   const [peek, setPeek] = useState<O | null>(null);
   const [ask, setAsk] = useState<O | null>(null);
+  const [askDesi, setAskDesi] = useState('');
+  const [askParcels, setAskParcels] = useState('1');
   const [busy, setBusy] = useState('');
   const [res, setRes] = useState<Record<string, Res>>({});
   const [ships, setShips] = useState<Record<string, Ship>>({});
@@ -118,11 +119,27 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
     setBusy('');
   }
 
-  async function send(o: O) {
+  const openAsk = (o: O) => {
+    const d = desiOf(o);
+    setAskDesi(d != null ? String(d) : '');
+    setAskParcels('1');
+    setAsk(o);
+  };
+
+  // Gönderim öncesi kontrol: HepsiJET'in reddedeceği durumları baştan göster
+  const phoneOk = (p: string) => {
+    let d = (p || '').replace(/\D/g, '');
+    if (d.startsWith('0090')) d = d.slice(4);
+    else if (d.startsWith('90') && d.length === 12) d = d.slice(2);
+    if (d.length === 10 && d[0] === '5') d = '0' + d;
+    return /^05\d{9}$/.test(d);
+  };
+
+  async function send(o: O, desi: string, parcels: string) {
     setAsk(null);
     setBusy('s' + o.order_no);
     try {
-      const r = await hj({ action: 'gonder', order_no: o.order_no, parcels: 1 });
+      const r = await hj({ action: 'gonder', order_no: o.order_no, parcels: Number(parcels) || 1, desi: desi.trim() || undefined });
       const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; barcode?: string; env?: string; desi?: number; warn?: string };
       if (!r.ok || !j.ok || !j.barcode) {
         setRes((m) => ({ ...m, [o.order_no]: { ok: false, text: j.error || 'HepsiJET gönderisi oluşturulamadı.' } }));
@@ -174,7 +191,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <button className="btn ghost" onClick={() => printForm(o)}>Form yazdır</button>
           {s && <button className="btn ghost" disabled={busy === 'l' + o.order_no} onClick={() => label(o)}>Etiket</button>}
-          {!done && !s && <button className="btn" disabled={busy === 's' + o.order_no} onClick={() => setAsk(o)}>{busy === 's' + o.order_no ? 'Gönderiliyor…' : 'HepsiJET gönder'}</button>}
+          {!done && !s && <button className="btn" disabled={busy === 's' + o.order_no} onClick={() => openAsk(o)}>{busy === 's' + o.order_no ? 'Gönderiliyor…' : 'HepsiJET gönder'}</button>}
           {!done && !s && <button className="btn ghost" onClick={() => onAddrLabel(o)}>Adres etiketi</button>}
           {!done && <button className="btn ghost" onClick={() => onPack(o)}>Paketlendi</button>}
           {!done && d != null && <span className="cell-muted" style={{ alignSelf: 'center', fontSize: 12 }}>{d} desi</span>}
@@ -239,16 +256,44 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
         </div>
       )}
 
-      {ask && (
-        <Confirm
-          title={`${ask.order_no} HepsiJET'e verilsin mi?`}
-          text={`HepsiJET'te gönderi açılacak${desiOf(ask) != null ? ` (${desiOf(ask)} desi)` : ''}, sipariş "Kargoda" olacak ve müşteriye "yola çıktı" e-postası gidecek. Bu işlem geri alınamaz.`}
-          confirmText="Gönder"
-          danger={false}
-          onConfirm={() => send(ask)}
-          onCancel={() => setAsk(null)}
-        />
-      )}
+      {ask && (() => {
+        const a = ask.address as unknown as { city?: string; district?: string; address?: string } | null;
+        const dn = Number(askDesi.replace(',', '.'));
+        const probs: string[] = [];
+        if (!phoneOk(ask.phone)) probs.push('Telefon geçerli bir Türkiye cep numarası değil (05xx xxx xx xx). HepsiJET kabul etmez.');
+        if (!a?.city || !a?.district) probs.push('İl/ilçe eksik.');
+        if ((a?.address || '').trim().length < 5) probs.push('Açık adres eksik.');
+        if (askDesi.trim() && (!Number.isFinite(dn) || dn <= 0)) probs.push('Desi geçersiz.');
+        if (Number.isFinite(dn) && dn > 41) probs.push('Desi 41\'i aşıyor, bu entegrasyonda gönderilemez.');
+        const row = (k: string, v: React.ReactNode) => (<div style={{ display: 'grid', gridTemplateColumns: '92px 1fr', gap: 8, padding: '4px 0', fontSize: 14 }}><span className="cell-muted">{k}</span><span>{v}</span></div>);
+        return (
+          <div className="overlay center" style={{ zIndex: 120 }} onMouseDown={(e) => e.target === e.currentTarget && setAsk(null)}>
+            <div className="dialog" role="alertdialog" aria-modal="true" style={{ maxWidth: 480, width: '100%' }}>
+              <h3 style={{ fontSize: 16.5, fontWeight: 700, marginBottom: 4 }}>{ask.order_no} HepsiJET&rsquo;e verilsin mi?</h3>
+              <p className="cell-muted" style={{ marginBottom: 10, fontSize: 13 }}>Aşağıdaki bilgilerle HepsiJET&rsquo;te gönderi açılacak.</p>
+              {row('Alıcı', ask.full_name)}
+              {row('Telefon', ask.phone)}
+              {row('Adres', `${a?.address || '—'}, ${a?.district || '—'} / ${a?.city || '—'}`)}
+              {row('Ürünler', (ask.items as Item[]).map((i) => `${i.qty}× ${i.name}${i.color_name ? ' · ' + i.color_name : ''}`).join(', '))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, margin: '10px 0' }}>
+                <label style={{ fontSize: 13 }}>Desi
+                  <input className="inp" inputMode="decimal" value={askDesi} onChange={(e) => setAskDesi(e.target.value)} placeholder="Otomatik" style={{ width: '100%' }} />
+                </label>
+                <label style={{ fontSize: 13 }}>Koli sayısı
+                  <input className="inp" inputMode="numeric" value={askParcels} onChange={(e) => setAskParcels(e.target.value)} style={{ width: '100%' }} />
+                </label>
+              </div>
+              {desiOf(ask) == null && !askDesi.trim() && <p style={{ fontSize: 13, color: '#c2410c' }}>Bazı ürünlerin desisi kayıtlı değil, boş bırakılırsa varsayılan desi (1) gider. Desiyi elle yazman iyi olur.</p>}
+              {probs.map((t) => <p key={t} style={{ fontSize: 13, color: '#c2410c', fontWeight: 600 }}>✗ {t}</p>)}
+              <p className="cell-muted" style={{ fontSize: 13, margin: '8px 0 14px' }}>Sipariş <b>Kargoda</b> olacak ve müşteriye <b>&ldquo;yola çıktı&rdquo; e-postası</b> gidecek. Bu işlem geri alınamaz.</p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button className="btn ghost" onClick={() => setAsk(null)}>Vazgeç</button>
+                <button className="btn" disabled={probs.length > 0} onClick={() => send(ask, askDesi, askParcels)}>Onaylıyorum, gönder</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </>
   );
 }
