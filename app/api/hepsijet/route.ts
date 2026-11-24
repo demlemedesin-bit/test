@@ -101,6 +101,7 @@ export async function POST(req: Request) {
       const r = await hj(env, 'POST', `/delivery/barcodes-label?format=${f}`, { barcodes: [s.barcode] }, true);
       const file = r.ok ? findFile(r) : null;
       if (!file) return J({ ok: false, error: 'Etiket alınamadı: ' + errMsg(r) }, 502);
+      if (b.mark === true) await sb.from('hepsijet_shipments').update({ label_printed_at: new Date().toISOString() }).eq('order_no', orderNo);
       return new NextResponse(new Uint8Array(file.buf), { headers: { 'Content-Type': file.mime, 'Cache-Control': 'no-store', 'Content-Disposition': `inline; filename="${s.barcode}.${f.toLowerCase()}"` } });
     }
 

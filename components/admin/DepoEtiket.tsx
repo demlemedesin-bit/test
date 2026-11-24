@@ -8,17 +8,8 @@ import { Card } from './Tbl';
 
 type Row = { order_no: string; barcode: string; created_at: string; full_name: string; status: string; items: AdminOrder['items'] };
 
-const PRINTED_KEY = 'dm-etiket-basildi';
 const A4 = { w: 595.28, h: 841.89 };
 const MARGIN = 6; // pt: hücre kenar boşluğu
-
-function readPrinted(): Record<string, number> {
-  try {
-    return JSON.parse(localStorage.getItem(PRINTED_KEY) || '{}') as Record<string, number>;
-  } catch {
-    return {};
-  }
-}
 
 async function token(): Promise<string> {
   const { data } = await supabase().auth.getSession();
@@ -37,15 +28,16 @@ export function DepoEtiket({ show }: { show: (t: string, e?: boolean) => void })
   const load = useCallback(async () => {
     const sb = supabase();
     const since = new Date(Date.now() - 7 * 86400000).toISOString();
-    const { data: sh } = await sb.from('hepsijet_shipments').select('order_no,barcode,created_at').eq('status', 'olusturuldu').eq('env', 'prod').gte('created_at', since).order('created_at', { ascending: false });
-    const list = (sh ?? []) as { order_no: string; barcode: string; created_at: string }[];
+    const { data: sh } = await sb.from('hepsijet_shipments').select('order_no,barcode,created_at,label_printed_at').eq('status', 'olusturuldu').eq('env', 'prod').gte('created_at', since).order('created_at', { ascending: false });
+    const list = (sh ?? []) as { order_no: string; barcode: string; created_at: string; label_printed_at: string | null }[];
     if (!list.length) { setRows([]); return; }
     const { data: os } = await sb.from('orders').select('order_no,full_name,status,items').in('order_no', list.map((s) => s.order_no));
     const om = new Map((os ?? []).map((o) => [o.order_no as string, o as { full_name: string; status: string; items: AdminOrder['items'] }]));
     const out: Row[] = list
       .filter((s) => om.has(s.order_no) && om.get(s.order_no)!.status !== 'iptal')
       .map((s) => ({ ...s, full_name: om.get(s.order_no)!.full_name, status: om.get(s.order_no)!.status, items: om.get(s.order_no)!.items }));
-    const p = readPrinted();
+    const p: Record<string, number> = {};
+    list.forEach((x) => { if (x.label_printed_at) p[x.order_no] = new Date(x.label_printed_at).getTime(); });
     setPrinted(p);
     setRows(out);
     setSel(out.filter((r) => !p[r.order_no]).map((r) => r.order_no));
@@ -65,7 +57,7 @@ export function DepoEtiket({ show }: { show: (t: string, e?: boolean) => void })
     const bad: { no: string; err: string }[] = [];
     for (const no of sel) {
       try {
-        const r = await fetch('/api/hepsijet', { method: 'POST', headers: { Authorization: 'Bearer ' + tk, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'etiket', format: 'pdf', order_no: no }) });
+        const r = await fetch('/api/hepsijet', { method: 'POST', headers: { Authorization: 'Bearer ' + tk, 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'etiket', format: 'pdf', order_no: no, mark: true }) });
         if (!r.ok || /json/i.test(r.headers.get('content-type') || '')) {
           const j = (await r.json().catch(() => ({}))) as { error?: string };
           bad.push({ no, err: j.error || 'Etiket alınamadı.' });
@@ -110,9 +102,8 @@ export function DepoEtiket({ show }: { show: (t: string, e?: boolean) => void })
       const bytes = await out.save();
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'application/pdf' }));
       if (w) w.location.href = url; else window.location.href = url;
-      const p = { ...readPrinted() };
+      const p = { ...printed };
       ok.forEach((n) => { p[n] = Date.now(); });
-      try { localStorage.setItem(PRINTED_KEY, JSON.stringify(p)); } catch { /* depolama kapalı olabilir */ }
       setPrinted(p);
       setSel((s) => s.filter((n) => !ok.includes(n)));
       show(`${ok.length} etiket ${out.getPageCount()} sayfaya dizildi${bad.length ? ` · ${bad.length} etiket alınamadı` : ''}`, bad.length > 0);
@@ -160,7 +151,7 @@ export function DepoEtiket({ show }: { show: (t: string, e?: boolean) => void })
         ))}
       </Card>
       <p className="cell-muted" style={{ fontSize: 12.5, margin: '0 4px 16px' }}>
-        Etiketler HepsiJET&rsquo;in kendi PDF&rsquo;inden alınır ve A4&rsquo;e 2×2 dizilir. &ldquo;Basıldı&rdquo; bilgisi bu tarayıcıda tutulur. Açılan PDF&rsquo;i yazdırırken ölçeği &ldquo;%100 / Gerçek boyut&rdquo; seç.
+        Etiketler HepsiJET&rsquo;in kendi PDF&rsquo;inden alınır ve A4&rsquo;e 2×2 dizilir. &ldquo;Basıldı&rdquo; bilgisi kayıtlıdır, hangi bilgisayardan bakılırsa bakılsın aynıdır. Açılan PDF&rsquo;i yazdırırken ölçeği &ldquo;%100 / Gerçek boyut&rdquo; seç.
       </p>
     </>
   );
