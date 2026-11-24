@@ -9,6 +9,7 @@ import { useMenu } from '@/components/admin/Shell';
 import { Loading, TopBar, useToast } from '@/components/admin/ui';
 import { Card, Tabs, Tbl } from '@/components/admin/Tbl';
 import { PageHero } from '@/components/admin/PageHero';
+import { DepoHazir } from '@/components/admin/DepoHazir';
 
 type O = AdminOrder & { packed_at?: string | null };
 const TABS = [['hazir', 'Hazırlanacak'], ['paket', 'Paketlenen / kargoya verilecek'], ['topla', 'Hazırlık özeti'], ['stok', 'Stok ve barkod'], ['iade', 'İade gelen / hasarlı']] as const;
@@ -78,7 +79,6 @@ export default function Depo() {
     if (error) show(error.message, true); else load();
   }
   if (!os) return (<><TopBar title="Depo" onMenu={menu} /><div className="adm-scroll"><Loading /></div></>);
-  const items = (o: O) => o.items.map((i) => `${i.qty}× ${i.name}${i.color_name ? ' · ' + i.color_name : ''}${i.size ? ' · ' + i.size : ''}`).join(', ');
   const crit = ps.filter((p) => p.active && p.stock != null && p.stock <= (((p.data as { crit?: number }).crit) ?? 5));
   const noBar = ps.filter((p) => p.active && !((p.data as { barcode?: string }).barcode ?? '').trim());
 
@@ -90,8 +90,7 @@ export default function Depo() {
           {[['Hazırlanacak', prep.length], ['Paketlenen', packed.length], ['Ödeme bekleyen', (os ?? []).filter((o) => o.status === 'odeme_bekleniyor').length], ['Gelen iade', rs.length]].map(([l, v]) => <div className="kpi" key={String(l)}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}
         </div>
         <Tabs items={TABS} value={tab} onChange={setTab} />
-        {tab === 'hazir' && <Card title="Hazırlanacak siparişler" meta="Eskiden yeniye"><Tbl min={820} cols={[['Sipariş', '90px'], ['Tarih', '110px'], ['Müşteri', 'minmax(0,1fr)'], ['Ürünler', 'minmax(0,2fr)'], ['', '170px']]}
-          rows={prep.map((o) => [o.order_no, dt(o.created_at, true), o.full_name, items(o), <span key="a" style={{ display: 'flex', gap: 6 }}><button className="btn ghost" onClick={() => label(o)}>Etiket</button><button className="btn" onClick={() => pack(o)}>Paketlendi</button></span>])} empty="Hazırlanacak sipariş yok" /></Card>}
+        {tab === 'hazir' && <DepoHazir orders={prep} products={ps} onChanged={load} show={show} onPack={pack} onAddrLabel={label} />}
         {tab === 'paket' && <Card title="Kargoya verilecek" meta="Takip numarasını gir, kargoya ver"><Tbl min={900} cols={[['Sipariş', '90px'], ['Müşteri', 'minmax(0,1fr)'], ['Kargo', '150px'], ['Takip no', '170px'], ['', '110px']]}
           rows={packed.map((o) => [o.order_no, o.full_name,
             <select key="c" className="inp" value={track[o.id]?.c ?? CARRIER_NAMES[0]} onChange={(e) => setTrack((t) => ({ ...t, [o.id]: { c: e.target.value, n: t[o.id]?.n ?? '' } }))}>{CARRIER_NAMES.map((c) => <option key={c}>{c}</option>)}</select>,
