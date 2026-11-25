@@ -289,8 +289,8 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
                 <td className="r">{i.qty}</td>
                 <td className="r">{tl(Number(i.unit_price))}</td>
                 <td className="r">%{rate}</td>
+                <td className="r">{tl(gross * f / (1 + rate / 100))}</td>
                 <td className="r">{tl(gross * f - gross * f / (1 + rate / 100))}</td>
-                <td className="r">{tl(gross * f / (1 + rate / 100) * (rate / 100))}</td>
                 <td className="r">{tl(gross)}</td>
               </tr>
             );
