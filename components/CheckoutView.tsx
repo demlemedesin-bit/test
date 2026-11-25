@@ -253,7 +253,7 @@ export function CheckoutView() {
           <legend>Fatura bilgisi</legend>
           <label className="check">
             <input type="checkbox" checked={invOn} onChange={(e) => setInvOn(e.target.checked)} />
-            <span>İsteğe bağlı: fatura bilgisi eklemek istiyorum (bireysel veya şirket adına).</span>
+            <span>Fatura bilgisi eklemek istiyorum (bireysel veya şirket adına).</span>
           </label>
           {invOn && (
             <>
@@ -281,8 +281,8 @@ export function CheckoutView() {
                 </>
               ) : (
                 <div className="row2">
-                  <Field id="inv_name" label="Fatura adı soyadı (isteğe bağlı)" value={inv.name} onChange={setI('name') as (v: string) => void} hint="Boş bırakırsan teslimat adı kullanılır." />
-                  <Field id="inv_tckn" label="TC kimlik no (isteğe bağlı)" inputMode="numeric" value={inv.tckn} onChange={setI('tckn') as (v: string) => void} error={errs.inv_tckn} />
+                  <Field id="inv_name" label="Fatura adı soyadı" value={inv.name} onChange={setI('name') as (v: string) => void} hint="Boş bırakırsan teslimat adı kullanılır." />
+                  <Field id="inv_tckn" label="TC kimlik no" inputMode="numeric" value={inv.tckn} onChange={setI('tckn') as (v: string) => void} error={errs.inv_tckn} />
                 </div>
               )}
               <label className="check">
