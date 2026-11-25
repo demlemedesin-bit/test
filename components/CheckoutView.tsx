@@ -250,10 +250,10 @@ export function CheckoutView() {
         </fieldset>
 
         <fieldset className="fieldset">
-          <legend>Fatura bilgisi (isteğe bağlı)</legend>
+          <legend>Fatura bilgisi</legend>
           <label className="check">
             <input type="checkbox" checked={invOn} onChange={(e) => setInvOn(e.target.checked)} />
-            <span>Fatura bilgisi eklemek istiyorum (bireysel veya şirket adına).</span>
+            <span>İsteğe bağlı: fatura bilgisi eklemek istiyorum (bireysel veya şirket adına).</span>
           </label>
           {invOn && (
             <>
