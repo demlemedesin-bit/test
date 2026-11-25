@@ -25,6 +25,9 @@ export function CheckoutView() {
 
   const [v, setV] = useState({ email: '', full_name: '', phone: '', city: '', district: '', address: '', zip: '', title: 'Teslimat adresi' });
   const [note, setNote] = useState('');
+  const [invOn, setInvOn] = useState(false);
+  const [inv, setInv] = useState({ type: 'bireysel' as 'bireysel' | 'kurumsal', name: '', tckn: '', company: '', tax_office: '', tax_no: '', same: true, address: '' });
+  const setI = (k: keyof typeof inv) => (val: string | boolean) => setInv((s0) => ({ ...s0, [k]: val }));
   const [payment, setPayment] = useState<'havale' | 'kart'>('havale');
   const [agree, setAgree] = useState(false);
   const [saveAddr, setSaveAddr] = useState(false);
@@ -93,6 +96,18 @@ export function CheckoutView() {
     if (!v.city.trim()) x.city = 'İl gerekli.';
     if (!v.district.trim()) x.district = 'İlçe gerekli.';
     if (v.address.trim().length < 10) x.address = 'Mahalle, cadde, bina ve daire numarasıyla açık adresi yaz.';
+    if (invOn) {
+      const dg = (t: string) => t.replace(/\D/g, '');
+      if (inv.type === 'kurumsal') {
+        if (inv.company.trim().length < 3) x.inv_company = 'Firma ünvanını yaz.';
+        if (inv.tax_office.trim().length < 2) x.inv_tax_office = 'Vergi dairesini yaz.';
+        if (![10, 11].includes(dg(inv.tax_no).length)) x.inv_tax_no = 'Vergi numarası 10 haneli olmalı (şahıs şirketlerinde TC kimlik no, 11 hane).';
+        if (!inv.same && inv.address.trim().length < 10) x.inv_address = 'Fatura adresini yaz.';
+      } else {
+        if (inv.tckn && dg(inv.tckn).length !== 11) x.inv_tckn = 'TC kimlik no 11 haneli olmalı.';
+        if (!inv.same && inv.address.trim().length < 10) x.inv_address = 'Fatura adresini yaz.';
+      }
+    }
     if (!agree) x.agree = 'Devam etmek için sözleşmeyi onaylaman gerekiyor.';
     setErrs(x);
     if (Object.keys(x).length) {
@@ -107,7 +122,7 @@ export function CheckoutView() {
     setBusy(true);
     const { data, error: rpcErr } = await supabase().rpc('create_order', {
       p_items: items.map((i) => ({ slug: i.slug, color: i.color, size: i.size, qty: i.qty })),
-      p_customer: { email: v.email, full_name: v.full_name, phone: v.phone, title: v.title, city: v.city, district: v.district, address: v.address, zip: v.zip, coupon: code },
+      p_customer: { email: v.email, full_name: v.full_name, phone: v.phone, title: v.title, city: v.city, district: v.district, address: v.address, zip: v.zip, coupon: code, ...(invOn ? { invoice: inv.type === 'kurumsal' ? { type: 'kurumsal', company: inv.company, tax_office: inv.tax_office, tax_no: inv.tax_no, same: inv.same, address: inv.address } : { type: 'bireysel', name: inv.name, tckn: inv.tckn, same: inv.same, address: inv.address } } : {}) },
       p_payment: payment,
       p_note: note,
     });
@@ -232,6 +247,57 @@ export function CheckoutView() {
             <label htmlFor="note">Sipariş notu (isteğe bağlı)</label>
             <textarea id="note" name="note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={400} />
           </div>
+        </fieldset>
+
+        <fieldset className="fieldset">
+          <legend>Fatura bilgisi (isteğe bağlı)</legend>
+          <label className="check">
+            <input type="checkbox" checked={invOn} onChange={(e) => setInvOn(e.target.checked)} />
+            <span>Fatura bilgisi eklemek istiyorum (bireysel veya şirket adına).</span>
+          </label>
+          {invOn && (
+            <>
+              <div className="pay" style={{ marginBottom: 14 }}>
+                <label className="pay-opt">
+                  <input type="radio" name="invtype" checked={inv.type === 'bireysel'} onChange={() => setI('type')('bireysel')} />
+                  <div>
+                    <b>Bireysel</b>
+                  </div>
+                </label>
+                <label className="pay-opt">
+                  <input type="radio" name="invtype" checked={inv.type === 'kurumsal'} onChange={() => setI('type')('kurumsal')} />
+                  <div>
+                    <b>Kurumsal</b>
+                  </div>
+                </label>
+              </div>
+              {inv.type === 'kurumsal' ? (
+                <>
+                  <Field id="inv_company" label="Firma ünvanı" value={inv.company} onChange={setI('company') as (v: string) => void} error={errs.inv_company} />
+                  <div className="row2">
+                    <Field id="inv_tax_office" label="Vergi dairesi" value={inv.tax_office} onChange={setI('tax_office') as (v: string) => void} error={errs.inv_tax_office} />
+                    <Field id="inv_tax_no" label="Vergi numarası" inputMode="numeric" value={inv.tax_no} onChange={setI('tax_no') as (v: string) => void} error={errs.inv_tax_no} />
+                  </div>
+                </>
+              ) : (
+                <div className="row2">
+                  <Field id="inv_name" label="Fatura adı soyadı (isteğe bağlı)" value={inv.name} onChange={setI('name') as (v: string) => void} hint="Boş bırakırsan teslimat adı kullanılır." />
+                  <Field id="inv_tckn" label="TC kimlik no (isteğe bağlı)" inputMode="numeric" value={inv.tckn} onChange={setI('tckn') as (v: string) => void} error={errs.inv_tckn} />
+                </div>
+              )}
+              <label className="check">
+                <input type="checkbox" checked={inv.same} onChange={(e) => setI('same')(e.target.checked)} />
+                <span>Fatura adresim teslimat adresimle aynı.</span>
+              </label>
+              {!inv.same && (
+                <div className="fld">
+                  <label htmlFor="inv_address">Fatura adresi</label>
+                  <textarea id="inv_address" name="inv_address" value={inv.address} onChange={(e) => setI('address')(e.target.value)} maxLength={400} aria-invalid={errs.inv_address ? true : undefined} />
+                  {errs.inv_address && <p className="fld-err">{errs.inv_address}</p>}
+                </div>
+              )}
+            </>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">

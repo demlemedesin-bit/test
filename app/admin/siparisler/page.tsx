@@ -5,7 +5,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronRight, Download, FileText, Printer, Search, ShoppingBag, Truck, Undo2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { dt, tl, type AdminOrder } from '@/lib/admin';
+import { dt, invoiceRows, tl, type AdminOrder } from '@/lib/admin';
 import { PAY, STATUS } from '@/components/OrderParts';
 import { CARRIER_NAMES } from '@/lib/carriers';
 import { useMenu } from '@/components/admin/Shell';
@@ -267,6 +267,16 @@ function Detail({ order, onClose, onChanged, toast }: { order: AdminOrder; onClo
         {order.note && (
           <div className="alert warn" style={{ marginTop: 12, marginBottom: 0 }}>
             <b>Müşteri notu:</b> {order.note}
+          </div>
+        )}
+        {invoiceRows(order.invoice, [a.address, a.district, a.city].filter(Boolean).join(', ')).length > 0 && (
+          <div className="alert" style={{ marginTop: 12, marginBottom: 0 }}>
+            <b>Fatura bilgisi</b>
+            {invoiceRows(order.invoice, [a.address, a.district, a.city].filter(Boolean).join(', ')).map(([k, v]) => (
+              <div key={k}>
+                <span className="cell-muted">{k}:</span> {v}
+              </div>
+            ))}
           </div>
         )}
       </div>

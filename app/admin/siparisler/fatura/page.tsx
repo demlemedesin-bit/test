@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Printer } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { dt, tl, type AdminOrder } from '@/lib/admin';
+import { dt, invoiceRows, tl, type AdminOrder } from '@/lib/admin';
 import { PAY } from '@/components/OrderParts';
 import { useMenu } from '@/components/admin/Shell';
 import { Empty, Loading, TopBar } from '@/components/admin/ui';
@@ -261,6 +261,16 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
           <div>Kargo firması: {o.tracking_carrier || '—'}{o.tracking_no ? ` · ${o.tracking_no}` : ''}</div>
           {o.note ? <div>Not: {o.note}</div> : null}
         </div>
+        {invoiceRows(o.invoice, addr.replace(/\n/g, ', ')).length > 0 && (
+          <div className="sh-box" style={{ gridColumn: '1 / -1' }}>
+            <h3>Fatura bilgisi</h3>
+            {invoiceRows(o.invoice, addr.replace(/\n/g, ', ')).map(([k, v]) => (
+              <div key={k}>
+                {k}: <b>{v}</b>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <table className="of-tbl">

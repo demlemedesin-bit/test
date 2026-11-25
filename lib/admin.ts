@@ -14,8 +14,22 @@ export const dt = (iso?: string | null, time = false) =>
     ? new Date(iso).toLocaleString('tr-TR', time ? { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short', year: 'numeric' })
     : '—';
 
+/** Ödeme sayfasında müşterinin girdiği fatura bilgisi (isteğe bağlı). */
+export type OrderInvoice = { type: 'bireysel' | 'kurumsal'; name?: string; tckn?: string; company?: string; tax_office?: string; tax_no?: string; same?: boolean; address?: string };
+
+/** Fatura bilgisini [etiket, değer] satırlarına çevirir. Boş alanlar atlanır. */
+export function invoiceRows(inv: OrderInvoice | null | undefined, deliveryAddr?: string): [string, string][] {
+  if (!inv || (inv.type !== 'kurumsal' && inv.type !== 'bireysel')) return [];
+  const addr = inv.same ? (deliveryAddr ? `Teslimat adresiyle aynı: ${deliveryAddr}` : 'Teslimat adresiyle aynı') : inv.address || '';
+  const rows: [string, string | undefined][] = inv.type === 'kurumsal'
+    ? [['Fatura türü', 'Kurumsal'], ['Firma ünvanı', inv.company], ['Vergi dairesi', inv.tax_office], ['Vergi no', inv.tax_no], ['Fatura adresi', addr]]
+    : [['Fatura türü', 'Bireysel'], ['Ad soyad', inv.name], ['TC kimlik no', inv.tckn], ['Fatura adresi', addr]];
+  return rows.filter((r): r is [string, string] => !!r[1]);
+}
+
 export type AdminOrder = OrderRow & {
   id: string;
+  invoice?: OrderInvoice | null;
   user_id: string | null;
   email: string;
   full_name: string;
