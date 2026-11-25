@@ -397,6 +397,8 @@ function Orders() {
   const [tab, setTab] = useState(sp.get('durum') || 'hepsi');
   const [q, setQ] = useState(sp.get('q') || '');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [sel, setSel] = useState<Set<string>>(new Set());
+  const toggleSel = (no: string) => setSel((p) => { const n = new Set(p); if (n.has(no)) n.delete(no); else n.add(no); return n; });
   const [nowTs, setNowTs] = useState(0);
   useEffect(() => { const t = setTimeout(() => setNowTs(Date.now()), 0); return () => clearTimeout(t); }, []);
   const [kargo, setKargo] = useState<Record<string, string>>({});
@@ -457,6 +459,11 @@ function Orders() {
   return (
     <>
       <TopBar title="Siparişler" sub={orders ? `${orders.filter((o) => !unpaidCard(o)).length} kayıt` : ''} onMenu={menu}>
+        {sel.size > 0 && (
+          <a className="btn sm" href={`/admin/siparisler/fatura?nos=${encodeURIComponent([...sel].join(','))}&mode=form&print=1`} target="_blank" rel="noopener noreferrer">
+            Seçilenlerin formu ({sel.size})
+          </a>
+        )}
         <button className="btn ghost sm" onClick={() => csv(list)} disabled={!list.length}>
           <Download size={14} /> CSV
         </button>
@@ -486,11 +493,11 @@ function Orders() {
             ) : (
               <div className="tbl">
                 <div className="tr hd cols-orders">
-                  <span>No</span><span>Tarih</span><span>Müşteri</span><span>Ürün</span><span>Toplam</span><span>Ödeme</span><span>Durum</span><span />
+                  <span><label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} title="Listedekilerin hepsini seç"><input type="checkbox" checked={list.length > 0 && list.every((o) => sel.has(o.order_no))} onChange={(e) => setSel(e.target.checked ? new Set(list.map((o) => o.order_no)) : new Set())} />No</label></span><span>Tarih</span><span>Müşteri</span><span>Ürün</span><span>Toplam</span><span>Ödeme</span><span>Durum</span><span />
                 </div>
                 {list.map((o) => (
                   <div key={o.id} className="tr click cols-orders" onClick={() => setOpenId(o.id)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOpenId(o.id)}>
-                    <span className="mono">{o.order_no}</span>
+                    <span className="mono"><label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={sel.has(o.order_no)} onChange={() => toggleSel(o.order_no)} />{o.order_no}</label></span>
                     <span className="cell-muted hide-m">{dt(o.created_at)}</span>
                     <span className="cell-clip"><b className="cell-strong">{o.full_name}</b><span className="cell-muted hide-m"> · {o.address?.city}</span></span>
                     <span className="cell-muted hide-m">{o.items.reduce((n, i) => n + i.qty, 0)} adet</span>

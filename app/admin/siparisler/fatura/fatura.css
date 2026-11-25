@@ -50,3 +50,7 @@
 .sheet.of .tot { margin-bottom: 4px; }
 @media print { .sheet.of .of-img { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .sheet.of tr, .sheet.of .tot { break-inside: avoid; } }
 .sheet.of .of-ship { width: 100%; margin-top: 12px; }
+
+/* Toplu sipariş formu: her sipariş ayrı sayfa */
+.bulk-pg { margin-bottom: 18px; }
+@media print { .bulk-pg { margin: 0; break-after: page; page-break-after: always; } .bulk-pg:last-child { break-after: auto; page-break-after: auto; } }

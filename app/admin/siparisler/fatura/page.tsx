@@ -18,6 +18,9 @@ function Doc() {
   const menu = useMenu();
   const sp = useSearchParams();
   const no = sp.get('no') ?? '';
+  const nos = (sp.get('nos') ?? '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 200);
+  const nosKey = nos.join(',');
+  const [bulk, setBulk] = useState<AdminOrder[] | null>(null);
   const autoPrint = sp.get('print') === '1';
   const [prods, setProds] = useState<Record<string, Prod>>({});
   const [order, setOrder] = useState<AdminOrder | null | 'yok'>(null);
@@ -28,7 +31,7 @@ function Doc() {
     let off = false;
     (async () => {
       const [o, s, pr, ds] = await Promise.all([
-        no ? supabase().from('orders').select('*').eq('order_no', no).maybeSingle() : Promise.resolve({ data: null }),
+        no && !nosKey ? supabase().from('orders').select('*').eq('order_no', no).maybeSingle() : Promise.resolve({ data: null }),
         supabase().from('shop_settings').select('key,value'),
         supabase().from('products').select('slug,thumb,colors,data'),
         supabase().from('shop_settings').select('key,value').eq('key', 'default_vat').maybeSingle(),
@@ -38,12 +41,56 @@ function Doc() {
       void ds;
       const m = Object.fromEntries((s.data ?? []).map((r) => [r.key as string, String(r.value ?? '').trim()]));
       setSeller({ name: m.seller_name ?? '', address: m.seller_address ?? '', taxOffice: m.seller_tax_office ?? '', taxNo: m.seller_tax_no ?? '', mersis: m.seller_mersis ?? '', phone: m.seller_phone ?? '', email: m.contact_email ?? '' });
+      if (nosKey) {
+        const { data } = await supabase().from('orders').select('*').in('order_no', nosKey.split(',')).order('created_at', { ascending: true });
+        if (off) return;
+        setBulk((data ?? []) as AdminOrder[]);
+        return;
+      }
       setOrder((o.data as AdminOrder | null) ?? 'yok');
     })();
     return () => {
       off = true;
     };
-  }, [no]);
+  }, [no, nosKey]);
+
+  useEffect(() => {
+    if (!bulk || !bulk.length || !autoPrint) return;
+    const t = setTimeout(() => window.print(), 1400); // görseller yüklensin
+    return () => clearTimeout(t);
+  }, [bulk, autoPrint]);
+
+  if (nosKey) {
+    return (
+      <>
+        <TopBar title="Sipariş formları" sub={bulk ? `${bulk.length} sipariş` : ''} onMenu={menu} />
+        <div className="adm-scroll">
+          <div className="fatura-page">
+            {bulk === null ? (
+              <Loading />
+            ) : bulk.length === 0 ? (
+              <Empty title="Sipariş bulunamadı" text="Seçilen siparişler bulunamadı." />
+            ) : (
+              <>
+                <div className="fatura-bar no-print">
+                  <span>{bulk.length} sipariş, her biri ayrı sayfada</span>
+                  <span className="grow" />
+                  <button className="btn" onClick={() => window.print()}>
+                    <Printer size={15} /> Yazdır
+                  </button>
+                </div>
+                {bulk.map((o) => (
+                  <div key={o.id} className="bulk-pg">
+                    <OrderForm o={o} s={seller} prods={prods} />
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
