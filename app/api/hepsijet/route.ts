@@ -142,9 +142,10 @@ export async function POST(req: Request) {
     if (action === 'guncelle') {
       if (s.status !== 'olusturuldu') return J({ ok: false, error: 'Gönderi aktif değil.' }, 409);
       const parcels = Number(b.parcels);
-      const total = Number(String(b.desi ?? '').replace(',', '.'));
+      const total0 = Number(String(b.desi ?? '').replace(',', '.'));
       if (!Number.isInteger(parcels) || parcels < 1 || parcels > 10) return J({ ok: false, error: 'Koli sayısı 1–10 arasında olmalı.' }, 400);
-      if (!Number.isFinite(total) || total < 1 || total > 41) return J({ ok: false, error: 'Toplam desi 1–41 arasında olmalı.' }, 400);
+      if (!Number.isFinite(total0) || total0 < 1) return J({ ok: false, error: 'Toplam desi 1 veya daha büyük olmalı.' }, 400);
+      const total = Math.min(total0, 41); // 41 üstü 41 olarak bildirilir
       const each = Math.round((total / parcels) * 100) / 100;
       const desi = Array.from({ length: parcels }, () => Math.max(0.1, each));
       const r = await hj(env, 'POST', '/delivery-update', { deliveryUpdateType: 'TOTAL_PARCEL', customerDeliveryNo: s.barcode, totalParcelInfo: { totalParcel: parcels, desi } });

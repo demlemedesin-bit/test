@@ -184,7 +184,7 @@ export function HepsiJetBox({
         <>
           {st && !st.ready && <div className="alert err" style={{ marginBottom: 10 }}>Eksik ayar: {st.missing.join(', ')}</div>}
           <div className="row2">
-            <Field label="Desi (isteğe bağlı)" hint="Boşsa ürün desisi ya da sabit desi kullanılır (1–41).">
+            <Field label="Desi (isteğe bağlı)" hint="Boşsa ürün desisi ya da sabit desi kullanılır. 41 üstü 41 olarak bildirilir.">
               <input className="inp" inputMode="decimal" value={desi} onChange={(e) => setDesi(e.target.value)} placeholder="Otomatik" />
             </Field>
             <Field label="Koli sayısı" hint="Birden çok koli için HepsiJET'te K-Barkod açık olmalı.">

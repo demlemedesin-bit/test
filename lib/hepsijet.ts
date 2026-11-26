@@ -225,7 +225,10 @@ export function buildPayload(c: HjCfg, o: OrderRec, productDesi: Map<string, num
   else total = c.defaultDesi;
   total = round2(total);
   if (!(total > 0)) throw new Error('Desi geçersiz.');
-  if (total > 41) throw new Error(`Toplam desi ${total}: 41'i aşan (XL) gönderi bu entegrasyonda desteklenmiyor. Desiyi kontrol et.`);
+  // 41 desiyi aşan gönderi 41 desi olarak bildirilir (entegrasyon üst sınırı); kalem desileri orantılı küçülür.
+  const rawTotal = total;
+  if (total > 41) total = 41;
+  const cap = rawTotal > 41 ? 41 / rawTotal : 1;
   if (total < 1) total = 1;
 
   const barcode = barcodeFor(c.prefix, o.order_no);
@@ -236,7 +239,7 @@ export function buildPayload(c: HjCfg, o: OrderRec, productDesi: Map<string, num
     return {
       sku: skuFor(i.slug || 'urun', [i.color, i.size].filter(Boolean).join('-')),
       description: [i.name, i.color_name, i.size].filter(Boolean).join(' ').slice(0, 120),
-      desi: Math.max(0.1, round2(unit)),
+      desi: Math.max(0.1, round2(unit * cap)),
       quantity: i.qty,
       indivisibleQuantity: false,
     };

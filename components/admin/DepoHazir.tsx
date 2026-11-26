@@ -264,7 +264,6 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
         if (!a?.city || !a?.district) probs.push('İl/ilçe eksik.');
         if ((a?.address || '').trim().length < 5) probs.push('Açık adres eksik.');
         if (askDesi.trim() && (!Number.isFinite(dn) || dn <= 0)) probs.push('Desi geçersiz.');
-        if (Number.isFinite(dn) && dn > 41) probs.push('Desi 41\'i aşıyor, bu entegrasyonda gönderilemez.');
         const row = (k: string, v: React.ReactNode) => (<div style={{ display: 'grid', gridTemplateColumns: '92px 1fr', gap: 8, padding: '4px 0', fontSize: 14 }}><span className="cell-muted">{k}</span><span>{v}</span></div>);
         return (
           <div className="overlay center" style={{ zIndex: 120 }} onMouseDown={(e) => e.target === e.currentTarget && setAsk(null)}>
