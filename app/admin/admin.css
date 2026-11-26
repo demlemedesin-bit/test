@@ -310,3 +310,13 @@ select.inp { appearance: auto; }
 .color-xtra[open] > summary { margin-bottom: 10px; }
 .color-xtra .chip-n { background: var(--ac); color: #fff; border-radius: 99px; padding: 1px 8px; font-size: 11px; }
 .color-xtra .muted { color: var(--tx3); }
+
+/* Menüde sabitleme */
+.sb-row { position: relative; }
+.sb-pin { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--tx3); cursor: pointer; opacity: 0; transition: opacity 0.12s, background 0.12s, color 0.12s; }
+.sb-row:hover .sb-pin, .sb-pin:focus-visible, .sb-pin.on { opacity: 1; }
+.sb-pin:hover { background: var(--s3); color: var(--tx); }
+.sb-pin.on { color: var(--ac); }
+.sb-row .sb-item { padding-right: 34px; }
+.sb-row .sb-pill { margin-left: auto; margin-right: 2px; }
+@media (hover: none) { .sb-pin { opacity: 0.55; } .sb-pin.on { opacity: 1; } }

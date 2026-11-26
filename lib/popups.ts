@@ -283,6 +283,23 @@ export function frequencyOk(p: Pick<Popup, 'id' | 'frequency' | 'days'>, now = D
   return ts === undefined || now - ts >= p.days * 864e5;
 }
 
+// "Bu konuda bir daha bilgilendirme istemiyorum": bülten/çıkış teklifleri bu tarayıcıda bir daha gösterilmez.
+const NEVER_KEY = 'dm-popups-never';
+export function isNever(): boolean {
+  try {
+    return window.localStorage.getItem(NEVER_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+export function markNever() {
+  try {
+    window.localStorage.setItem(NEVER_KEY, '1');
+  } catch {
+    /* sessizce geç */
+  }
+}
+
 export function isSubscribed(): boolean {
   try {
     return window.localStorage.getItem(SUB) === '1';

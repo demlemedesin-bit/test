@@ -7,8 +7,11 @@ import {
   deviceMatches,
   frequencyOk,
   inSchedule,
+  isNever,
   isSubscribed,
+  markNever,
   markSeen,
+  readSessionSeen,
   pageMatches,
   parsePopups,
   safeUrl,
@@ -174,6 +177,19 @@ export function PopupCard({ p, onClose, preview = false, titleId }: { p: Popup; 
             Teşekkürler, istemiyorum
           </button>
         )}
+        {onClose && isNews && !subscribed && !preview && (
+          <button
+            type="button"
+            className="dpop-skip"
+            style={{ marginTop: 8 }}
+            onClick={() => {
+              markNever();
+              onClose();
+            }}
+          >
+            Bu konuda hiçbir zaman bilgilendirme almak istemiyorum
+          </button>
+        )}
       </div>
     </div>
   );
@@ -270,6 +286,7 @@ export function Popups() {
     const now = Date.now();
     const mobile = isMobile();
     const subscribed = isSubscribed();
+    const never = isNever();
     const elig = list.filter(
       (p) =>
         p.on &&
@@ -277,7 +294,8 @@ export function Popups() {
         pageMatches(p, pathname) &&
         deviceMatches(p, mobile) &&
         inSchedule(p, now) &&
-        !(subscribed && p.hide_after_subscribe && (p.kind === 'newsletter' || p.kind === 'exit')),
+        !(subscribed && p.hide_after_subscribe && (p.kind === 'newsletter' || p.kind === 'exit')) &&
+        !(never && (p.kind === 'newsletter' || p.kind === 'exit')),
     );
     if (!elig.length) return;
 
@@ -292,7 +310,9 @@ export function Popups() {
     const cleanups: (() => void)[] = [];
     if (firedFor.current !== pathname) {
       for (const p of elig) {
-        if (p.trigger === 'click' || !frequencyOk(p, now)) continue;
+        // Bülten teklifi: abone olmayan ve "bir daha gösterme" demeyen ziyaretçiye her yeni oturumda tekrar sunulur.
+        const freqOk = p.kind === 'newsletter' ? readSessionSeen()[p.id] === undefined : frequencyOk(p, now);
+        if (p.trigger === 'click' || !freqOk) continue;
         const delay = Math.max(0, p.delay_s) * 1000;
         if (p.trigger === 'delay' || (p.trigger === 'exit' && mobile)) {
           const t = setTimeout(() => show(p), delay);

@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { SelectSeg } from './SelectSeg';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu, Pin } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { grantPreview, useAdmin, usePendingCounts } from '@/lib/admin';
@@ -169,6 +169,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const counts = usePendingCounts(admin && perms.includes('orders'));
+  // Sabitlenen sayfalar (bu tarayıcıda saklanır; menünün tepesinde "Sabitlenenler" olarak görünür)
+  const [pins, setPins] = useState<string[]>([]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try {
+        const v = JSON.parse(window.localStorage.getItem('adm-pins') || '[]') as unknown;
+        if (Array.isArray(v)) setPins(v.filter((x): x is string => typeof x === 'string'));
+      } catch {
+        /* depolama kapalı olabilir */
+      }
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+  const togglePin = (href: string) =>
+    setPins((p) => {
+      const n = p.includes(href) ? p.filter((x) => x !== href) : [...p, href];
+      try {
+        window.localStorage.setItem('adm-pins', JSON.stringify(n));
+      } catch {
+        /* sessizce geç */
+      }
+      return n;
+    });
 
   useEffect(() => { initTheme(); }, []);
   useEffect(() => { if (admin) grantPreview(); }, [admin]);
@@ -210,11 +233,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="sb-nav">
-          {NAV.map((g) => ({ ...g, items: g.items.filter((i) => !i.perm || perms.includes(i.perm)) })).filter((g) => g.items.length).map((g) => (
-            <div key={g.g}>
-              <p className="sb-group">{g.g}</p>
-              {g.items.map(({ href, label, Icon, ...rest }) => (
-                <Link key={href} href={href} className={`sb-item${active(href) ? ' active' : ''}`}>
+          {(() => {
+            const vis = NAV.flatMap((g) => g.items.filter((i) => !i.perm || perms.includes(i.perm)));
+            const pinned = pins.map((h) => vis.find((i) => i.href === h)).filter((i): i is (typeof vis)[number] => !!i);
+            const row = ({ href, label, Icon, ...rest }: (typeof vis)[number], k: string) => (
+              <div key={k} className="sb-row">
+                <Link href={href} className={`sb-item${active(href) ? ' active' : ''}`}>
                   <Icon size={17} strokeWidth={1.9} />
                   {label}
                   {'badge' in rest && counts.pay + counts.ship > 0 && (
@@ -223,9 +247,28 @@ export function AdminShell({ children }: { children: ReactNode }) {
                     </span>
                   )}
                 </Link>
-              ))}
-            </div>
-          ))}
+                <button type="button" className={`sb-pin${pins.includes(href) ? ' on' : ''}`} onClick={() => togglePin(href)} aria-pressed={pins.includes(href)} aria-label={pins.includes(href) ? `${label} sabitlemesini kaldır` : `${label} sayfasını sabitle`} title={pins.includes(href) ? 'Sabitlemeyi kaldır' : 'Tepeye sabitle'}>
+                  <Pin size={13} strokeWidth={2} />
+                </button>
+              </div>
+            );
+            return (
+              <>
+                {pinned.length > 0 && (
+                  <div>
+                    <p className="sb-group">Sabitlenenler</p>
+                    {pinned.map((i) => row(i, 'pin:' + i.href))}
+                  </div>
+                )}
+                {NAV.map((g) => ({ ...g, items: g.items.filter((i) => !i.perm || perms.includes(i.perm)) })).filter((g) => g.items.length).map((g) => (
+                  <div key={g.g}>
+                    <p className="sb-group">{g.g}</p>
+                    {g.items.map((i) => row(i, i.href))}
+                  </div>
+                ))}
+              </>
+            );
+          })()}
           <p className="sb-group">Site</p>
           <a className="sb-item" href="/" target="_blank" rel="noopener">
             <ExternalLink size={17} strokeWidth={1.9} />

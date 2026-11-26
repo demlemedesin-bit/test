@@ -11,6 +11,7 @@ type Ship = { order_no: string; barcode: string; env: string; status: string };
 type Res = { ok: boolean; text: string };
 
 const keyOf = (i: Item) => i.slug || i.name;
+const nickOfP = (p?: { data?: unknown } | null): string => String((p?.data as { subtitle?: unknown } | undefined)?.subtitle ?? '').trim();
 
 async function token(): Promise<string> {
   const { data } = await supabase().auth.getSession();
@@ -69,12 +70,12 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
 
   // Pano: ürün bazında sipariş ve adet
   const board = useMemo(() => {
-    const m = new Map<string, { key: string; name: string; img: string; orders: number; qty: number }>();
+    const m = new Map<string, { key: string; name: string; nick: string; img: string; orders: number; qty: number }>();
     orders.forEach((o) => {
       const seen = new Set<string>();
       (o.items as Item[]).forEach((i) => {
         const k = keyOf(i);
-        const c = m.get(k) ?? { key: k, name: i.name, img: imgOf(i), orders: 0, qty: 0 };
+        const c = m.get(k) ?? { key: k, name: i.name, nick: nickOfP(i.slug ? pmap.get(i.slug) : null), img: imgOf(i), orders: 0, qty: 0 };
         c.qty += i.qty;
         if (!seen.has(k)) { c.orders += 1; seen.add(k); }
         if (!c.img) c.img = imgOf(i);
@@ -82,7 +83,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
       });
     });
     return [...m.values()].sort((a, b) => b.qty - a.qty);
-  }, [orders, imgOf]);
+  }, [orders, imgOf, pmap]);
 
   const list = useMemo(() => (sel.length ? orders.filter((o) => (o.items as Item[]).some((i) => sel.includes(keyOf(i)))) : orders), [orders, sel]);
   const toggle = (k: string) => setSel((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
@@ -167,7 +168,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
   const Thumbs = ({ o }: { o: O }) => (
     <button type="button" onClick={() => setPeek(o)} aria-label="Ürünleri göster" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', background: 'none', border: 0, padding: 0, cursor: 'pointer', textAlign: 'left' }}>
       {(o.items as Item[]).map((i, k) => (
-        <span key={k} title={`${i.qty}× ${i.name}${i.color_name ? ' · ' + i.color_name : ''}`} style={{ position: 'relative', width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: 'var(--bg2, #eee)', border: '1px solid var(--line, #ddd)', display: 'inline-block', opacity: sel.length && !sel.includes(keyOf(i)) ? 0.35 : 1 }}>
+        <span key={k} title={`${i.qty}× ${i.name}${nickOfP(i.slug ? pmap.get(i.slug) : null) ? ' (' + nickOfP(i.slug ? pmap.get(i.slug) : null) + ')' : ''}${i.color_name ? ' · ' + i.color_name : ''}`} style={{ position: 'relative', width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: 'var(--bg2, #eee)', border: '1px solid var(--line, #ddd)', display: 'inline-block', opacity: sel.length && !sel.includes(keyOf(i)) ? 0.35 : 1 }}>
           {imgOf(i) ?   <img src={imgOf(i)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 10, padding: 2, display: 'block' }}>{i.name.slice(0, 10)}</span>}
           {i.qty > 1 && <b style={{ position: 'absolute', right: 0, bottom: 0, background: '#17130F', color: '#fff', fontSize: 11, padding: '0 4px', borderTopLeftRadius: 6 }}>×{i.qty}</b>}
         </span>
@@ -214,6 +215,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
                 </span>
                 <span style={{ minWidth: 0 }}>
                   <b style={{ display: 'block', fontSize: 13, lineHeight: 1.25 }}>{b.name}</b>
+                  {b.nick && <span style={{ display: 'block', fontSize: 12, fontStyle: 'italic', color: 'var(--ac, #6b5cf6)' }}>{b.nick}</span>}
                   <span className="cell-muted" style={{ fontSize: 12 }}>{b.orders} sipariş · {b.qty} adet</span>
                 </span>
               </button>
@@ -245,6 +247,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
                   </span>
                   <span>
                     <b>{i.name}</b>
+                    {nickOfP(i.slug ? pmap.get(i.slug) : null) && <div style={{ fontSize: 13, fontStyle: 'italic', color: 'var(--ac, #6b5cf6)' }}>{nickOfP(i.slug ? pmap.get(i.slug) : null)}</div>}
                     <div className="cell-muted">{[i.color_name, i.size].filter(Boolean).join(' · ') || 'Tek seçenek'}</div>
                     <div><b>{i.qty} adet</b> <span className="cell-muted">· {tl(Number(i.line_total))}</span></div>
                   </span>
@@ -273,7 +276,7 @@ export function DepoHazir({ orders, products, onChanged, show, onPack, onAddrLab
               {row('Alıcı', ask.full_name)}
               {row('Telefon', ask.phone)}
               {row('Adres', `${a?.address || '—'}, ${a?.district || '—'} / ${a?.city || '—'}`)}
-              {row('Ürünler', (ask.items as Item[]).map((i) => `${i.qty}× ${i.name}${i.color_name ? ' · ' + i.color_name : ''}`).join(', '))}
+              {row('Ürünler', (ask.items as Item[]).map((i) => `${i.qty}× ${i.name}${nickOfP(i.slug ? pmap.get(i.slug) : null) ? ' (' + nickOfP(i.slug ? pmap.get(i.slug) : null) + ')' : ''}${i.color_name ? ' · ' + i.color_name : ''}`).join(', '))}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, margin: '10px 0' }}>
                 <label style={{ fontSize: 13 }}>Desi
                   <input className="inp" inputMode="decimal" value={askDesi} onChange={(e) => setAskDesi(e.target.value)} placeholder="Otomatik" style={{ width: '100%' }} />

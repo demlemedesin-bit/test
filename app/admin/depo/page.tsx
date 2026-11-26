@@ -43,6 +43,7 @@ export default function Depo() {
   }, []);
   useEffect(() => { const t = setTimeout(load, 0); return () => clearTimeout(t); }, [load]);
 
+  const nickOf = useCallback((slug: string): string => String(((ps.find((p) => p.slug === slug)?.data) as { subtitle?: unknown } | undefined)?.subtitle ?? '').trim(), [ps]);
   const prep = useMemo(() => (os ?? []).filter((o) => o.status === 'hazirlaniyor' && !o.packed_at), [os]);
   const packed = useMemo(() => (os ?? []).filter((o) => o.status === 'hazirlaniyor' && o.packed_at), [os]);
   const pick = useMemo(() => {
@@ -52,16 +53,16 @@ export default function Depo() {
   }, [prep]);
 
   const groups = useMemo(() => {
-    const m = new Map<string, { name: string; qty: number; rows: { opt: string; qty: number }[] }>();
-    pick.forEach((x) => { const g = m.get(x.slug || x.name) ?? { name: x.name, qty: 0, rows: [] }; g.qty += x.qty; g.rows.push({ opt: x.opt || 'Tek seçenek', qty: x.qty }); m.set(x.slug || x.name, g); });
+    const m = new Map<string, { key: string; name: string; nick: string; qty: number; rows: { opt: string; qty: number }[] }>();
+    pick.forEach((x) => { const g = m.get(x.slug || x.name) ?? { key: x.slug || x.name, name: x.name, nick: nickOf(x.slug), qty: 0, rows: [] }; g.qty += x.qty; g.rows.push({ opt: x.opt || 'Tek seçenek', qty: x.qty }); m.set(x.slug || x.name, g); });
     return [...m.values()].sort((a, b) => b.qty - a.qty);
-  }, [pick]);
+  }, [pick, nickOf]);
   function printPrep() {
     const a = window.open('', '_blank', 'width=720,height=900');
     if (!a) return;
     const e = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;');
     const total = groups.reduce((n, g) => n + g.qty, 0);
-    a.document.write(`<title>Hazırlık özeti</title><body style="font:14px system-ui;padding:24px"><h2 style="margin:0 0 4px">Hazırlık özeti</h2><div style="color:#666;margin-bottom:14px">${prep.length} sipariş · ${total} adet · ${new Date().toLocaleDateString('tr-TR')}</div>${groups.map((g) => `<div style="margin:0 0 14px;break-inside:avoid"><div style="display:flex;justify-content:space-between;border-bottom:2px solid #000;font-weight:700;padding:4px 0"><span>${e(g.name)}</span><span>${g.qty} adet</span></div>${g.rows.map((r) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ddd"><span>☐ ${e(r.opt)}</span><b>${r.qty}</b></div>`).join('')}</div>`).join('')}</body>`);
+    a.document.write(`<title>Hazırlık özeti</title><body style="font:14px system-ui;padding:24px"><h2 style="margin:0 0 4px">Hazırlık özeti</h2><div style="color:#666;margin-bottom:14px">${prep.length} sipariş · ${total} adet · ${new Date().toLocaleDateString('tr-TR')}</div>${groups.map((g) => `<div style="margin:0 0 14px;break-inside:avoid"><div style="display:flex;justify-content:space-between;border-bottom:2px solid #000;font-weight:700;padding:4px 0"><span>${e(g.name)}${g.nick ? ' <i style="font-weight:400">(' + e(g.nick) + ')</i>' : ''}</span><span>${g.qty} adet</span></div>${g.rows.map((r) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ddd"><span>☐ ${e(r.opt)}</span><b>${r.qty}</b></div>`).join('')}</div>`).join('')}</body>`);
     a.document.close(); a.print();
   }
 
@@ -103,7 +104,7 @@ export default function Depo() {
             <div className="kpis">{[['Sipariş', prep.length], ['Toplam adet', groups.reduce((n, g) => n + g.qty, 0)], ['Ürün çeşidi', groups.length]].map(([l, v]) => <div className="kpi" key={String(l)}><div className="kpi-top"><span className="kpi-label">{l}</span></div><div className="kpi-val">{v}</div></div>)}</div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '0 0 8px' }}><button className="btn ghost" onClick={printPrep} disabled={!groups.length}>Yazdır</button></div>
             {groups.length === 0 ? <Card title="Hazırlık özeti"><Tbl min={0} cols={[['Ürün', '1fr']]} rows={[]} empty="Hazırlanacak ürün yok" /></Card> : groups.map((g) => (
-              <Card key={g.name} title={g.name} meta={`${g.qty} adet`}><Tbl min={0} cols={[['Varyasyon', 'minmax(0,1fr)'], ['Adet', '70px']]} rows={g.rows.map((r) => [r.opt, <b key="q">{r.qty}</b>])} empty="" /></Card>
+              <Card key={g.key} title={g.nick ? `${g.name} · ${g.nick}` : g.name} meta={`${g.qty} adet`}><Tbl min={0} cols={[['Varyasyon', 'minmax(0,1fr)'], ['Adet', '70px']]} rows={g.rows.map((r) => [r.opt, <b key="q">{r.qty}</b>])} empty="" /></Card>
             ))}
           </>
         )}
@@ -112,11 +113,12 @@ export default function Depo() {
             <Card title="Varyasyon stokları" meta="Ürün ve renk bazında"><Tbl min={0} cols={[['Ürün', 'minmax(0,1.2fr)'], ['Varyasyon', 'minmax(0,1fr)'], ['Stok', '80px']]}
               rows={ps.filter((p) => p.active).flatMap((p): React.ReactNode[][] => {
                 const cs = (p.colors ?? []).filter((c) => typeof c.stock === 'number');
-                if (!cs.length) return [[p.name, '—', p.stock ?? '∞']];
-                return cs.map((c, k) => [k === 0 ? p.name : '', c.name, <b key={c.key} style={{ color: (c.stock as number) <= 0 ? 'var(--red, #d33)' : undefined }}>{c.stock}</b>]);
+                const nm = <span key="n">{p.name}{nickOf(p.slug) && <i style={{ display: 'block', fontSize: 12.5, color: 'var(--ac, #6b5cf6)' }}>{nickOf(p.slug)}</i>}</span>;
+                if (!cs.length) return [[nm, '—', p.stock ?? '∞']];
+                return cs.map((c, k) => [k === 0 ? nm : '', c.name, <b key={c.key} style={{ color: (c.stock as number) <= 0 ? 'var(--red, #d33)' : undefined }}>{c.stock}</b>]);
               })} empty="Ürün yok" /></Card>
-            <Card title="Kritik stok" meta={`${crit.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['Stok', '80px']]} rows={crit.map((p) => [p.name, p.stock])} empty="Kritik stok yok" /></Card>
-            <Card title="Barkodu girilmemiş" meta={`${noBar.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['', '90px']]} rows={noBar.map((p) => [p.name, <a key="a" style={{ color: 'var(--ac)' }} href={`/admin/urunler?edit=${p.slug}`}>Düzenle</a>])} empty="Hepsi tamam" /></Card>
+            <Card title="Kritik stok" meta={`${crit.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['Stok', '80px']]} rows={crit.map((p) => [<span key={p.slug}>{p.name}{nickOf(p.slug) && <i style={{ display: 'block', fontSize: 12.5, color: 'var(--ac, #6b5cf6)' }}>{nickOf(p.slug)}</i>}</span>, p.stock])} empty="Kritik stok yok" /></Card>
+            <Card title="Barkodu girilmemiş" meta={`${noBar.length} ürün`}><Tbl min={0} cols={[['Ürün', 'minmax(0,1fr)'], ['', '90px']]} rows={noBar.map((p) => [<span key={p.slug}>{p.name}{nickOf(p.slug) && <i style={{ display: 'block', fontSize: 12.5, color: 'var(--ac, #6b5cf6)' }}>{nickOf(p.slug)}</i>}</span>, <a key="a" style={{ color: 'var(--ac)' }} href={`/admin/urunler?edit=${p.slug}`}>Düzenle</a>])} empty="Hepsi tamam" /></Card>
           </>
         )}
         {tab === 'iade' && <Card title="İade gelen ve hasarlı ürünler"><Tbl min={700} cols={[['Sipariş', '100px'], ['Ürün', 'minmax(0,1fr)'], ['Adet', '60px'], ['Tarih', '110px'], ['Durum', '170px']]}
