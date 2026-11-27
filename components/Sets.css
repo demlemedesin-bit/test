@@ -1,0 +1,27 @@
+/* Kampanyalı setler */
+.st-grid{ align-items:start; display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s-24,24px); }
+.st-card{ display:grid; gap:10px; align-content:start; background:#fff; border:1px solid var(--line); border-radius:20px; padding:16px; scroll-margin-top:90px; }
+.st-tiles{ position:relative; display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:0; }
+.st-tilewrap{ display:inline-flex; align-items:center; }
+.st-tile{ width:120px; height:120px; background:#F1E4D6; border:1px solid rgba(142,42,33,.18); border-radius:14px; display:grid; place-items:center; overflow:hidden; }
+.st-tile img{ width:100%; height:100%; object-fit:contain; mix-blend-mode:multiply; }
+.st-plus{ font-style:normal; width:26px; height:26px; margin:0 -6px; z-index:1; display:grid; place-items:center; border-radius:50%; background:#5B0F1E; color:#fff; font-size:18px; line-height:1; flex:none; }
+.st-pct{ position:absolute; top:-6px; right:-4px; background:var(--tea,#8E2A21); color:#fff; font-size:12px; font-weight:700; padding:4px 9px; border-radius:99px; }
+.st-name{ font-size:24px; color:var(--brown); text-align:center; }
+.st-sub{ margin:0; text-align:center; font-size:13px; color:var(--ink-2); }
+.st-pill{ margin:0 auto; max-width:100%; padding:7px 16px; border-radius:99px; background:#5B0F1E; color:#fff; font-size:13px; font-weight:600; text-align:center; }
+.st-pick{ display:grid; gap:8px; }
+.st-pick label{ display:grid; gap:3px; font-size:12px; color:var(--ink-2); }
+.st-pick select{ width:100%; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font:inherit; font-size:14px; background:var(--cream-light); color:var(--ink); }
+.st-price{ margin:4px 0 0; display:flex; align-items:baseline; justify-content:center; gap:10px; flex-wrap:wrap; }
+.st-price s{ color:var(--ink-3); font-size:15px; } .st-price b{ font-size:24px; color:var(--tea,#8E2A21); }
+.st-price em{ font-style:normal; font-size:12px; font-weight:700; color:var(--ok,#2F6B3A); background:#e6f1e8; padding:3px 8px; border-radius:99px; }
+.st-add{ border:0; border-radius:12px; padding:14px 16px; background:#5B0F1E; color:#fff; font-weight:700; font-size:15px; cursor:pointer; }
+.st-add:hover{ background:#470b17; }
+.st-go{ text-align:center; font-size:14px; text-decoration:underline; color:var(--ink); }
+.st-hint{ background:#fff; border:1px dashed var(--tea,#8E2A21); border-radius:14px; padding:12px 14px; margin:16px 0; font-size:14px; line-height:1.5; }
+.st-hint a{ text-decoration:underline; font-weight:600; }
+@media (max-width:560px){ .st-tile{ width:96px; height:96px; } .st-grid{ grid-template-columns:1fr; } }
+
+.st-n3 .st-tile{ width:86px; height:86px; } .st-n4 .st-tile{ width:68px; height:68px; }
+@media (max-width:560px){ .st-n3 .st-tile{ width:76px; height:76px; } .st-n4 .st-tile{ width:62px; height:62px; } }

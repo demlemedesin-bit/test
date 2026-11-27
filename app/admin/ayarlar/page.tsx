@@ -25,6 +25,7 @@ export default function Settings() {
   const [busy, setBusy] = useState(false);
   const [maint, setMaint] = useState(false);
   const [guestOn, setGuestOn] = useState(false);
+  const [setsF, setSetsF] = useState({ sets_home: false, sets_cart: false, sets_shop: false });
   const [err, setErr] = useState('');
   const { show, node } = useToast();
 
@@ -34,6 +35,7 @@ export default function Settings() {
     const m = Object.fromEntries((s.data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
     setMaint(m.maintenance === '1');
     setGuestOn(m.guest_apply_on === '1');
+    setSetsF({ sets_home: m.sets_home === '1', sets_cart: m.sets_cart === '1', sets_shop: m.sets_shop === '1' });
     setF(Object.fromEntries(KEYS.map((k) => [k, m[k] ?? ''])) as Form);
     setAdmins((a.data ?? []) as Adm[]);
   }, []);
@@ -102,6 +104,17 @@ export default function Settings() {
     show(on ? 'Konuk başvuru sayfası AÇIK: menüde “Konuğum ol” görünüyor' : 'Konuk başvuru sayfası kapatıldı');
   }
 
+  async function toggleSets(key: 'sets_home' | 'sets_cart' | 'sets_shop', on: boolean) {
+    setSetsF((p) => ({ ...p, [key]: on }));
+    const { error } = await supabase().from('shop_settings').upsert({ key, value: on ? '1' : '0', is_public: true }, { onConflict: 'key' });
+    if (error) {
+      setSetsF((p) => ({ ...p, [key]: !on }));
+      return show('Kaydedilemedi: ' + error.message, true);
+    }
+    await refreshSite();
+    show(on ? 'Set gösterimi açıldı' : 'Set gösterimi kapatıldı');
+  }
+
   async function addAdmin() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return show('Geçerli bir e-posta gir.', true);
     const { error } = await supabase().rpc('admin_set_admin', { p_email: email, p_make: true });
@@ -145,6 +158,25 @@ export default function Settings() {
                 <span>“Demleme’ye konuk olmak ister misin?” sayfasını aç ve menüye “Konuğum ol” bağlantısını ekle</span>
               </label>
               <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Kapalıyken sayfa herkese “bulunamadı” döner, menüde görünmez ve başvuru alınmaz. Gelen başvurular Mağaza → Konuk başvuruları sayfasında listelenir. Değişiklik yaklaşık 1 dakikada yansır.</p>
+            </div>
+          </section>
+
+          <section className="card" style={{ marginBottom: 18 }}>
+            <div className="card-h"><h2 className="card-t">Set ürünleri</h2><span className="card-m">{[setsF.sets_home, setsF.sets_cart, setsF.sets_shop].filter(Boolean).length} yerde açık</span></div>
+            <div className="card-b" style={{ display: 'grid', gap: 10 }}>
+              <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={setsF.sets_shop} onChange={(e) => toggleSets('sets_shop', e.target.checked)} />
+                <span>Setler sayfasında göster (<b>/setler</b> sayfası ve Tüm ürünler sayfasında “Setler” sekmesi)</span>
+              </label>
+              <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={setsF.sets_home} onChange={(e) => toggleSets('sets_home', e.target.checked)} />
+                <span>Ana sayfada “Kampanyalı setler” bölümünü göster</span>
+              </label>
+              <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={setsF.sets_cart} onChange={(e) => toggleSets('sets_cart', e.target.checked)} />
+                <span>Sepette “setini tamamla” önerisini göster</span>
+              </label>
+              <p style={{ margin: '4px 0 0', opacity: 0.7, fontSize: 13 }}>Setleri Mağaza → Setler sayfasından oluşturup “Satışta” yaparsın. Bir set satıştayken müşteri set ürünlerini sepete koyunca indirim, bu seçeneklerden bağımsız olarak sepette uygulanır; bu seçenekler yalnızca setin nerede tanıtılacağını belirler. Sepet önerisindeki bağlantı Setler sayfası açıkken çalışır. Değişiklik yaklaşık 1 dakikada yansır.</p>
             </div>
           </section>
 

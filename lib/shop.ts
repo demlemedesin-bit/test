@@ -164,7 +164,15 @@ export type Quote = {
   total: number;
   coupon: { code: string | null; name: string; kind: string; auto: boolean } | null;
   error: string | null;
+  set_discount?: number;
+  sets?: string[];
 };
+
+/** Sepet/ödeme özetindeki indirim satırının etiketi (kupon ve/veya set). */
+export function discountLabel(q: Quote): string {
+  const parts = [q.coupon?.code || q.coupon?.name || '', (q.set_discount ?? 0) > 0 && q.sets?.length ? [...new Set(q.sets)].join(', ') : ''].filter(Boolean);
+  return parts.length ? ` (${parts.join(' + ')})` : '';
+}
 
 /** Kupon kodu (oturum boyunca sepet ve ödeme sayfası arasında paylaşılır). */
 export function useCouponCode() {

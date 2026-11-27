@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { useCart, lineKey, MAX_QTY } from '@/lib/cart';
-import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
+import { tl, discountLabel, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { CouponBox } from './CouponBox';
 import { Alert } from './ui';
 import { RecentlyViewed, useStorefront } from './RecentlyViewed';
 import { Upsell } from './Upsell';
+import { SetHints } from './SetHints';
 import './ProductExtras.css';
 
 export function CartView() {
@@ -83,6 +84,7 @@ export function CartView() {
             ← Alışverişe devam et
           </a>
         </p>
+        <SetHints items={items} />
         {(() => {
           const qty = items.reduce((n, i) => n + i.qty, 0);
           const shipNow = quote ? quote.shipping : priced?.shipping ?? 0;
@@ -109,7 +111,7 @@ export function CartView() {
         </div>
         {quote && quote.discount > 0 && (
           <div className="sum-row">
-            <span>İndirim{quote.coupon?.code ? ` (${quote.coupon.code})` : quote.coupon?.name ? ` (${quote.coupon.name})` : ''}</span>
+            <span>İndirim{discountLabel(quote)}</span>
             <span>−{tl(quote.discount)}</span>
           </div>
         )}

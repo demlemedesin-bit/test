@@ -13,7 +13,7 @@ export function CouponBox({ code, setCode, quote, busy }: { code: string; setCod
         <p className="small" style={{ margin: 0, display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between' }}>
           <span>
             Kupon: <b>{code}</b>
-            {quote?.error ? <span style={{ color: 'var(--red, #b3261e)' }}> — {quote.error}</span> : applied && quote && quote.discount > 0 ? <span> — {tl(quote.discount)} indirim</span> : null}
+            {quote?.error ? <span style={{ color: 'var(--red, #b3261e)' }}> — {quote.error}</span> : applied && quote && quote.discount - (quote.set_discount ?? 0) > 0 ? <span> — {tl(quote.discount - (quote.set_discount ?? 0))} indirim</span> : null}
           </span>
           <button type="button" className="btn-text" onClick={() => setCode('')}>
             Kaldır
@@ -36,9 +36,9 @@ export function CouponBox({ code, setCode, quote, busy }: { code: string; setCod
           </button>
         </form>
       )}
-      {applied?.auto && !code && quote && quote.discount > 0 && (
+      {applied?.auto && !code && quote && quote.discount - (quote.set_discount ?? 0) > 0 && (
         <p className="free-note" style={{ marginTop: 8 }}>
-          {applied.name} uygulandı: −{tl(quote.discount)}
+          {applied.name} uygulandı: −{tl(quote.discount - (quote.set_discount ?? 0))}
         </p>
       )}
     </div>

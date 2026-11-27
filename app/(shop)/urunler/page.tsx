@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { D } from '@/components/Display';
 import { getProducts, type SiteProduct } from '@/lib/catalog';
 import ListingCard from '@/components/ListingCard';
+import { getSetViews, setFlags } from '@/lib/sets';
 import '@/components/Listing.css';
 
 export const metadata: Metadata = {
@@ -27,7 +28,8 @@ export default async function Urunler({ searchParams }: { searchParams: Promise<
   const kat = CATS.some(([k]) => k === one(sp.kat)) ? one(sp.kat) : '';
   const sirala = SORTS.some(([k]) => k === one(sp.sirala)) ? one(sp.sirala) : '';
 
-  const all = await getProducts();
+  const [all, sflags, sviews] = await Promise.all([getProducts(), setFlags(), getSetViews()]);
+  const showSets = sflags.shop && sviews.length > 0;
   let list = all.filter((p) => !kat || p.shopCat === kat);
   if (sirala === 'indirim') list = list.filter((p) => p.was);
   if (sirala === 'artan') list = [...list].sort((a, b) => a.priceNum - b.priceNum);
@@ -45,6 +47,7 @@ export default async function Urunler({ searchParams }: { searchParams: Promise<
 
       <div className="ls-bar">
         <nav className="ls-cats" aria-label="Kategoriler">
+          {showSets ? <a href="/setler" className="ls-chip">Setler <small>{sviews.length}</small></a> : null}
           {CATS.map(([k, label]) => (
             <a key={k || 'all'} href={href(k, sirala)} className={`ls-chip${kat === k ? ' on' : ''}`} aria-current={kat === k ? 'page' : undefined}>
               {label} <small>{count(k)}</small>

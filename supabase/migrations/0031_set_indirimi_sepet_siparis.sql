@@ -1,0 +1,4 @@
+-- quote_cart ve create_order içine set indirimi eklendi (canlıda DO bloğuyla, mevcut tanımlar üzerinde metin değişimiyle uygulandı).
+-- Değişiklik: indirim = set_discount(lines) + kupon indirimi (kupon, set indirimi düşülmüş tutar üzerinden hesaplanır).
+-- quote_cart: yanıta set_discount ve sets alanları eklendi. create_order: orders.discount toplam indirimi tutar,
+-- orders.coupon_code sete uygulanmışsa "KOD + Set: Ad" olur. Aktif set yoksa sonuçlar önceki ile birebir aynıdır.

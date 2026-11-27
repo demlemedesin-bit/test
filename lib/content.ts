@@ -10,6 +10,7 @@ import type { Storefront } from './storefront';
 import { bannersHtml, parseBanners } from './design';
 import { getIgReels } from './instagramReels';
 import { guestApplyOn } from './guestApply';
+import { setsHomeHtml } from './sets';
 
 const ROOT = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(ROOT, 'content', rel), 'utf-8');
@@ -38,6 +39,7 @@ export async function homeHtml(): Promise<string> {
   // “Footer'da göster” denen sayfalar alt şerit bağlantılarına eklenir
   const legal = [...site.footer.legal, ...footerPages.filter((p) => !site.footer.legal.some((l) => l.href === p.href))];
   const guestOn = await guestApplyOn();
+  const setsHtml = await setsHomeHtml().catch(() => '');
   const aspect = json<Record<string, number>>('meta/guest-aspect.json');
   const steam = json<Record<string, unknown>>('meta/steam-spots.json');
   const tea = json<{ teas: { steam: number[][] } }>('konuklar.json').teas.steam;
@@ -66,6 +68,7 @@ export async function homeHtml(): Promise<string> {
   const html = fill(read('home.html'), site)
     .replace('{{BANNERS}}', () => bannersHtml(banners))
     .replace(/(<em class="line">[^<]*?)\s+(\S+<\/em>)/, '$1<br class="mo2"> $2')   // mobilde 3. satır son kelimeden önce bölünür
+    .replace('{{SETLER}}', () => setsHtml)
     .replaceAll('{{GUEST_NAV}}', guestOn ? '<a href="/konuk-ol">Konuğum ol</a>' : '')
     .replace('{{FAQ_ITEMS}}', () => faqHtml(site.faq))
     .replace('{{SELLER_INFO}}', () => { const l = sellerLine(cfg); return (l ? `<p>${esc(l)} · <a href="/iletisim">İletişim</a></p>` : '') + `<p class="footer-pay">🔒 ${esc(PAY_NOTE)}</p>`; })

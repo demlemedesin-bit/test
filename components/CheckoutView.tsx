@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { postForm } from '@/lib/payForm';
 import { useCart } from '@/lib/cart';
-import { tl, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
+import { tl, discountLabel, useCouponCode, usePricedCart, useQuote } from '@/lib/shop';
 import { CouponBox } from './CouponBox';
 import { Alert, CityDistrict, Field, emailOk, phoneOk } from './ui';
 
@@ -358,7 +358,7 @@ export function CheckoutView() {
         </div>
         {quote && quote.discount > 0 && (
           <div className="sum-row muted">
-            <span>İndirim{quote.coupon?.code ? ` (${quote.coupon.code})` : quote.coupon?.name ? ` (${quote.coupon.name})` : ''}</span>
+            <span>İndirim{discountLabel(quote)}</span>
             <span>−{tl(quote.discount)}</span>
           </div>
         )}
