@@ -1,6 +1,7 @@
 import { getSite, text } from '@/lib/site';
 import { getFooterPages } from '@/lib/cms';
 import { getConfig } from '@/lib/catalog';
+import { guestApplyOn } from '@/lib/guestApply';
 import { PAY_NOTE, sellerLine } from '@/lib/sellerInfo';
 import { AnnounceBar } from './AnnounceBar';
 import { Footer } from './Footer';
@@ -8,11 +9,12 @@ import { Header } from './Header';
 
 /** Mağaza sayfalarının üst menüsü: etiketler panelden (İçerik → Menü). */
 export async function SiteHeader() {
-  const s = await getSite();
+  const [s, guestApply] = await Promise.all([getSite(), guestApplyOn()]);
   return (
     <>
       <AnnounceBar a={s.announce} />
       <Header
+        guestApply={guestApply}
         labels={{
           shop: text(s, 'nav_shop'),
           guests: text(s, 'nav_guests'),

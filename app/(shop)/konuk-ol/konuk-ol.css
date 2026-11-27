@@ -1,0 +1,34 @@
+/* Konuk başvuru sayfası (/konuk-ol) */
+.ko{ width:100%; max-width:1180px; margin:0 auto; padding:var(--s-48) var(--pad) var(--s-96); }
+.ko-hero{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); align-items:center; gap:var(--s-32); }
+.ko-copy h1{ font-size:clamp(38px,6vw,76px); line-height:1.04; color:var(--brown); }
+.ko-lead{ margin:var(--s-24) 0 0; font-size:clamp(15px,1.6vw,18px); line-height:1.6; color:var(--ink-2); }
+.ko-script{ margin:var(--s-32) 0 0; font-family:var(--font-display); font-style:italic; font-size:clamp(24px,3.2vw,36px); line-height:1.15; color:var(--tea); transform:rotate(-3deg); transform-origin:left; }
+.ko-art{ width:100%; height:auto; justify-self:end; mix-blend-mode:multiply; }
+.ko-bar{ margin-top:var(--s-32); background:var(--white); border:1px solid var(--line); border-radius:22px; padding:var(--s-24); box-shadow:0 14px 40px rgba(32,27,20,.08);
+  display:grid; grid-template-columns:1fr 1fr 220px 200px; grid-template-areas:"n e v b" "w w v b"; gap:var(--s-16) var(--s-24); align-items:start; }
+.ko-f{ display:grid; gap:6px; font-size:13px; font-weight:600; color:var(--ink); }
+.ko-n{ grid-area:n; } .ko-e{ grid-area:e; } .ko-w{ grid-area:w; } .ko-v{ grid-area:v; } .ko-b{ grid-area:b; }
+.ko-inp{ width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font:inherit; font-size:14px; font-weight:400; color:var(--ink); background:var(--cream-light); }
+.ko-inp::placeholder{ color:var(--ink-3); }
+.ko-inp:focus{ outline:2px solid var(--tea); outline-offset:1px; }
+.ko-v{ display:grid; justify-items:center; align-content:center; gap:6px; text-align:center; border-left:1px solid var(--line); border-right:1px solid var(--line); padding:0 var(--s-16); min-height:100%; font-size:13px; }
+.ko-v b{ font-size:14px; } .ko-v small{ color:var(--ink-2); }
+.ko-file{ margin-top:4px; padding:9px 18px; border:1px solid var(--line-strong); border-radius:10px; background:var(--cream); font-size:14px; cursor:pointer; }
+.ko-file:hover{ background:var(--cream-light); }
+.ko-fn{ max-width:100%; overflow-wrap:anywhere; color:var(--ink-2); font-size:12px; }
+.ko-b{ align-self:center; }
+.ko-send{ width:100%; border:0; border-radius:12px; padding:16px 18px; background:#3d4a2f; color:var(--on-brown); font:inherit; font-size:15px; font-weight:700; cursor:pointer; }
+.ko-send:hover:not(:disabled){ background:#2f3a24; } .ko-send:disabled{ opacity:.6; cursor:default; }
+.ko-consent{ display:flex; gap:10px; align-items:flex-start; margin-top:var(--s-16); font-size:13px; line-height:1.5; color:var(--ink-2); }
+.ko-consent input{ margin-top:3px; }
+.ko-consent a{ text-decoration:underline; }
+.ko-msg{ margin-top:var(--s-16); padding:12px 14px; border-radius:10px; font-size:14px; }
+.ko-msg.err{ background:#fbe9e8; color:var(--red); } .ko-msg.ok{ background:#e6f1e8; color:var(--ok); }
+.ko-hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+@media (max-width:900px){
+  .ko-hero{ grid-template-columns:1fr; }
+  .ko-art{ order:-1; max-width:520px; justify-self:center; }
+  .ko-bar{ grid-template-columns:1fr; grid-template-areas:"n" "e" "w" "v" "b"; }
+  .ko-v{ border:1px dashed var(--line-strong); border-radius:14px; padding:var(--s-16); }
+}

@@ -9,7 +9,7 @@ import './ShopExtras.css';
 export type NavLabels = { shop: string; guests: string; about: string; contact: string; account: string; login: string };
 const DEFAULT_LABELS: NavLabels = { shop: 'Mağaza', guests: 'Konuklar', about: 'Hakkında', contact: 'İletişim', account: 'Hesabım', login: 'Giriş yap' };
 
-export function Header({ active, labels = DEFAULT_LABELS }: { active?: 'sepet' | 'hesap'; labels?: NavLabels }) {
+export function Header({ active, labels = DEFAULT_LABELS, guestApply = false }: { active?: 'sepet' | 'hesap'; labels?: NavLabels; guestApply?: boolean }) {
   const { items } = useCart();
   const { user, loading } = useAuth();
   const count = items.reduce((n, i) => n + i.qty, 0);
@@ -28,6 +28,7 @@ export function Header({ active, labels = DEFAULT_LABELS }: { active?: 'sepet' |
         <a href="/#konuklar">{labels.guests}</a>
         <a href="/#hakkinda">{labels.about}</a>
         <a href="/#iletisim">{labels.contact}</a>
+        {guestApply && <a href="/konuk-ol">Konuğum ol</a>}
       </nav>
       <div className="pn-right">
         <Link className="pn-search" href="/ara" aria-label="Ara">

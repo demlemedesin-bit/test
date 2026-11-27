@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { SelectSeg } from './SelectSeg';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu, Pin } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, FileText, Megaphone, LogOut, ExternalLink, BadgePercent, BarChart3, ShoppingCart, Newspaper, Plug, ShieldCheck, Search, ImageIcon, Star, LayoutTemplate, MailPlus, Boxes, Calculator, Headphones, Timer, Gift, Gauge, PaintBucket, Undo2, Activity, Menu, Pin, Mic } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { authMessage } from '@/lib/auth';
 import { grantPreview, useAdmin, usePendingCounts } from '@/lib/admin';
@@ -25,6 +25,7 @@ export const NAV: { g: string; items: { href: string; label: string; Icon: typeo
       { href: '/admin/depo', label: 'Depo', Icon: Boxes, perm: 'warehouse' },
       { href: '/admin/muhasebe', label: 'Muhasebe', Icon: Calculator, perm: 'accounting' },
       { href: '/admin/destek', label: 'Müşteri hizmetleri', Icon: Headphones, perm: 'support' },
+      { href: '/admin/konuk-basvurulari', label: 'Konuk başvuruları', Icon: Mic, perm: 'customers' },
     ],
   },
   {

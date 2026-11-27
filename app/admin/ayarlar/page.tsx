@@ -24,6 +24,7 @@ export default function Settings() {
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [maint, setMaint] = useState(false);
+  const [guestOn, setGuestOn] = useState(false);
   const [err, setErr] = useState('');
   const { show, node } = useToast();
 
@@ -32,6 +33,7 @@ export default function Settings() {
     if (s.error) return setErr('Ayarlar yüklenemedi. Sayfayı yenile.');
     const m = Object.fromEntries((s.data ?? []).map((r) => [r.key as string, String(r.value ?? '')]));
     setMaint(m.maintenance === '1');
+    setGuestOn(m.guest_apply_on === '1');
     setF(Object.fromEntries(KEYS.map((k) => [k, m[k] ?? ''])) as Form);
     setAdmins((a.data ?? []) as Adm[]);
   }, []);
@@ -89,6 +91,17 @@ export default function Settings() {
     show(on ? 'Bakım modu AÇIK: ziyaretçiler “Demleniyor” ekranını görüyor' : 'Bakım modu kapatıldı, site açık');
   }
 
+  async function toggleGuest(on: boolean) {
+    setGuestOn(on);
+    const { error } = await supabase().from('shop_settings').upsert({ key: 'guest_apply_on', value: on ? '1' : '0', is_public: true }, { onConflict: 'key' });
+    if (error) {
+      setGuestOn(!on);
+      return show('Kaydedilemedi: ' + error.message, true);
+    }
+    await refreshSite();
+    show(on ? 'Konuk başvuru sayfası AÇIK: menüde “Konuğum ol” görünüyor' : 'Konuk başvuru sayfası kapatıldı');
+  }
+
   async function addAdmin() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return show('Geçerli bir e-posta gir.', true);
     const { error } = await supabase().rpc('admin_set_admin', { p_email: email, p_make: true });
@@ -121,6 +134,17 @@ export default function Settings() {
                 <span>Siteyi tüm ziyaretçilere kapat, “Demleniyor…” animasyonu göster</span>
               </label>
               <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Yönetim paneli ve giriş sayfası açık kalır, panele girmiş personel siteyi normal görür (12 saat); diğer tüm sayfalar sunucuda kapatılır, içerik hiç gönderilmez. Değişiklik yaklaşık 15 saniyede yansır.</p>
+            </div>
+          </section>
+
+          <section className="card" style={{ marginBottom: 18 }}>
+            <div className="card-h"><h2 className="card-t">Konuk başvuru sayfası</h2><span className="card-m">{guestOn ? 'AÇIK' : 'Kapalı'}</span></div>
+            <div className="card-b">
+              <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={guestOn} onChange={(e) => toggleGuest(e.target.checked)} />
+                <span>“Demleme’ye konuk olmak ister misin?” sayfasını aç ve menüye “Konuğum ol” bağlantısını ekle</span>
+              </label>
+              <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: 13 }}>Kapalıyken sayfa herkese “bulunamadı” döner, menüde görünmez ve başvuru alınmaz. Gelen başvurular Mağaza → Konuk başvuruları sayfasında listelenir. Değişiklik yaklaşık 1 dakikada yansır.</p>
             </div>
           </section>
 
