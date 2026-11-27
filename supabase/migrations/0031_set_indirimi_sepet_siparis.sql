@@ -2,3 +2,6 @@
 -- Değişiklik: indirim = set_discount(lines) + kupon indirimi (kupon, set indirimi düşülmüş tutar üzerinden hesaplanır).
 -- quote_cart: yanıta set_discount ve sets alanları eklendi. create_order: orders.discount toplam indirimi tutar,
 -- orders.coupon_code sete uygulanmışsa "KOD + Set: Ad" olur. Aktif set yoksa sonuçlar önceki ile birebir aynıdır.
+-- Sonradan (0032 olarak canlıda uygulandı): set indirimi uygulanan sepette kupon ve otomatik kampanyalar çalışmaz.
+-- quote_cart / create_order: sdisc > 0 ise coupon_discount çağrılmaz; kupon kodu girilmişse
+-- 'Set indirimi uygulanan sepette kupon kullanılamaz' hatası döner. Ücretsiz kargo eşiği bundan etkilenmez.
