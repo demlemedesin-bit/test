@@ -11,7 +11,9 @@ import { Empty, Loading, TopBar } from '@/components/admin/ui';
 import './fatura.css';
 
 type Mode = 'form' | 'fatura' | 'irsaliye' | 'etiket';
-type Prod = { slug: string; thumb?: string | null; colors?: { key: string; name?: string; thumb?: string; img?: string }[] | null; data?: { vat?: number } | null };
+type Prod = { slug: string; thumb?: string | null; colors?: { key: string; name?: string; thumb?: string; img?: string }[] | null; data?: { vat?: number; subtitle?: string } | null };
+/** Ürün lakabı (Ürünler → alt başlık); yoksa boş. Fatura dışındaki çıktılarda ürün adının yanında gösterilir. */
+const nick = (prods: Record<string, Prod>, slug?: string | null) => String((slug ? prods[slug]?.data?.subtitle : '') ?? '').trim();
 type Seller = { name: string; address: string; taxOffice: string; taxNo: string; mersis: string; phone: string; email: string };
 
 function Doc() {
@@ -141,7 +143,7 @@ function Sheet({ order: o, seller: s, mode, setMode, prods, autoPrint }: { order
           <div className="lbl-to"><small>ALICI</small><b>{o.full_name}</b><span style={{ whiteSpace: 'pre-line' }}>{addr}</span><span>Tel: {o.phone}</span></div>
           <div className="lbl-row"><div><small>SİPARİŞ</small><b className="mono">{o.order_no}</b></div><div><small>KARGO</small><b>{o.tracking_carrier || '—'}</b></div><div><small>ÖDEME</small><b>{o.payment_method === 'havale' || o.payment_method === 'kapida' ? PAY[o.payment_method] ?? o.payment_method : 'Ödendi'}</b></div></div>
           {o.tracking_no && <div className="lbl-bc"><small>TAKİP NO</small><b className="mono">{o.tracking_no}</b></div>}
-          <div className="lbl-items"><small>İÇERİK</small>{o.items.map((i, k) => <span key={k}>{i.qty} × {i.name}{[i.color_name, i.size].filter(Boolean).length ? ` (${[i.color_name, i.size].filter(Boolean).join(' · ')})` : ''}</span>)}</div>
+          <div className="lbl-items"><small>İÇERİK</small>{o.items.map((i, k) => <span key={k}>{i.qty} × {i.name}{nick(prods, i.slug) ? ` — ${nick(prods, i.slug)}` : ''}{[i.color_name, i.size].filter(Boolean).length ? ` (${[i.color_name, i.size].filter(Boolean).join(' · ')})` : ''}</span>)}</div>
         </article>
       )}
       {mode === 'form' && <OrderForm o={o} s={s} prods={prods} />}
@@ -208,6 +210,7 @@ function Sheet({ order: o, seller: s, mode, setMode, prods, autoPrint }: { order
                 <tr key={k}>
                   <td>
                     {i.name}
+                    {mode === 'irsaliye' && nick(prods, i.slug) ? <span style={{ color: '#666' }}> — {nick(prods, i.slug)}</span> : null}
                     {v ? <span style={{ color: '#666' }}> ({v})</span> : null}
                   </td>
                   <td className="r">{i.qty}</td>
@@ -341,6 +344,7 @@ function OrderForm({ o, s, prods }: { o: AdminOrder; s: Seller; prods: Record<st
                 <td>{img ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={img} alt="" className="of-img" /> : null}</td>
                 <td>
                   <b>{i.name}</b>
+                  {nick(prods, i.slug) ? <div style={{ color: '#666' }}>{nick(prods, i.slug)}</div> : null}
                   {v ? <div style={{ color: '#666' }}>{v}</div> : null}
                 </td>
                 <td className="r">{i.qty}</td>
