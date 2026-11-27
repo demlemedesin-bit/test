@@ -26,7 +26,7 @@ export async function getSetViews(): Promise<SetView[]> {
         if (!p || p.soon || p.out) return [];
         return p.colors
           .filter((c) => !c.out)
-          .map((c) => ({ slug: p.slug, color: c.key, label: p.colors.length > 1 ? `${p.name} · ${c.name}` : p.name, img: c.thumb || c.img || p.thumb, price: p.priceNum }));
+          .map((c) => ({ slug: p.slug, color: c.key, label: `${p.name}${p.sub ? ` (${p.sub})` : ''}${p.colors.length > 1 ? ` · ${c.name}` : ''}`, img: c.thumb || c.img || p.thumb, price: p.priceNum }));
       }),
     }));
     if (!slots.length || slots.some((s) => !s.opts.length)) continue;
