@@ -6,7 +6,7 @@ import { GUEST_BUCKET, GUEST_MAX_MB, GUEST_MIMES } from '@/lib/guestConst';
 
 type St = { kind: 'idle' | 'busy' | 'ok' | 'err'; text?: string };
 
-export function KonukForm() {
+export function KonukForm({ t }: { t: Record<string, string> }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [who, setWho] = useState('');
@@ -57,7 +57,7 @@ export function KonukForm() {
       });
       const j = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!r.ok || !j.ok) return setSt({ kind: 'err', text: j.error || 'Başvuru gönderilemedi. Tekrar dene.' });
-      setSt({ kind: 'ok', text: 'Hikâyen bize ulaştı. Teşekkürler! İncelemeden sonra e-postayla dönüş yapacağız.' });
+      setSt({ kind: 'ok', text: t.ko_ok });
       setName(''); setEmail(''); setWho(''); setConsent(false); setFile(null);
       if (fileRef.current) fileRef.current.value = '';
     } catch {
@@ -70,30 +70,30 @@ export function KonukForm() {
     <form onSubmit={submit} noValidate>
       <div className="ko-bar">
         <label className="ko-f ko-n">
-          Ad Soyad *
-          <input className="ko-inp" value={name} onChange={(e) => setName(e.target.value)} placeholder="Adın Soyadın" autoComplete="name" maxLength={120} />
+          {t.ko_f_name} *
+          <input className="ko-inp" value={name} onChange={(e) => setName(e.target.value)} placeholder={t.ko_f_name_ph} autoComplete="name" maxLength={120} />
         </label>
         <label className="ko-f ko-e">
-          E-posta Adresin *
-          <input className="ko-inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ornek@email.com" autoComplete="email" maxLength={200} />
+          {t.ko_f_email} *
+          <input className="ko-inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.ko_f_email_ph} autoComplete="email" maxLength={200} />
         </label>
         <label className="ko-f ko-w">
-          Kimin hikayesini dinlemek istersiniz? *
-          <input className="ko-inp" value={who} onChange={(e) => setWho(e.target.value)} placeholder="Örn. bir usta, bir anne, bir yolcu…" maxLength={600} />
+          {t.ko_f_who} *
+          <input className="ko-inp" value={who} onChange={(e) => setWho(e.target.value)} placeholder={t.ko_f_who_ph} maxLength={600} />
         </label>
         <div className="ko-v">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2" /><path d="m15 10 6-3v10l-6-3" /></svg>
-          <b>Başvuru videonu yükle</b>
-          <small>2 – 5 dakika · en fazla {GUEST_MAX_MB} MB</small>
+          <b>{t.ko_v_title}</b>
+          <small>{t.ko_v_sub} · en fazla {GUEST_MAX_MB} MB</small>
           <input ref={fileRef} type="file" accept="video/*" hidden onChange={(e) => pick(e.target.files?.[0] ?? null)} />
           <button type="button" className="ko-file" onClick={() => fileRef.current?.click()} disabled={busy}>
-            {file ? 'Değiştir' : 'Dosya Seç'}
+            {file ? 'Değiştir' : t.ko_v_btn}
           </button>
           {file && <span className="ko-fn">{file.name} · {(file.size / 1048576).toFixed(1)} MB</span>}
         </div>
         <div className="ko-b">
           <button type="submit" className="ko-send" disabled={busy}>
-            {busy ? 'Gönderiliyor…' : 'Hikâyemi gönder →'}
+            {busy ? 'Gönderiliyor…' : t.ko_send}
           </button>
         </div>
       </div>
@@ -101,7 +101,7 @@ export function KonukForm() {
       <label className="ko-consent">
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>
-          <a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>’ni okudum; başvurumun değerlendirilmesi için bilgilerimin ve yüklediğim videonun işlenmesini kabul ediyorum.
+          <a href="/kvkk" target="_blank" rel="noopener">{t.ko_consent_link}</a>{t.ko_consent}
         </span>
       </label>
       {st.text && <div className={`ko-msg ${st.kind === 'ok' ? 'ok' : st.kind === 'err' ? 'err' : ''}`} role="status">{st.text}</div>}

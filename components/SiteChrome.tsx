@@ -15,6 +15,7 @@ export async function SiteHeader() {
       <AnnounceBar a={s.announce} />
       <Header
         guestApply={guestApply}
+        guestLabel={text(s, 'ko_nav')}
         labels={{
           shop: text(s, 'nav_shop'),
           guests: text(s, 'nav_guests'),

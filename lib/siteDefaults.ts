@@ -692,6 +692,137 @@ export const FIELDS: Field[] = [
   "kind": "text",
   "def": "",
   "hint": "Sayısal kod"
+ },
+ {
+  "id": "ko_nav",
+  "group": "Konuk başvuru sayfası",
+  "label": "Menüdeki bağlantı yazısı",
+  "kind": "text",
+  "def": "Konuğum ol",
+  "hint": "Sayfa açıkken menüde görünen yazı."
+ },
+ {
+  "id": "ko_title",
+  "group": "Konuk başvuru sayfası",
+  "label": "Sayfa başlığı",
+  "kind": "text",
+  "def": "Demleme’ye konuk olmak ister misin?"
+ },
+ {
+  "id": "ko_lead",
+  "group": "Konuk başvuru sayfası",
+  "label": "Açıklama",
+  "kind": "long",
+  "def": "Herkesin anlatmaya değer bir hikâyesi var.\nBelki de Demleme’nin bir sonraki konuğu sensin.",
+  "hint": "Yeni satır, görünümde de yeni satır olur."
+ },
+ {
+  "id": "ko_script",
+  "group": "Konuk başvuru sayfası",
+  "label": "El yazısı slogan",
+  "kind": "text",
+  "def": "Çaylar bizden, hikâye senden."
+ },
+ {
+  "id": "ko_image",
+  "group": "Konuk başvuru sayfası",
+  "label": "Sayfa görseli",
+  "kind": "image",
+  "def": "/demleme/konuk-ol/sofra.webp",
+  "hint": "Şeffaf zeminli PNG/WebP en iyi görünür."
+ },
+ {
+  "id": "ko_f_name",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: Ad Soyad etiketi",
+  "kind": "text",
+  "def": "Ad Soyad"
+ },
+ {
+  "id": "ko_f_name_ph",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: Ad Soyad örnek yazısı",
+  "kind": "text",
+  "def": "Adın Soyadın"
+ },
+ {
+  "id": "ko_f_email",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: E-posta etiketi",
+  "kind": "text",
+  "def": "E-posta Adresin"
+ },
+ {
+  "id": "ko_f_email_ph",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: E-posta örnek yazısı",
+  "kind": "text",
+  "def": "ornek@email.com"
+ },
+ {
+  "id": "ko_f_who",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: “Kimin hikâyesi” etiketi",
+  "kind": "text",
+  "def": "Kimin hikayesini dinlemek istersiniz?"
+ },
+ {
+  "id": "ko_f_who_ph",
+  "group": "Konuk başvuru sayfası",
+  "label": "Form: “Kimin hikâyesi” örnek yazısı",
+  "kind": "text",
+  "def": "Örn. bir usta, bir anne, bir yolcu…"
+ },
+ {
+  "id": "ko_v_title",
+  "group": "Konuk başvuru sayfası",
+  "label": "Video kutusu başlığı",
+  "kind": "text",
+  "def": "Başvuru videonu yükle"
+ },
+ {
+  "id": "ko_v_sub",
+  "group": "Konuk başvuru sayfası",
+  "label": "Video kutusu açıklaması",
+  "kind": "text",
+  "def": "2 – 5 dakika",
+  "hint": "Yanına “· en fazla 50 MB” otomatik eklenir."
+ },
+ {
+  "id": "ko_v_btn",
+  "group": "Konuk başvuru sayfası",
+  "label": "Video dosya seç düğmesi",
+  "kind": "text",
+  "def": "Dosya Seç"
+ },
+ {
+  "id": "ko_send",
+  "group": "Konuk başvuru sayfası",
+  "label": "Gönder düğmesi",
+  "kind": "text",
+  "def": "Hikâyemi gönder →"
+ },
+ {
+  "id": "ko_consent_link",
+  "group": "Konuk başvuru sayfası",
+  "label": "Onay: bağlantı yazısı (KVKK sayfasına gider)",
+  "kind": "text",
+  "def": "KVKK Aydınlatma Metni"
+ },
+ {
+  "id": "ko_consent",
+  "group": "Konuk başvuru sayfası",
+  "label": "Onay: devamındaki yazı",
+  "kind": "text",
+  "def": "’ni okudum; başvurumun değerlendirilmesi için bilgilerimin ve yüklediğim videonun işlenmesini kabul ediyorum."
+ },
+ {
+  "id": "ko_ok",
+  "group": "Konuk başvuru sayfası",
+  "label": "Başarı mesajı",
+  "kind": "long",
+  "def": "Hikâyen bize ulaştı. Teşekkürler! İncelemeden sonra e-postayla dönüş yapacağız.",
+  "hint": "Form gönderilince çıkan mesaj."
  }
 ];
 export const DEFAULT_FAQ: Faq[] = [
