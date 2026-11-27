@@ -25,3 +25,15 @@
 
 .st-n3 .st-tile{ width:86px; height:86px; } .st-n4 .st-tile{ width:68px; height:68px; }
 @media (max-width:560px){ .st-n3 .st-tile{ width:76px; height:76px; } .st-n4 .st-tile{ width:62px; height:62px; } }
+
+/* Taşma/ortalama düzeltmesi: kutucuklar kart genişliğine göre küçülür, hep ortada kalır */
+.st-grid{ grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); }
+.st-card{ min-width:0; overflow:hidden; }
+.st-tiles{ width:100%; padding:0 4px; box-sizing:border-box; }
+.st-tilewrap{ flex:1 1 0; min-width:0; max-width:120px; justify-content:center; position:relative; }
+.st-tile,.st-n3 .st-tile,.st-n4 .st-tile{ width:100%; height:auto; aspect-ratio:1; }
+.st-plus{ position:absolute; left:-13px; top:50%; transform:translateY(-50%); margin:0; }
+.st-tilewrap + .st-tilewrap{ margin-left:14px; }
+.st-name{ overflow-wrap:normal; word-break:normal; hyphens:none; font-size:clamp(18px,4.6vw,24px); line-height:1.15; }
+.st-sub,.st-pill{ overflow-wrap:anywhere; }
+@media (max-width:560px){ .st-tile,.st-n3 .st-tile,.st-n4 .st-tile{ width:100%; height:auto; } }
